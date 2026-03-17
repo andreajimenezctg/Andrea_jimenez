@@ -138,19 +138,25 @@ def migrar_datos_produccion(request):
     """
     output = []
     
-    # 1. Cargar Datos
+    # 1. Cargar Datos desde Fixture (datos.json)
     try:
-        # Intentamos cargar datos.json que es el fixture principal
         call_command('loaddata', 'datos.json')
-        output.append("✅ Datos de productos y categorías cargados con éxito.")
+        output.append("✅ Datos de 'datos.json' cargados con éxito.")
     except Exception as e:
         output.append(f"❌ Error al cargar datos.json: {str(e)}")
 
-    # 2. Crear Superusuario si no existe
+    # 2. Ejecutar comando de creación de productos (crear_productos_tienda)
+    try:
+        call_command('crear_productos_tienda')
+        output.append("✅ Comando 'crear_productos_tienda' ejecutado con éxito.")
+    except Exception as e:
+        output.append(f"❌ Error al ejecutar crear_productos_tienda: {str(e)}")
+
+    # 3. Crear Superusuario si no existe
     if not User.objects.filter(username="admin").exists():
         try:
             User.objects.create_superuser("admin", "andreajimenezctg@gmail.com", "admin123456")
-            output.append("✅ Superusuario 'admin' creado (Clave: admin123456). ¡CÁMBIALA PRONTO!")
+            output.append("✅ Superusuario 'admin' creado (Clave: admin123456).")
         except Exception as e:
             output.append(f"❌ Error al crear superusuario: {str(e)}")
     else:
