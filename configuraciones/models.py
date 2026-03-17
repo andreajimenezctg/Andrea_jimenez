@@ -39,53 +39,6 @@ class Categoria(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100, default='Sin nombre')
 
-    def get_image_url(self):
-        """
-        Solución ULTRA-RESILIENTE para Render Free:
-        Prioriza static/img/ para evitar los borrados de la carpeta media.
-        """
-        from django.templatetags.static import static
-        import os
-        from django.conf import settings
-
-        # 1. Obtener el nombre base del archivo guardado en la DB
-        nombre_archivo = ""
-        if self.imagen:
-            # os.path.basename convierte 'productos/vestido.jpeg' en 'vestido.jpeg'
-            nombre_archivo = os.path.basename(self.imagen.name)
-        
-        # 2. Si no hay nombre en la DB, intentamos deducirlo por el nombre del producto
-        if not nombre_archivo:
-            nombre_lower = self.nombre.lower()
-            if "vestido" in nombre_lower: 
-                if "floral" in nombre_lower: nombre_archivo = "vestido_floral.jpg"
-                elif "casual" in nombre_lower: nombre_archivo = "vestido_casual.jpg"
-                else: nombre_archivo = "vestido.jpeg"
-            elif "bolso" in nombre_lower:
-                if "mano" in nombre_lower: nombre_archivo = "bolso_mano.jpg"
-                elif "cruzado" in nombre_lower: nombre_archivo = "bolso_cruzado.jpg"
-                else: nombre_archivo = "bolsos.jpeg"
-            elif "cintur" in nombre_lower: nombre_archivo = "cinturon.jpg"
-            elif "pañoleta" in nombre_lower or "panoleta" in nombre_lower: nombre_archivo = "panoleta.jpg"
-            else: nombre_archivo = "vestido.jpeg"
-
-        # 3. Verificar si el archivo existe en static/img/
-        # Esto es lo que queremos forzar para que NO se borre nunca
-        ruta_estatica = os.path.join(settings.BASE_DIR, "static", "img", nombre_archivo)
-        
-        if os.path.exists(ruta_estatica):
-            return static(f"img/{nombre_archivo}")
-        
-        # 4. Fallback por categorías si el archivo específico no existe
-        if self.categoria:
-            cat = self.categoria.nombre.lower()
-            if "vestido" in cat: return static("img/vestido_floral.jpg")
-            if "bolso" in cat: return static("img/bolso_mano.jpg")
-            if "accesorio" in cat or "cinturon" in cat: return static("img/cinturon.jpg")
-
-        # 5. Fallback final
-        return static("img/vestido_floral.jpg")
-
     def __str__(self):
         return self.nombre
 
@@ -191,6 +144,51 @@ class Prenda(models.Model):
         # 2. Guardado inicial para obtener ID (si es nuevo)
         is_new = self.pk is None
         super().save(*args, **kwargs)
+
+    def get_image_url(self):
+        """
+        Solución ULTRA-RESILIENTE para Render Free:
+        Prioriza static/img/ para evitar los borrados de la carpeta media.
+        """
+        from django.templatetags.static import static
+        import os
+        from django.conf import settings
+
+        # 1. Obtener el nombre base del archivo guardado en la DB
+        nombre_archivo = ""
+        if self.imagen:
+            nombre_archivo = os.path.basename(self.imagen.name)
+        
+        # 2. Si no hay nombre en la DB, intentamos deducirlo por el nombre del producto
+        if not nombre_archivo:
+            nombre_lower = self.nombre.lower()
+            if "vestido" in nombre_lower: 
+                if "floral" in nombre_lower: nombre_archivo = "vestido_floral.jpg"
+                elif "casual" in nombre_lower: nombre_archivo = "vestido_casual.jpg"
+                else: nombre_archivo = "vestido.jpeg"
+            elif "bolso" in nombre_lower:
+                if "mano" in nombre_lower: nombre_archivo = "bolso_mano.jpg"
+                elif "cruzado" in nombre_lower: nombre_archivo = "bolso_cruzado.jpg"
+                else: nombre_archivo = "bolsos.jpeg"
+            elif "cintur" in nombre_lower: nombre_archivo = "cinturon.jpg"
+            elif "pañoleta" in nombre_lower or "panoleta" in nombre_lower: nombre_archivo = "panoleta.jpg"
+            else: nombre_archivo = "vestido.jpeg"
+
+        # 3. Verificar si el archivo existe en static/img/
+        ruta_estatica = os.path.join(settings.BASE_DIR, "static", "img", nombre_archivo)
+        
+        if os.path.exists(ruta_estatica):
+            return static(f"img/{nombre_archivo}")
+        
+        # 4. Fallback por categorías
+        if self.categoria:
+            cat = self.categoria.nombre.lower()
+            if "vestido" in cat: return static("img/vestido_floral.jpg")
+            if "bolso" in cat: return static("img/bolso_mano.jpg")
+            if "accesorio" in cat or "cinturon" in cat: return static("img/cinturon.jpg")
+
+        # 5. Fallback final
+        return static("img/vestido_floral.jpg")
 
     def archive(self):
         """Arquiva sin borrar datos"""
