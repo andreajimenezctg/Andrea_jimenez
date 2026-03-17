@@ -42,48 +42,7 @@
     <div class="loader-logo">Andrea Jiménez</div>
 </div>
 
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="{% url 'home' %}">
-                <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="logo-img">
-            </a>
-        </div>
-
-        <ul class="menu">
-            <li><a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a></li>
-            <li><a href="{% url 'tienda' %}" class="active"><i class="fa-solid fa-store"></i> Tienda</a></li>
-            <li><a href="{% url 'oferta' %}"><i class="fa-solid fa-tags"></i> Oferta</a></li>
-            <li><a href="{% url 'atencion' %}"><i class="fa-solid fa-headset"></i> Atencion al cliente</a></li>
-            <li><a href="{% url 'distribuidores' %}"><i class="fa-solid fa-location-dot"></i> Ubicacion</a></li>
-        </ul>
-
-        <div class="user-actions">
-            {% if user.is_authenticated and es_cliente %}
-                <div class="cart">
-                    <a href="{% url 'carrito' %}" aria-label="Bolsa de compras"><i class="fa-solid fa-bag-shopping"></i></a>
-                </div>
-            {% endif %}
-
-            {% if user.is_authenticated %}
-                <div class="dropdown">
-                    <button class="dropdown-btn">
-                        <i class="fa-regular fa-user"></i> 
-                        {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}
-                        <i class="fa-solid fa-chevron-down" style="font-size: 0.5rem; margin-left: 5px;"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        <a href="{% url 'panel_cliente' %}"><i class="fa-regular fa-user"></i> Mi Perfil</a>
-                        <a href="{% url 'carrito' %}"><i class="fa-solid fa-bag-shopping"></i> Carrito</a>
-                        <a href="{% url 'mis_ventas' %}"><i class="fa-solid fa-clock-rotate-left"></i> Mis Compras</a>
-                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;"></div>
-                        <a href="{% url 'logout' %}" style="color: #ff7a9c;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</a>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </nav>
-</header>
+{% include 'includes/navbar.html' %}
 
 <main class="contenedor-ofertas fade-in-section">
     <div class="titulo-ofertas">

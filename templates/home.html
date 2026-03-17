@@ -25,52 +25,7 @@
 
 <div class="overlay-fondo"></div>
 
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="{% url 'home' %}">
-                <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="logo-img">
-            </a>
-        </div>
-
-        <button class="mobile-menu-btn" aria-label="Abrir menú">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-
-        <ul class="menu">
-            <li><a href="{% url 'home' %}" class="active"><i class="fa-solid fa-house"></i> Inicio</a></li>
-            <li><a href="{% url 'tienda' %}"><i class="fa-solid fa-store"></i> Tienda</a></li>
-            <li><a href="{% url 'oferta' %}"><i class="fa-solid fa-tags"></i> Oferta</a></li>
-            <li><a href="{% url 'atencion' %}"><i class="fa-solid fa-headset"></i> Atención al cliente</a></li>
-            <li><a href="{% url 'distribuidores' %}"><i class="fa-solid fa-location-dot"></i> Ubicación</a></li>
-        </ul>
-
-        <div class="user-actions">
-            {% if user.is_authenticated and user.groups.first.name == "Cliente" %}
-                <div class="cart">
-                    <a href="{% url 'carrito' %}" aria-label="Bolsa de compras"><i class="fa-solid fa-bag-shopping"></i></a>
-                </div>
-            {% endif %}
-
-            {% if user.is_authenticated %}
-                <div class="dropdown">
-                    <button class="dropdown-btn">
-                        <i class="fa-regular fa-user"></i> 
-                        {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}
-                        <i class="fa-solid fa-chevron-down" style="font-size: 0.5rem; margin-left: 5px;"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        <a href="{% url 'panel_cliente' %}"><i class="fa-regular fa-user"></i> Mi Perfil</a>
-                        <a href="{% url 'carrito' %}"><i class="fa-solid fa-bag-shopping"></i> Carrito</a>
-                        <a href="{% url 'mis_ventas' %}"><i class="fa-solid fa-clock-rotate-left"></i> Mis Compras</a>
-                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;"></div>
-                        <a href="{% url 'logout' %}" style="color: #ff7a9c;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</a>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </nav>
-</header>
+{% include 'includes/navbar.html' %}
 
 <main>
     <section class="hero fade-in-section">
@@ -165,89 +120,58 @@
 </a>
 
 <script>
-// Carrusel
-(function() {
-    var carrusel = document.querySelector('.carrusel');
-    var prev = document.querySelector('.carrusel-prev');
-    var next = document.querySelector('.carrusel-next');
-    if (!carrusel || !prev || !next) return;
-    var ancho = 230; // Coincide con CSS
-    var gap = 20;
-    var paso = 3; // Ahora salta de 3 en 3
-    prev.addEventListener('click', function() {
-        carrusel.scrollBy({ left: -(ancho + gap) * paso, behavior: 'smooth' });
-    });
-    next.addEventListener('click', function() {
-        carrusel.scrollBy({ left: (ancho + gap) * paso, behavior: 'smooth' });
-    });
-})();
-
-// Page loader y menú móvil
-document.addEventListener('DOMContentLoaded', () => {
-    const menuBtn = document.querySelector('.mobile-menu-btn');
-    const menu = document.querySelector('.menu');
-    const loader = document.querySelector('.page-loader');
-
-    // Toggle menu móvil
-    if (menuBtn && menu) {
-        menuBtn.addEventListener('click', () => {
-            menu.classList.toggle('active');
-            const icon = menuBtn.querySelector('i');
-            if (menu.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-xmark');
-            } else {
-                icon.classList.remove('fa-xmark');
-                icon.classList.add('fa-bars');
-            }
-        });
-    }
-
-    // Ocultar loader
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            if (loader) {
-                loader.style.opacity = '0';
-                setTimeout(() => { loader.style.display = 'none'; }, 600);
-            }
-        }, 800);
-    });
-
-    // Cerrar menú al hacer click fuera
-    document.addEventListener('click', (e) => {
-        if (menu && menu.classList.contains('active') && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
-            menu.classList.remove('active');
-            const icon = menuBtn.querySelector('i');
-            if (icon) {
-                icon.classList.remove('fa-xmark');
-                icon.classList.add('fa-bars');
-            }
-        }
-    });
-});
-
-// Navbar shrink on scroll
-window.addEventListener('scroll', function() {
-    var header = document.querySelector('header');
-    if (window.scrollY > 60) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-});
-
-// Fade-in sections on scroll
-var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.15 });
-
-document.querySelectorAll('.fade-in-section').forEach(function(el) {
-    observer.observe(el);
-});
-</script>
-</body>
+ // Carrusel
+ (function() {
+     var carrusel = document.querySelector('.carrusel');
+     var prev = document.querySelector('.carrusel-prev');
+     var next = document.querySelector('.carrusel-next');
+     if (!carrusel || !prev || !next) return;
+     var ancho = 230; 
+     var gap = 20;
+     var paso = 3; 
+     prev.addEventListener('click', function() {
+         carrusel.scrollBy({ left: -(ancho + gap) * paso, behavior: 'smooth' });
+     });
+     next.addEventListener('click', function() {
+         carrusel.scrollBy({ left: (ancho + gap) * paso, behavior: 'smooth' });
+     });
+ })();
+ 
+ // Page loader
+ window.addEventListener('load', () => {
+     const loader = document.querySelector('.page-loader');
+     setTimeout(() => {
+         if (loader) {
+             loader.style.opacity = '0';
+             setTimeout(() => { loader.style.display = 'none'; }, 600);
+         }
+     }, 800);
+ });
+ 
+ // Navbar shrink on scroll
+ window.addEventListener('scroll', function() {
+     var header = document.querySelector('header');
+     if (header) {
+         if (window.scrollY > 60) {
+             header.classList.add('scrolled');
+         } else {
+             header.classList.remove('scrolled');
+         }
+     }
+ });
+ 
+ // Fade-in sections on scroll
+ var observer = new IntersectionObserver(function(entries) {
+     entries.forEach(function(entry) {
+         if (entry.isIntersecting) {
+             entry.target.classList.add('visible');
+         }
+     });
+ }, { threshold: 0.15 });
+ 
+ document.querySelectorAll('.fade-in-section').forEach(function(el) {
+     observer.observe(el);
+ });
+ </script>
+ </body>
 </html>

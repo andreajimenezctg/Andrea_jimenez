@@ -223,20 +223,7 @@
 </head>
 <body>
 
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="{% url 'home' %}">
-                <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="logo-img">
-            </a>
-        </div>
-        <ul class="menu">
-            <li><a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a></li>
-            <li><a href="{% url 'tienda' %}"><i class="fa-solid fa-store"></i> Tienda</a></li>
-            <li><a href="{% url 'oferta' %}"><i class="fa-solid fa-tags"></i> Oferta</a></li>
-        </ul>
-    </nav>
-</header>
+{% include 'includes/navbar.html' %}
 
 <main class="product-detail-container">
     <div class="product-images">
