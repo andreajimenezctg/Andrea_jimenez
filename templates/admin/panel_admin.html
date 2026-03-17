@@ -257,13 +257,7 @@
                     {% for producto in productos_bajo_stock %}
                     <a href="{% url 'editar_producto' producto.id %}" class="low-stock-item">
                         <div class="product-thumb">
-                            {% if producto.imagen %}
-                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
-                            {% else %}
-                            <div class="product-thumb-placeholder">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            {% endif %}
+                            <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}">
                         </div>
                         <div class="product-details">
                             <span class="product-name">{{ producto.nombre }}</span>

@@ -136,7 +136,7 @@
                         <p class="form-label">Imagen Actual:</p>
                         <div class="image-preview-wrapper" style="margin-bottom: var(--spacing-lg);">
                             <div class="image-preview">
-                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                                <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}">
                             </div>
                         </div>
                     </div>

@@ -128,13 +128,7 @@
                             <td>
                                 <div class="product-cell">
                                     <div class="product-image-wrapper">
-                                        {% if producto.imagen %}
-                                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image">
-                                        {% else %}
-                                        <div class="product-image-placeholder">
-                                            <i class="fas fa-image"></i>
-                                        </div>
-                                        {% endif %}
+                                        <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}" class="product-image">
                                     </div>
                                     <div class="product-info">
                                         <span class="product-name">{{ producto.nombre }}</span>
@@ -224,13 +218,7 @@
                 {% for producto in productos %}
                 <div class="product-card" data-id="{{ producto.id }}">
                     <div class="product-card-image">
-                        {% if producto.imagen %}
-                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
-                        {% else %}
-                        <div class="product-image-placeholder">
-                            <i class="fas fa-image"></i>
-                        </div>
-                        {% endif %}
+                        <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}">
                         {% if producto.es_oferta %}
                         <span class="product-badge">Oferta</span>
                         {% endif %}

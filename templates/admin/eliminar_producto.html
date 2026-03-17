@@ -20,11 +20,9 @@
         <h1 class="delete-title">Eliminar Producto</h1>
         
         <div class="delete-product-info">
-            {% if producto.imagen %}
             <div class="delete-product-image">
-                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}">
             </div>
-            {% endif %}
             <div class="delete-product-details">
                 <h3>{{ producto.nombre }}</h3>
                 <p>Categoria: {{ producto.categoria.nombre|default:"Sin categoria" }}</p>

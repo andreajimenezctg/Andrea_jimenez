@@ -13,11 +13,11 @@
         </button>
 
         <ul class="menu">
-            <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="fa-solid fa-house"></i> Inicio</a></li>
-            <li><a href="{% url 'tienda' %}" class="{% if request.resolver_match.url_name == 'tienda' %}active{% endif %}"><i class="fa-solid fa-store"></i> Tienda</a></li>
-            <li><a href="{% url 'oferta' %}" class="{% if request.resolver_match.url_name == 'oferta' %}active{% endif %}"><i class="fa-solid fa-tags"></i> Oferta</a></li>
-            <li><a href="{% url 'atencion' %}" class="{% if request.resolver_match.url_name == 'atencion' %}active{% endif %}"><i class="fa-solid fa-headset"></i> Atención al cliente</a></li>
-            <li><a href="{% url 'distribuidores' %}" class="{% if request.resolver_match.url_name == 'distribuidores' %}active{% endif %}"><i class="fa-solid fa-location-dot"></i> Ubicación</a></li>
+            <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Inicio</a></li>
+            <li><a href="{% url 'tienda' %}" class="{% if request.resolver_match.url_name == 'tienda' %}active{% endif %}">Tienda</a></li>
+            <li><a href="{% url 'oferta' %}" class="{% if request.resolver_match.url_name == 'oferta' %}active{% endif %}">Oferta</a></li>
+            <li><a href="{% url 'atencion' %}" class="{% if request.resolver_match.url_name == 'atencion' %}active{% endif %}">Atención al cliente</a></li>
+            <li><a href="{% url 'distribuidores' %}" class="{% if request.resolver_match.url_name == 'distribuidores' %}active{% endif %}">Ubicación</a></li>
         </ul>
 
         <div class="user-actions">
