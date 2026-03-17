@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, re_path
+from django.views.generic.base import RedirectView
 from django.views.static import serve
 from configuraciones import views
 from django.conf import settings
@@ -12,6 +13,7 @@ urlpatterns = [
     # ----------------------------
     path("", views.home, name="home"),
     path("home/", views.home, name="home_redirect"),
+    path("favicon.ico", RedirectView.as_view(url=settings.STATIC_URL + "img/favicon-round.png")),
 
     # ----------------------------
     # ADMIN DE DJANGO

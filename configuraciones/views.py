@@ -533,7 +533,7 @@ def confirmar_compra(request):
                     'total': total,
                     'metodo_pago': pago.metodo,
                     'site_url': settings.SITE_URL,
-                    'current_year': datetime.datetime.now().year,
+                    'current_year': timezone.now().year,
                 }
                 
                 # Renderizar el correo usando la plantilla
@@ -657,7 +657,7 @@ def paypal_capture(request):
                         'total': total,
                         'metodo_pago': "PayPal",
                         'site_url': settings.SITE_URL,
-                        'current_year': datetime.datetime.now().year,
+                        'current_year': timezone.now().year,
                     }
                     html_content = render_to_string('email/email_factura.html', context)
                     email = EmailMessage(
@@ -739,7 +739,7 @@ def panel_admin(request):
     total_clientes = Cliente.objects.count()
 
     # 2. Estadísticas Mensuales (Mes actual)
-    hoy = datetime.datetime.now()
+    hoy = timezone.now()
     inicio_mes = hoy.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     
     productos_mes = Prenda.objects.filter(created_at__gte=inicio_mes, is_archived=False).count()

@@ -113,7 +113,7 @@ STORAGES = {
 }
 
 WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+WHITENOISE_USE_FINDERS = True
 
 # Media files (para imágenes de productos)
 MEDIA_URL = "/media/"
