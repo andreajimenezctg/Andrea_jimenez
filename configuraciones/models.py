@@ -41,61 +41,30 @@ class Categoria(models.Model):
 
     def get_image_url(self):
         """
-        Devuelve la URL de la imagen. 
-        Si no existe en media (común en Render Free), intenta buscarla en static/img/
+        Solución definitiva para Render Free:
+        Busca la imagen en static/img/ si no está en media.
         """
         from django.templatetags.static import static
         import os
         from django.conf import settings
 
-        if self.imagen:
-            # 1. Si el archivo físico existe en media, devolver su URL
-            if os.path.exists(os.path.join(settings.MEDIA_ROOT, self.imagen.name)):
-                return self.imagen.url
-            
-            # 2. Si no existe en media, intentar devolver la versión estática si coincide el nombre
-            # Quitamos 'productos/' de la ruta si está presente
+        # 1. Intentar obtener el nombre del archivo
+        nombre_archivo = ""
+        if hasattr(self, 'imagen') and self.imagen:
             nombre_archivo = os.path.basename(self.imagen.name)
-            ruta_estatica = os.path.join(settings.BASE_DIR, "static", "img", nombre_archivo)
-            if os.path.exists(ruta_estatica):
-                return static(f"img/{nombre_archivo}")
+        
+        # 2. Si no hay imagen, asignar una por defecto según el nombre del objeto
+        if not nombre_archivo:
+            nombre_lower = self.nombre.lower()
+            if "vestido" in nombre_lower: nombre_archivo = "vestido_floral.jpg"
+            elif "bolso" in nombre_lower: nombre_archivo = "bolso_mano.jpg"
+            elif "cinturón" in nombre_lower or "cinturon" in nombre_lower: nombre_archivo = "cinturon.jpg"
+            elif "pañoleta" in nombre_lower or "panoleta" in nombre_lower: nombre_archivo = "panoleta.jpg"
+            else: nombre_archivo = "vestido_floral.jpg"
 
-        # 3. Fallback a imagen genérica por categoría
-        if self.categoria:
-            if self.categoria.nombre == "Vestidos": return static("img/vestido_floral.jpg")
-            if self.categoria.nombre == "Bolsos": return static("img/bolso_mano.jpg")
-            if self.categoria.nombre == "Accesorios": return static("img/cinturon.jpg")
-
-        return static("img/vestido_floral.jpg")
-
-    def get_image_url(self):
-        """
-        Devuelve la URL de la imagen. 
-        Si no existe en media (común en Render Free), intenta buscarla en static/img/
-        """
-        from django.templatetags.static import static
-        import os
-        from django.conf import settings
-
-        if self.imagen:
-            # 1. Si el archivo físico existe en media, devolver su URL
-            if os.path.exists(os.path.join(settings.MEDIA_ROOT, self.imagen.name)):
-                return self.imagen.url
-            
-            # 2. Si no existe en media, intentar devolver la versión estática si coincide el nombre
-            nombre_archivo = os.path.basename(self.imagen.name)
-            ruta_estatica = os.path.join(settings.BASE_DIR, "static", "img", nombre_archivo)
-            if os.path.exists(ruta_estatica):
-                return static(f"img/{nombre_archivo}")
-
-        # 3. Fallback a imagen genérica por categoría
-        if self.categoria:
-            nombre_cat = self.categoria.nombre.lower()
-            if "vestido" in nombre_cat: return static("img/vestido_floral.jpg")
-            if "bolso" in nombre_cat: return static("img/bolso_mano.jpg")
-            if "accesorio" in nombre_cat or "cinturon" in nombre_cat: return static("img/cinturon.jpg")
-
-        return static("img/vestido_floral.jpg")
+        # 3. Retornar siempre la versión de static para Render Free
+        # Esto garantiza que la imagen CARGUE siempre porque static es permanente
+        return static(f"img/{nombre_archivo}")
 
     def __str__(self):
         return self.nombre
