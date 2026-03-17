@@ -22,69 +22,67 @@
 
 <div class="overlay-fondo"></div>
 
-<main>
-    <section class="hero fade-in-section">
-        <div class="frase">
-            <p>
-                "<span class="cursiva">Looks</span><br>
-                <span class="resaltado">que se adaptan</span><br>
-                a tu <span class="cursiva">Ritmo</span>"
-            </p>
+<section class="hero fade-in-section">
+    <div class="frase">
+        <p>
+            "<span class="cursiva">Looks</span><br>
+            <span class="resaltado">que se adaptan</span><br>
+            a tu <span class="cursiva">Ritmo</span>"
+        </p>
 
-            <div class="carrusel-container">
-                <h3 class="carrusel-titulo">Selección Destacada</h3>
-                <div class="carrusel-wrapper">
-                    <button type="button" class="carrusel-btn carrusel-prev" aria-label="Anterior">&#8249;</button>
-                    <div class="carrusel">
-                        {% for producto in productos_carrusel %}
-                        <div class="carrusel-item">
-                            <a href="{% url 'tienda' %}" class="carrusel-card">
-                                {% if producto.imagen %}
-                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="carrusel-img">
-                                {% else %}
-                                <div class="carrusel-img-placeholder">Sin imagen</div>
-                                {% endif %}
-                                <div class="carrusel-info">
-                                    <span class="carrusel-nombre">{{ producto.nombre }}</span>
-                                    <span class="carrusel-precio">COP ${{ producto.precio }}</span>
-                                </div>
-                            </a>
-                            {% if user.is_authenticated and es_cliente %}
-                            <a href="{% url 'agregar_al_carrito' producto.id %}" class="carrusel-btn-add"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</a>
+        <div class="carrusel-container">
+            <h3 class="carrusel-titulo">Selección Destacada</h3>
+            <div class="carrusel-wrapper">
+                <button type="button" class="carrusel-btn carrusel-prev" aria-label="Anterior">&#8249;</button>
+                <div class="carrusel">
+                    {% for producto in productos_carrusel %}
+                    <div class="carrusel-item">
+                        <a href="{% url 'tienda' %}" class="carrusel-card">
+                            {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="carrusel-img">
+                            {% else %}
+                            <div class="carrusel-img-placeholder">Sin imagen</div>
                             {% endif %}
-                        </div>
-                        {% empty %}
-                        <p class="carrusel-vacio">Próximamente productos destacados. <a href="{% url 'tienda' %}">Explorar tienda</a></p>
-                        {% endfor %}
+                            <div class="carrusel-info">
+                                <span class="carrusel-nombre">{{ producto.nombre }}</span>
+                                <span class="carrusel-precio">COP ${{ producto.precio }}</span>
+                            </div>
+                        </a>
+                        {% if user.is_authenticated and es_cliente %}
+                        <a href="{% url 'agregar_al_carrito' producto.id %}" class="carrusel-btn-add"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</a>
+                        {% endif %}
                     </div>
-                    <button type="button" class="carrusel-btn carrusel-next" aria-label="Siguiente">&#8250;</button>
+                    {% empty %}
+                    <p class="carrusel-vacio">Próximamente productos destacados. <a href="{% url 'tienda' %}">Explorar tienda</a></p>
+                    {% endfor %}
                 </div>
+                <button type="button" class="carrusel-btn carrusel-next" aria-label="Siguiente">&#8250;</button>
             </div>
-
-            {% if not user.is_authenticated %}
-            <div class="btn-group">
-                <a href="{% url 'login' %}" class="btn"><i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión</a>
-                <a href="{% url 'registro' %}" class="btn btn-secundario"><i class="fa-solid fa-user-plus"></i> Registrarse</a>
-            </div>
-            {% endif %}
         </div>
-    </section>
 
-    <section class="nosotros fade-in-section">
-        <h2>Nuestra Esencia</h2>
-        <p>En Andrea Jiménez creemos que la moda es una forma de ser tu misma. Creamos piezas que combinan comodidad, elegancia y versatilidad para acompañar cada momento de tu vida.</p>
-    </section>
-
-    <section class="ofrecemos fade-in-section">
-        <h2>La Colección</h2>
-        <p class="subtitulo">Piezas esenciales para tu guardarropa</p>
-        <div class="galeria">
-            <div class="item"><img src="{% static 'img/vestido.jpeg' %}" alt="Vestidos exclusivos"></div>
-            <div class="item"><img src="{% static 'img/accesorios.jpeg' %}" alt="Accesorios de lujo"></div>
-            <div class="item"><img src="{% static 'img/bolsos.jpeg' %}" alt="Bolsos de diseño"></div>
+        {% if not user.is_authenticated %}
+        <div class="btn-group">
+            <a href="{% url 'login' %}" class="btn"><i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión</a>
+            <a href="{% url 'registro' %}" class="btn btn-secundario"><i class="fa-solid fa-user-plus"></i> Registrarse</a>
         </div>
-    </section>
-</main>
+        {% endif %}
+    </div>
+</section>
+
+<section class="nosotros fade-in-section">
+    <h2>Nuestra Esencia</h2>
+    <p>En Andrea Jiménez creemos que la moda es una forma de ser tu misma. Creamos piezas que combinan comodidad, elegancia y versatilidad para acompañar cada momento de tu vida.</p>
+</section>
+
+<section class="ofrecemos fade-in-section">
+    <h2>La Colección</h2>
+    <p class="subtitulo">Piezas esenciales para tu guardarropa</p>
+    <div class="galeria">
+        <div class="item"><img src="{% static 'img/vestido.jpeg' %}" alt="Vestidos exclusivos"></div>
+        <div class="item"><img src="{% static 'img/accesorios.jpeg' %}" alt="Accesorios de lujo"></div>
+        <div class="item"><img src="{% static 'img/bolsos.jpeg' %}" alt="Bolsos de diseño"></div>
+    </div>
+</section>
 {% endblock %}
 
 {% block extra_js %}
