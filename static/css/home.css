@@ -930,13 +930,56 @@ header.scrolled .logo-img {
     }
 }
 
+/* Botón menú móvil */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--blanco);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 1001;
+    transition: var(--transicion);
+}
+
 /* Tablets (768px) */
 @media screen and (max-width: 768px) {
-    header {
-        padding: 0 20px;
+    .mobile-menu-btn {
+        display: block;
     }
+
     .menu {
-        display: none; /* Podríamos implementar un menú hamburguesa, pero por ahora simplificamos */
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        height: 100vh;
+        background: rgba(26, 26, 26, 0.98);
+        backdrop-filter: blur(15px);
+        padding: 100px 40px;
+        gap: 2rem;
+        transition: right 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        z-index: 1000;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    }
+
+    .menu.active {
+        right: 0;
+    }
+
+    .menu li a {
+        font-size: 1.2rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .navbar {
+        padding: 0 20px;
+        height: 80px;
     }
     .hero .frase p {
         font-size: 2.2rem;
@@ -997,11 +1040,35 @@ header.scrolled .logo-img {
         font-size: 2rem;
         margin-top: 0;
     }
-    .hero .frase p .cursiva {
-        font-size: 1.1em;
+    .hero {
+        padding: 100px 20px 60px;
+        min-height: auto;
+    }
+    .hero .frase {
+        max-width: 100%;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .hero .frase p {
+        font-size: 1.2rem;
+        line-height: 1.4;
+        margin-bottom: 2rem;
     }
     .hero .frase p .resaltado {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
+        display: block;
+        margin-top: 10px;
+    }
+    .hero-btn-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        width: 100%;
+    }
+    .hero-btn {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
     }
     .carrusel-container {
         margin-top: 30px;

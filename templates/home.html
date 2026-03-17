@@ -33,6 +33,10 @@
             </a>
         </div>
 
+        <button class="mobile-menu-btn" aria-label="Abrir menú">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
         <ul class="menu">
             <li><a href="{% url 'home' %}" class="active"><i class="fa-solid fa-house"></i> Inicio</a></li>
             <li><a href="{% url 'tienda' %}"><i class="fa-solid fa-store"></i> Tienda</a></li>
@@ -182,15 +186,48 @@
     });
 })();
 
-// Page loader
-window.addEventListener('load', function() {
-    var loader = document.querySelector('.page-loader');
-    if (loader) {
-        setTimeout(function() {
-            loader.style.opacity = '0';
-            setTimeout(function() { loader.style.display = 'none'; }, 600);
-        }, 800);
+// Page loader y menú móvil
+document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const menu = document.querySelector('.menu');
+    const loader = document.querySelector('.page-loader');
+
+    // Toggle menu móvil
+    if (menuBtn && menu) {
+        menuBtn.addEventListener('click', () => {
+            menu.classList.toggle('active');
+            const icon = menuBtn.querySelector('i');
+            if (menu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
     }
+
+    // Ocultar loader
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 600);
+            }
+        }, 800);
+    });
+
+    // Cerrar menú al hacer click fuera
+    document.addEventListener('click', (e) => {
+        if (menu && menu.classList.contains('active') && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
+            menu.classList.remove('active');
+            const icon = menuBtn.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        }
+    });
 });
 
 // Navbar shrink on scroll
