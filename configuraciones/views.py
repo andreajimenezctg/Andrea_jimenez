@@ -152,38 +152,54 @@ def migrar_datos_produccion(request):
     # 2. Forzar asignación de imágenes desde static/img a los productos creados
     try:
         import shutil
-        # Mapeo de categorías a imágenes en static/img/
-        mapeo_imagenes = {
-            "Vestidos": "vestido.jpeg",
-            "Bolsos": "bolsos.jpeg",
-            "Accesorios": "accesorios.jpeg",
+        # Mapeo de productos específicos a nuevas imágenes descargadas
+        mapeo_productos = {
+            "Vestido floral verano": "vestido_floral.jpg",
+            "Vestido noche elegante": "vestido_noche.jpg",
+            "Vestido casual": "vestido_casual.jpg",
+            "Bolso mano": "bolso_mano.jpg",
+            "Bolso cruzado": "bolso_cruzado.jpg",
+            "Cinturón clásico": "cinturon.jpg",
+            "Pañoleta": "panoleta.jpg",
         }
         
-        # Aseguramos que el directorio de destino existe dentro de MEDIA_ROOT
+        # Mapeo de categorías (respaldo)
+        mapeo_categorias = {
+            "Vestidos": "vestido_floral.jpg",
+            "Bolsos": "bolso_mano.jpg",
+            "Accesorios": "cinturon.jpg",
+        }
+        
         media_productos = Path(settings.MEDIA_ROOT) / "productos"
         media_productos.mkdir(parents=True, exist_ok=True)
         
-        output.append(f"📁 Directorio media: {settings.MEDIA_ROOT}")
-        
-        for nombre_cat, nombre_img_static in mapeo_imagenes.items():
-            productos = Prenda.objects.filter(categoria__nombre=nombre_cat)
-            ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img_static
+        # 1. Asignar por nombre de producto
+        for nombre_prod, nombre_img in mapeo_productos.items():
+            productos = Prenda.objects.filter(nombre=nombre_prod)
+            ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
             
             if ruta_img_static.exists():
-                # Nombre que guardaremos en la DB: 'productos/nombre.jpeg'
-                nombre_db = f"productos/{nombre_img_static}"
-                ruta_destino_media = Path(settings.MEDIA_ROOT) / "productos" / nombre_img_static
-                
-                # Copia física del archivo de static a media
+                nombre_db = f"productos/{nombre_img}"
+                ruta_destino_media = Path(settings.MEDIA_ROOT) / nombre_db
                 shutil.copy2(ruta_img_static, ruta_destino_media)
-                output.append(f"📸 Copiada imagen {nombre_img_static} a media/productos/")
                 
                 for p in productos:
                     p.imagen = nombre_db
                     p.save()
-                output.append(f"✅ Productos de {nombre_cat} actualizados en DB con ruta: {nombre_db}")
-            else:
-                output.append(f"⚠️ No se encontró {nombre_img_static} en static/img/.")
+                output.append(f"✅ Imagen asignada a {nombre_prod}.")
+
+        # 2. Asignar por categoría a los que falten
+        for nombre_cat, nombre_img in mapeo_categorias.items():
+            productos = Prenda.objects.filter(categoria__nombre=nombre_cat, imagen='')
+            ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
+            
+            if ruta_img_static.exists():
+                nombre_db = f"productos/{nombre_img}"
+                ruta_destino_media = Path(settings.MEDIA_ROOT) / nombre_db
+                shutil.copy2(ruta_img_static, ruta_destino_media)
+                for p in productos:
+                    p.imagen = nombre_db
+                    p.save()
                 
     except Exception as e:
         output.append(f"❌ Error al asignar imágenes: {str(e)}")
