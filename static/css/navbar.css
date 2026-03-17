@@ -3,7 +3,7 @@
    ========================================= */
 
 header {
-    background-color: var(--negro, #1a1a1a);
+    background-color: #1a1a1a;
     width: 100%;
     z-index: 1000;
     position: fixed;
@@ -71,21 +71,128 @@ header.scrolled .logo-img {
 }
 
 .menu li a:hover, .menu li a.active {
-    color: var(--rosado, #e8b4b8);
+    color: #e8b4b8;
 }
 
 /* User Actions */
 .user-actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
+}
+
+/* Dropdown de Usuario */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-btn {
+    color: rgba(250, 240, 225, 0.75);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    transition: all 0.4s ease;
+    white-space: nowrap;
+}
+
+.dropdown-btn i:first-child {
+    font-size: 1.1rem;
+    color: #e8b4b8;
+}
+
+.dropdown:hover .dropdown-btn {
+    color: #e8b4b8;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #1a1a1a;
+    min-width: 220px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    border: 1px solid rgba(232, 180, 184, 0.2);
+    border-top: 2px solid #e8b4b8;
+    padding: 12px 0;
+    backdrop-filter: blur(10px);
+}
+
+.dropdown-content a {
+    color: rgba(250, 240, 225, 0.7) !important;
+    padding: 12px 25px !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    background: none !important;
+    border: none !important;
+}
+
+.dropdown-content a i {
+    font-size: 0.9rem;
+    width: 20px;
+    color: #e8b4b8;
+    opacity: 0.7;
+}
+
+.dropdown-content a:hover {
+    background-color: rgba(232, 180, 184, 0.1) !important;
+    color: #faf0e1 !important;
+    padding-left: 30px !important;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    animation: fadeInDown 0.3s ease forwards;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Carrito */
+.cart {
+    position: relative;
+}
+
+.cart a {
+    color: rgba(250, 240, 225, 0.75);
+    font-size: 1.1rem;
+    transition: all 0.4s ease;
+}
+
+.cart a:hover {
+    color: #e8b4b8;
 }
 
 .mobile-menu-btn {
     display: none;
     background: none;
     border: none;
-    color: var(--blanco, #faf0e1);
+    color: #faf0e1;
     font-size: 1.5rem;
     cursor: pointer;
     z-index: 1001;
@@ -98,7 +205,6 @@ header.scrolled .logo-img {
         height: 70px;
     }
 
-    /* Ocultamos el menu normal por defecto */
     .menu {
         display: none !important; 
         flex-direction: column !important;
@@ -107,7 +213,7 @@ header.scrolled .logo-img {
         right: -100% !important;
         width: 100% !important;
         height: 100vh !important;
-        background: #1a1a1a !important; /* Fondo solido para evitar transparencias raras */
+        background: #1a1a1a !important;
         padding: 100px 0 !important;
         gap: 2rem !important;
         transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
@@ -117,7 +223,6 @@ header.scrolled .logo-img {
         justify-content: flex-start !important;
     }
 
-    /* Cuando el menu esta activo */
     .menu.active {
         display: flex !important;
         right: 0 !important;
