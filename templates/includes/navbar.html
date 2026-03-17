@@ -11,32 +11,25 @@
             <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
             <li><a href="{% url 'tienda' %}" class="{% if 'tienda' in request.path %}active{% endif %}">Tienda</a></li>
             <li><a href="{% url 'oferta' %}" class="{% if 'oferta' in request.path %}active{% endif %}">Oferta</a></li>
-            <li><a href="{% url 'atencion' %}" class="{% if 'atencion' in request.path %}active{% endif %}">Atención al cliente</a></li>
-            <li><a href="{% url 'distribuidores' %}" class="{% if 'distribuidores' in request.path %}active{% endif %}">Ubicación Andrea Jiménez</a></li>
+            <li><a href="{% url 'atencion' %}" class="{% if 'atencion' in request.path %}active{% endif %}">Atención</a></li>
+            <li><a href="{% url 'distribuidores' %}" class="{% if 'distribuidores' in request.path %}active{% endif %}">Ubicación</a></li>
         </ul>
 
         <div class="user-actions">
-            {% if user.is_authenticated and user.groups.first.name == "Cliente" %}
-                <div class="cart">
-                    <a href="{% url 'carrito' %}" aria-label="Bolsa de compras"><i class="fa-solid fa-bag-shopping"></i></a>
-                </div>
-            {% endif %}
-
             {% if user.is_authenticated %}
-                <div class="dropdown">
-                    <button class="dropdown-btn">
-                        <i class="fa-regular fa-user"></i> 
-                        {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}
-                        <i class="fa-solid fa-chevron-down" style="font-size: 0.5rem; margin-left: 5px;"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        <a href="{% url 'panel_cliente' %}"><i class="fa-regular fa-user"></i> Mi Perfil</a>
-                        <a href="{% url 'carrito' %}"><i class="fa-solid fa-bag-shopping"></i> Carrito</a>
-                        <a href="{% url 'mis_ventas' %}"><i class="fa-solid fa-clock-rotate-left"></i> Mis Compras</a>
-                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;"></div>
-                        <a href="{% url 'logout' %}" style="color: #ff7a9c;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</a>
-                    </div>
+                <span class="user-name">{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</span>
+                
+                {% if user.groups.first.name == "Cliente" %}
+                <div class="cart">
+                    <a href="{% url 'carrito' %}" aria-label="Bolsa de compras">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </a>
                 </div>
+                {% endif %}
+
+                <a href="{% url 'logout' %}" class="btn-logout">Salir</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-logout">Entrar</a>
             {% endif %}
         </div>
     </nav>
