@@ -151,6 +151,8 @@ def migrar_datos_produccion(request):
 
     # 2. Forzar asignación de imágenes desde static/img a los productos creados
     try:
+    # 2. Forzar asignación de imágenes desde static/img a los productos creados
+    try:
         # Mapeo de categorías a imágenes en static/img/
         mapeo_imagenes = {
             "Vestidos": "vestido.jpeg",
@@ -158,39 +160,31 @@ def migrar_datos_produccion(request):
             "Accesorios": "accesorios.jpeg",
         }
         
-        # Productos específicos por nombre
-        mapeo_productos = {
-            "Vestido floral verano": "vestido.jpeg",
-            "Vestido noche elegante": "vestido.jpeg",
-            "Vestido casual": "vestido.jpeg",
-            "Bolso mano": "bolsos.jpeg",
-            "Bolso cruzado": "bolsos.jpeg",
-            "Cinturón clásico": "accesorios.jpeg",
-            "Pañoleta": "accesorios.jpeg",
-        }
-        
+        # Aseguramos que el directorio de destino existe
         media_productos = Path(settings.MEDIA_ROOT) / "productos"
         media_productos.mkdir(parents=True, exist_ok=True)
         
-        # 1. Asignar por nombre de producto
-        for nombre_prod, nombre_img in mapeo_productos.items():
-            productos = Prenda.objects.filter(nombre=nombre_prod)
-            ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
-            if ruta_img_static.exists():
-                for p in productos:
-                    with open(ruta_img_static, "rb") as f:
-                        p.imagen.save(f"{nombre_img}", File(f), save=True)
-        
-        # 2. Asignar por categoría (respaldo)
-        for nombre_cat, nombre_img in mapeo_imagenes.items():
-            productos = Prenda.objects.filter(categoria__nombre=nombre_cat, imagen='')
-            ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
+        for nombre_cat, nombre_img_static in mapeo_imagenes.items():
+            productos = Prenda.objects.filter(categoria__nombre=nombre_cat)
+            ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img_static
             
             if ruta_img_static.exists():
                 for p in productos:
-                    with open(ruta_img_static, "rb") as f:
-                        p.imagen.save(f"{nombre_img}", File(f), save=True)
-                output.append(f"✅ Imágenes sincronizadas.")
+                    # Usamos el nombre original sin sufijos aleatorios de Django
+                    nombre_destino = f"productos/{nombre_img_static}"
+                    ruta_destino = Path(settings.MEDIA_ROOT) / nombre_destino
+                    
+                    # Copiamos físicamente el archivo si no existe en media
+                    if not ruta_destino.exists():
+                        import shutil
+                        shutil.copy2(ruta_img_static, ruta_destino)
+                    
+                    # Actualizamos la base de datos para que apunte exactamente a ese nombre
+                    p.imagen = nombre_destino
+                    p.save()
+                output.append(f"✅ Imágenes sincronizadas para {nombre_cat}.")
+            else:
+                output.append(f"⚠️ No se encontró {nombre_img_static} en static/img/.")
                 
     except Exception as e:
         output.append(f"❌ Error al asignar imágenes: {str(e)}")
