@@ -1005,45 +1005,52 @@ header.scrolled .logo-img {
     }
     .carrusel-container {
         margin-top: 30px;
+        padding: 0 10px;
     }
     .carrusel-item {
-        min-width: 280px; /* Un poco más ancho para que no se vea mocho */
-        flex: 0 0 280px;
+        min-width: 260px;
+        flex: 0 0 260px;
         scroll-snap-align: center;
     }
     .carrusel-card {
         width: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(5px);
     }
     .carrusel-img {
-        height: 320px; /* Imagen un poco más alta en móvil */
+        height: 300px;
+        object-fit: cover;
+    }
+    .carrusel-info {
+        padding: 15px;
+        text-align: center;
     }
     .carrusel-nombre {
-        font-size: 0.85rem;
-        white-space: normal; /* Permitir que el nombre use dos líneas si es necesario */
-        line-height: 1.4;
+        font-size: 0.9rem;
+        display: block;
+        margin-bottom: 5px;
+    }
+    .carrusel-precio {
+        font-size: 0.8rem;
+        color: var(--rosado);
+    }
+    .carrusel-btn-add {
+        width: 100%;
+        border-radius: 0 0 15px 15px;
+        padding: 12px;
     }
     .carrusel {
         gap: 15px;
-        padding: 0 10px;
+        padding: 10px 5px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     .carrusel-wrapper {
-        gap: 8px;
         position: relative;
     }
     .carrusel-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 10;
-        width: 40px;
-        height: 40px;
-        background: rgba(232, 180, 184, 0.9); /* Color rosado sólido para visibilidad */
-        color: var(--negro);
-        border: none;
-        border-radius: 50%;
+        display: none; /* En móvil es mejor usar scroll táctil */
     }
-    .carrusel-prev { left: -10px; }
-    .carrusel-next { right: -10px; }
     .nosotros,
     .ofrecemos {
         padding: 60px 20px;
