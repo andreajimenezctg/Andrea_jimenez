@@ -163,43 +163,27 @@ def migrar_datos_produccion(request):
             "Pañoleta": "panoleta.jpg",
         }
         
-        # Mapeo de categorías (respaldo)
-        mapeo_categorias = {
-            "Vestidos": "vestido_floral.jpg",
-            "Bolsos": "bolso_mano.jpg",
-            "Accesorios": "cinturon.jpg",
-        }
-        
         media_productos = Path(settings.MEDIA_ROOT) / "productos"
         media_productos.mkdir(parents=True, exist_ok=True)
         
-        # 1. Asignar por nombre de producto
+        # 1. Asignar por nombre de producto (FORZADO)
         for nombre_prod, nombre_img in mapeo_productos.items():
-            productos = Prenda.objects.filter(nombre=nombre_prod)
+            productos = Prenda.objects.filter(nombre__icontains=nombre_prod)
             ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
             
             if ruta_img_static.exists():
                 nombre_db = f"productos/{nombre_img}"
                 ruta_destino_media = Path(settings.MEDIA_ROOT) / nombre_db
+                
+                # FORZAMOS LA COPIA SOBREESCRIBIENDO
                 shutil.copy2(ruta_img_static, ruta_destino_media)
                 
                 for p in productos:
                     p.imagen = nombre_db
                     p.save()
-                output.append(f"✅ Imagen asignada a {nombre_prod}.")
-
-        # 2. Asignar por categoría a los que falten
-        for nombre_cat, nombre_img in mapeo_categorias.items():
-            productos = Prenda.objects.filter(categoria__nombre=nombre_cat, imagen='')
-            ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
-            
-            if ruta_img_static.exists():
-                nombre_db = f"productos/{nombre_img}"
-                ruta_destino_media = Path(settings.MEDIA_ROOT) / nombre_db
-                shutil.copy2(ruta_img_static, ruta_destino_media)
-                for p in productos:
-                    p.imagen = nombre_db
-                    p.save()
+                output.append(f"✅ Imagen REAL forzada para: {nombre_prod}")
+            else:
+                output.append(f"⚠️ No se encontró {nombre_img} en static/img/.")
                 
     except Exception as e:
         output.append(f"❌ Error al asignar imágenes: {str(e)}")
