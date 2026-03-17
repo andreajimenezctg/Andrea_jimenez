@@ -158,15 +158,19 @@ def migrar_datos_produccion(request):
             "Accesorios": "accesorios.jpeg",
         }
         
+        media_productos = Path(settings.MEDIA_ROOT) / "productos"
+        media_productos.mkdir(parents=True, exist_ok=True)
+        
         for nombre_cat, nombre_img in mapeo_imagenes.items():
             productos = Prenda.objects.filter(categoria__nombre=nombre_cat)
-            ruta_img = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
+            ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
             
-            if ruta_img.exists():
+            if ruta_img_static.exists():
                 for p in productos:
                     # Siempre reasignamos la imagen para asegurar que se suba a la base de datos de Render
-                    with open(ruta_img, "rb") as f:
-                        p.imagen.save(nombre_img, File(f), save=True)
+                    with open(ruta_img_static, "rb") as f:
+                        # Guardamos explícitamente en la subcarpeta 'productos/' de media
+                        p.imagen.save(f"productos/{nombre_img}", File(f), save=True)
                 output.append(f"✅ Imágenes asignadas a la categoría {nombre_cat}.")
             else:
                 output.append(f"⚠️ No se encontró la imagen {nombre_img} en static/img/.")
