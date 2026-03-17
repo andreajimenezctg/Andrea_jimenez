@@ -60,7 +60,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'configuraciones.context_processors.whatsapp_config',
+                'configuraciones.context_processors.global_config',
             ],
         },
     },
