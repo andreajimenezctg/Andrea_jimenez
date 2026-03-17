@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Finalizar Compra - Andrea Jiménez</title>
-    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Compra - Andrea Jiménez</title>
     <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id|default:'sb' }}&currency={{ paypal_currency|default:'USD' }}&intent=capture"></script>
 </head>
@@ -15,42 +16,48 @@
 
     <main class="container">
         <h1>Finalizar Compra</h1>
-        <p>Revisa tu pedido y completa el pago de forma segura con <strong>PayPal</strong>.</p>
+        <p style="text-align: center; color: var(--gris-texto); margin-bottom: 30px;">Revisa tu pedido y completa el pago de forma segura con <strong>PayPal</strong>.</p>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in carrito_items %}
-                <tr>
-                    <td>{{ item.prenda.nombre }}</td>
-                    <td>{{ item.cantidad }}</td>
-                    <td>${{ item.prenda.precio|floatformat:0 }}</td>
-                    <td>${{ item.subtotal|floatformat:0 }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="total-box" style="margin: 20px 0; padding: 20px; background: #f9f9f9; border-radius: 8px; text-align: right;">
-            <p>Subtotal: ${{ total|floatformat:0 }}</p>
-            <p>Envío: $15.000</p>
-            <h2 style="color: #ff7a9c;">Total a Pagar: ${{ total|add:15000|floatformat:0 }}</h2>
+        <div class="shipping-info" style="padding: 0; overflow: hidden;">
+            <table class="carrito-table" style="width: 100%; margin: 0;">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in carrito_items %}
+                    <tr>
+                        <td style="text-align: left; padding-left: 30px;">{{ item.prenda.nombre }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>${{ item.prenda.precio|floatformat:0 }}</td>
+                        <td>${{ item.subtotal|floatformat:0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
-        <div class="checkout-form-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px;">
-            <div class="shipping-section">
-                <h3>Información de Envío</h3>
+        <div class="total-section" style="text-align: right; margin: 30px 0; padding: 20px; background: var(--blanco); border-radius: 15px; border: var(--borde-rosado);">
+            <p style="font-size: 1rem; color: var(--gris-texto);">Subtotal: ${{ total|floatformat:0 }}</p>
+            <p style="font-size: 1rem; color: var(--gris-texto);">Envío: $15.000</p>
+            <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: var(--rosado); margin-top: 10px;">
+                Total a Pagar: ${{ total|add:15000|floatformat:0 }}
+            </h2>
+        </div>
+
+        <div class="checkout-form-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+            <div class="shipping-info">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 20px; color: var(--negro); border-bottom: 1px solid rgba(232, 180, 184, 0.2); padding-bottom: 10px;">
+                    Información de Envío
+                </h3>
                 <form id="shipping-form">
-                    <div class="form-group" style="margin-bottom: 15px;">
+                    <div class="form-group">
                         <label>Departamento</label>
-                        <select name="departamento" id="id_departamento" required class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <select name="departamento" id="id_departamento" required class="form-control">
                             <option value="">Selecciona...</option>
                             <option value="Antioquia">Antioquia</option>
                             <option value="Atlántico">Atlántico</option>
@@ -69,27 +76,33 @@
                             <option value="Valle del Cauca">Valle del Cauca</option>
                         </select>
                     </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
+                    <div class="form-group">
                         <label>Ciudad</label>
-                        <input type="text" name="ciudad" id="id_ciudad" placeholder="Ej: Cartagena" required class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <input type="text" name="ciudad" id="id_ciudad" placeholder="Ej: Cartagena" required class="form-control">
                     </div>
-                    <div class="form-group" style="margin-bottom: 15px;">
+                    <div class="form-group">
                         <label>Dirección Completa</label>
-                        <input type="text" name="direccion" id="id_direccion" placeholder="Calle 123 #45-67..." required class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <input type="text" name="direccion" id="id_direccion" placeholder="Calle 123 #45-67..." required class="form-control">
                     </div>
                 </form>
             </div>
 
-            <div class="payment-section">
-                <h3>Método de Pago</h3>
-                <p id="payment-status-msg" style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">
+            <div class="shipping-info">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 20px; color: var(--negro); border-bottom: 1px solid rgba(232, 180, 184, 0.2); padding-bottom: 10px;">
+                    Método de Pago
+                </h3>
+                <p id="payment-status-msg" style="font-size: 0.9rem; color: var(--gris-texto); margin-bottom: 25px;">
                     El total de <strong>${{ total|add:15000|floatformat:0 }} COP</strong> se pagará en dólares vía PayPal.
                 </p>
                 <div id="paypal-button-container"></div>
             </div>
         </div>
 
-        <p style="margin-top: 40px;"><a href="{% url 'carrito' %}" style="color: #666; text-decoration: none;">← Volver al carrito</a></p>
+        <p style="margin-top: 40px; text-align: center;">
+            <a href="{% url 'carrito' %}" style="color: var(--gris-texto); text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;">
+                ← Volver al carrito
+            </a>
+        </p>
     </main>
 
     <script>

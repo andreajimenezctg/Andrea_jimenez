@@ -81,12 +81,12 @@
 
 .hero .frase p {
     color: var(--blanco);
-    font-size: 1.4rem;
+    font-size: 2.2rem;
     font-family: 'Playfair Display', serif;
     font-weight: 400;
     letter-spacing: 1px;
-    margin-bottom: 2rem;
-    line-height: 1.2;
+    margin-bottom: 2.5rem;
+    line-height: 1.1;
     opacity: 0;
     transform: translateY(30px);
     animation: fadeInUp 1s 0.5s forwards;
@@ -94,13 +94,18 @@
 
 .hero .frase p .resaltado {
     display: block;
-    font-size: 2.8rem;
+    font-size: 5rem;
     font-weight: 700;
     color: var(--rosado);
     text-transform: uppercase;
-    letter-spacing: 4px;
-    margin-top: 10px;
+    letter-spacing: 10px;
+    margin: 15px 0;
     text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hero .frase p .cursiva {
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
 }
 
 .hero-btn-container {
@@ -163,14 +168,15 @@
 }
 
 .carrusel-titulo {
-    color: var(--rosado);
+    color: var(--blanco);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 4px;
     text-transform: uppercase;
     margin-bottom: 30px;
     text-align: center;
+    opacity: 0.8;
 }
 
 .section-title {
