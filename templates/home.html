@@ -89,11 +89,7 @@
                         {% for producto in productos_carrusel %}
                         <div class="carrusel-item">
                             <a href="{% url 'detalle_producto' producto.slug %}" class="carrusel-card">
-                                {% if producto.imagen %}
-                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="carrusel-img">
-                                {% else %}
-                                <div class="carrusel-img-placeholder">Sin imagen</div>
-                                {% endif %}
+                                <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}" class="carrusel-img">
                                 <div class="carrusel-info">
                                     <span class="carrusel-nombre">{{ producto.nombre }}</span>
                                     <span class="carrusel-precio">COP ${{ producto.precio }}</span>

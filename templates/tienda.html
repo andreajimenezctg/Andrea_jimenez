@@ -131,13 +131,9 @@
                 <div class="swiper-slide">
                     <div class="card-oferta">
                         <div class="card-imagen-container">
-                            {% if producto.imagen %}
-                                <a href="{% url 'detalle_producto' producto.slug %}">
-                                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="card-imagen">
-                                </a>
-                            {% else %}
-                                <div class="sin-imagen"><i class="fa-regular fa-image"></i> Imagen no disponible</div>
-                            {% endif %}
+                            <a href="{% url 'detalle_producto' producto.slug %}">
+                                <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}" class="card-imagen">
+                            </a>
                             <span class="etiqueta-oferta"><i class="fa-solid fa-gem"></i> Coleccion</span>
                         </div>
 

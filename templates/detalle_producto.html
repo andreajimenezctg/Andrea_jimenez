@@ -241,17 +241,11 @@
 <main class="product-detail-container">
     <div class="product-images">
         <div class="thumbnails">
-            {% if producto.imagen %}
-            <img src="{{ producto.imagen.url }}" class="thumb active" alt="{{ producto.nombre }}" onclick="changeImage(this.src)">
-            {% endif %}
+            <img src="{{ producto.get_image_url }}" class="thumb active" alt="{{ producto.nombre }}" onclick="changeImage(this.src)">
             <!-- Aquí podrían ir más imágenes si el modelo las tuviera -->
         </div>
         <div class="main-image-container">
-            {% if producto.imagen %}
-            <img src="{{ producto.imagen.url }}" class="main-image" id="mainImage" alt="{{ producto.nombre }}">
-            {% else %}
-            <div class="sin-imagen"><i class="fa-regular fa-image" style="font-size: 5rem; color: #ddd;"></i></div>
-            {% endif %}
+            <img src="{{ producto.get_image_url }}" class="main-image" id="mainImage" alt="{{ producto.nombre }}">
         </div>
     </div>
 

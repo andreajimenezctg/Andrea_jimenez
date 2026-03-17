@@ -61,11 +61,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if item.prenda.imagen %}
-                        <img src="{{ item.prenda.imagen.url }}" class="producto-img" alt="{{ item.prenda.nombre }}">
-                        {% else %}
-                        <div class="producto-img placeholder-img">Sin imagen</div>
-                        {% endif %}
+                        <img src="{{ item.prenda.get_image_url }}" class="producto-img" alt="{{ item.prenda.nombre }}">
                     </td>
                     <td>${{ item.prenda.precio }}</td>
                     <td>
