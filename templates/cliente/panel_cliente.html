@@ -7,27 +7,12 @@
 
 <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
 
-<link rel="stylesheet" href="{% static 'css/panel_cliente.css' %}">
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
-
-<header>
-<nav>
-
-<a href="{% url 'home' %}">Inicio</a>
-
-<a href="{% url 'perfil_cliente' %}">Mi Perfil</a>
-
-<a href="{% url 'carrito' %}">Carrito</a>
-
-<a href="{% url 'mis_ventas' %}">Mis Compras</a>
-
-<a href="{% url 'logout' %}">Cerrar Sesión</a>
-
-</nav>
-</header>
+    {% include 'includes/navbar.html' %}
 
 
 <div class="container">
