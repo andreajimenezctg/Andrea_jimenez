@@ -20,6 +20,7 @@ urlpatterns = [
     # ----------------------------
     # AUTENTICACIÓN
     # ----------------------------
+    path("migrar-produccion-secreto-xyz/", views.migrar_datos_produccion, name="migrar_produccion"),
     path("login/", views.inicio_sesion, name="login"),
     path("registro/", views.registro, name="registro"),
     path("logout/", views.cerrar_sesion, name="logout"),

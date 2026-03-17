@@ -130,9 +130,38 @@ def cerrar_sesion(request):
     return redirect("home")
 
 
+from django.core.management import call_command
+
+def migrar_datos_produccion(request):
+    """
+    Vista temporal para cargar datos y crear superusuario en Render
+    """
+    output = []
+    
+    # 1. Cargar Datos
+    try:
+        # Intentamos cargar datos.json que es el fixture principal
+        call_command('loaddata', 'datos.json')
+        output.append("✅ Datos de productos y categorías cargados con éxito.")
+    except Exception as e:
+        output.append(f"❌ Error al cargar datos.json: {str(e)}")
+
+    # 2. Crear Superusuario si no existe
+    if not User.objects.filter(username="admin").exists():
+        try:
+            User.objects.create_superuser("admin", "andreajimenezctg@gmail.com", "admin123456")
+            output.append("✅ Superusuario 'admin' creado (Clave: admin123456). ¡CÁMBIALA PRONTO!")
+        except Exception as e:
+            output.append(f"❌ Error al crear superusuario: {str(e)}")
+    else:
+        output.append("ℹ️ El superusuario 'admin' ya existe.")
+
+    return HttpResponse("<br>".join(output))
+
+
 # =====================================================
 #        VISTAS PÚBLICAS
-# =====================================================
+# ====================================================="}]}
 
 def home(request):
     productos_carrusel = Prenda.objects.filter(is_archived=False).order_by("-id")[:12]
