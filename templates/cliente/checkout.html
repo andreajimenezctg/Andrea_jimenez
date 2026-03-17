@@ -7,7 +7,10 @@
     <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
     <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
     <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency={{ paypal_currency }}&intent=capture"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id|default:'sb' }}&currency={{ paypal_currency|default:'USD' }}&intent=capture"></script>
+    <script>
+        console.log("PayPal Client ID:", "{{ paypal_client_id }}");
+    </script>
 </head>
 <body>
     <header>
