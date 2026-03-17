@@ -1,18 +1,4 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
-<style>
-    /* Asegurar que los links del dropdown no hereden estilos globales azules */
-    .dropdown-content a {
-        color: rgba(250, 240, 225, 0.7) !important;
-        text-decoration: none !important;
-        display: flex !important;
-        background: none !important;
-    }
-    .dropdown-content a:hover {
-        color: #faf0e1 !important;
-        background-color: rgba(232, 180, 184, 0.1) !important;
-    }
-</style>
 <header>
     <nav class="navbar">
         <div class="logo">
@@ -21,20 +7,16 @@
             </a>
         </div>
 
-        <button class="mobile-menu-btn" aria-label="Abrir menú">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-
         <ul class="menu">
-            <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Inicio</a></li>
-            <li><a href="{% url 'tienda' %}" class="{% if request.resolver_match.url_name == 'tienda' %}active{% endif %}">Tienda</a></li>
-            <li><a href="{% url 'oferta' %}" class="{% if request.resolver_match.url_name == 'oferta' %}active{% endif %}">Oferta</a></li>
-            <li><a href="{% url 'atencion' %}" class="{% if request.resolver_match.url_name == 'atencion' %}active{% endif %}">Atención al cliente</a></li>
-            <li><a href="{% url 'distribuidores' %}" class="{% if request.resolver_match.url_name == 'distribuidores' %}active{% endif %}">Ubicación Andrea Jiménez</a></li>
+            <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
+            <li><a href="{% url 'tienda' %}" class="{% if 'tienda' in request.path %}active{% endif %}">Tienda</a></li>
+            <li><a href="{% url 'oferta' %}" class="{% if 'oferta' in request.path %}active{% endif %}">Oferta</a></li>
+            <li><a href="{% url 'atencion' %}" class="{% if 'atencion' in request.path %}active{% endif %}">Atención al cliente</a></li>
+            <li><a href="{% url 'distribuidores' %}" class="{% if 'distribuidores' in request.path %}active{% endif %}">Ubicación Andrea Jiménez</a></li>
         </ul>
 
         <div class="user-actions">
-            {% if user.is_authenticated and es_cliente %}
+            {% if user.is_authenticated and user.groups.first.name == "Cliente" %}
                 <div class="cart">
                     <a href="{% url 'carrito' %}" aria-label="Bolsa de compras"><i class="fa-solid fa-bag-shopping"></i></a>
                 </div>
@@ -55,40 +37,7 @@
                         <a href="{% url 'logout' %}" style="color: #ff7a9c;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</a>
                     </div>
                 </div>
-            {% else %}
-                <a href="{% url 'login' %}" class="dropdown-btn"><i class="fa-regular fa-user"></i> Iniciar Sesión</a>
             {% endif %}
         </div>
     </nav>
 </header>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const menuBtn = document.querySelector('.mobile-menu-btn');
-        const menu = document.querySelector('.menu');
-
-        if (menuBtn && menu) {
-            menuBtn.addEventListener('click', () => {
-                menu.classList.toggle('active');
-                const icon = menuBtn.querySelector('i');
-                if (menu.classList.contains('active')) {
-                    icon.classList.remove('fa-bars');
-                    icon.classList.add('fa-xmark');
-                } else {
-                    icon.classList.remove('fa-xmark');
-                    icon.classList.add('fa-bars');
-                }
-            });
-
-            // Cerrar menú al hacer click fuera
-            document.addEventListener('click', (e) => {
-                if (menu.classList.contains('active') && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
-                    menu.classList.remove('active');
-                    const icon = menuBtn.querySelector('i');
-                    icon.classList.remove('fa-xmark');
-                    icon.classList.add('fa-bars');
-                }
-            });
-        }
-    });
-</script>

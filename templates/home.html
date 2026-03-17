@@ -1,17 +1,14 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Andrea Jiménez | Inicio</title>
-    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+{% block title %}Andrea Jiménez | Inicio{% endblock %}
+
+{% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="preload" href="{% static 'img/video/fondo.mp4' %}" as="video">
-</head>
-<body>
+{% endblock %}
 
+{% block content %}
 <div class="page-loader">
     <div class="loader-logo">
         <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez Logo">
@@ -24,49 +21,6 @@
 </video>
 
 <div class="overlay-fondo"></div>
-
-<header>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="{% url 'home' %}">
-                <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="logo-img">
-            </a>
-        </div>
-
-        <ul class="menu">
-            <li><a href="{% url 'home' %}" class="active">Inicio</a></li>
-            <li><a href="{% url 'tienda' %}">Tienda</a></li>
-            <li><a href="{% url 'oferta' %}">Oferta</a></li>
-            <li><a href="{% url 'atencion' %}">Atención al cliente</a></li>
-            <li><a href="{% url 'distribuidores' %}">Ubicación Andrea Jiménez</a></li>
-        </ul>
-
-        <div class="user-actions">
-            {% if user.is_authenticated and user.groups.first.name == "Cliente" %}
-                <div class="cart">
-                    <a href="{% url 'carrito' %}" aria-label="Bolsa de compras"><i class="fa-solid fa-bag-shopping"></i></a>
-                </div>
-            {% endif %}
-
-            {% if user.is_authenticated %}
-                <div class="dropdown">
-                    <button class="dropdown-btn">
-                        <i class="fa-regular fa-user"></i> 
-                        {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}
-                        <i class="fa-solid fa-chevron-down" style="font-size: 0.5rem; margin-left: 5px;"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        <a href="{% url 'panel_cliente' %}"><i class="fa-regular fa-user"></i> Mi Perfil</a>
-                        <a href="{% url 'carrito' %}"><i class="fa-solid fa-bag-shopping"></i> Carrito</a>
-                        <a href="{% url 'mis_ventas' %}"><i class="fa-solid fa-clock-rotate-left"></i> Mis Compras</a>
-                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;"></div>
-                        <a href="{% url 'logout' %}" style="color: #ff7a9c;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</a>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </nav>
-</header>
 
 <main>
     <section class="hero fade-in-section">
@@ -131,39 +85,9 @@
         </div>
     </section>
 </main>
+{% endblock %}
 
-<footer class="footer">
-    <div class="footer-container">
-        <div class="footer-col">
-            <h3>Conecta</h3>
-            <div class="social-icons">
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-            </div>
-        </div>
-        <div class="footer-col">
-            <h3>Newsletter</h3>
-            <form action="#">
-                <input type="email" placeholder="Tu email" required>
-                <button type="submit"><i class="fa-solid fa-paper-plane"></i> Suscribirse</button>
-            </form>
-        </div>
-        <div class="footer-col">
-            <h3>Contacto</h3>
-            <p><i class="fa-solid fa-phone"></i> +{{ whatsapp_number }}</p>
-            <p><i class="fa-solid fa-envelope"></i> andreajimenezctg@gmail.com</p>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <p>&copy; 2025 Andrea Jiménez &mdash; Todos los derechos reservados</p>
-    </div>
-</footer>
-
-<a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" target="_blank" class="whatsapp-btn" aria-label="Contactar por WhatsApp">
-    <i class="fab fa-whatsapp"></i>
-</a>
-
+{% block extra_js %}
 <script>
 // Carrusel
 (function() {
@@ -216,5 +140,4 @@ document.querySelectorAll('.fade-in-section').forEach(function(el) {
     observer.observe(el);
 });
 </script>
-</body>
-</html>
+{% endblock %}
