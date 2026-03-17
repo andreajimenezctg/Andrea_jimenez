@@ -164,9 +164,9 @@ def migrar_datos_produccion(request):
             
             if ruta_img.exists():
                 for p in productos:
-                    if not p.imagen:
-                        with open(ruta_img, "rb") as f:
-                            p.imagen.save(nombre_img, File(f), save=True)
+                    # Siempre reasignamos la imagen para asegurar que se suba a la base de datos de Render
+                    with open(ruta_img, "rb") as f:
+                        p.imagen.save(nombre_img, File(f), save=True)
                 output.append(f"✅ Imágenes asignadas a la categoría {nombre_cat}.")
             else:
                 output.append(f"⚠️ No se encontró la imagen {nombre_img} en static/img/.")
