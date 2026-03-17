@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Panel Cliente - Andrea Jiménez</title>
+
+<link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+
+<link rel="stylesheet" href="{% static 'css/panel_cliente.css' %}">
+
+</head>
+
+<body>
+
+<header>
+<nav>
+
+<a href="{% url 'home' %}">Inicio</a>
+
+<a href="{% url 'perfil_cliente' %}">Mi Perfil</a>
+
+<a href="{% url 'carrito' %}">Carrito</a>
+
+<a href="{% url 'mis_ventas' %}">Mis Compras</a>
+
+<a href="{% url 'logout' %}">Cerrar Sesión</a>
+
+</nav>
+</header>
+
+
+<div class="container">
+
+<h1>Bienvenido {{ user.first_name }}</h1>
+
+<p class="panel-subtitle">
+Desde aquí puedes gestionar tu perfil, revisar tu carrito y ver tus compras.
+</p>
+
+
+<div class="panel-grid">
+
+<a href="{% url 'perfil_cliente' %}" class="panel-card">
+
+<h3>Mi Perfil</h3>
+
+<p>Ver y editar tu información personal.</p>
+
+</a>
+
+
+<a href="{% url 'carrito' %}" class="panel-card">
+
+<h3>Carrito</h3>
+
+<p>Revisa los productos que quieres comprar.</p>
+
+</a>
+
+
+<a href="{% url 'mis_ventas' %}" class="panel-card">
+
+<h3>Mis Compras</h3>
+
+<p>Consulta tu historial de pedidos.</p>
+
+</a>
+
+
+<a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" class="panel-card whatsapp-card" target="_blank">
+<h3>Contacto WhatsApp</h3>
+<p>Habla directamente con nosotros para soporte.</p>
+</a>
+
+</div>
+
+</div>
+
+<style>
+.whatsapp-card {
+    border-left: 5px solid #25d366 !important;
+}
+.whatsapp-card:hover {
+    background-color: #e8f5e9 !important;
+}
+</style>
+
+</body>
+</html>

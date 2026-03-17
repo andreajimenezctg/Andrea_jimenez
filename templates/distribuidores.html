@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ubicación - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/distribuidores.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Andrea Jimenez" class="logo-img">
+            </a>
+        </div>
+
+        <ul class="menu">
+            <li><a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li><a href="{% url 'tienda' %}"><i class="fa-solid fa-store"></i> Tienda</a></li>
+            <li><a href="{% url 'oferta' %}"><i class="fa-solid fa-tags"></i> Oferta</a></li>
+            <li><a href="{% url 'atencion' %}"><i class="fa-solid fa-headset"></i> Atencion al cliente</a></li>
+            <li><a href="{% url 'distribuidores' %}" class="active"><i class="fa-solid fa-location-dot"></i> Ubicacion</a></li>
+        </ul>
+
+        <div class="user-actions">
+            {% if user.is_authenticated and user.groups.first.name == "Cliente" %}
+                <div class="cart">
+                    <a href="{% url 'carrito' %}" aria-label="Bolsa de compras"><i class="fa-solid fa-bag-shopping"></i></a>
+                </div>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'panel_cliente' %}" class="user-name">
+                    <i class="fa-regular fa-user"></i> 
+                    {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}
+                </a>
+                <a href="{% url 'logout' %}" class="btn-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesion</a>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div class="container">
+    <h1>UBICACIÓN ANDREA JIMÉNEZ</h1>
+    <p class="subtitle">Encuentra nuestra sede en Cartagena, barrio Villa Estrella</p>
+
+    <div class="store">
+        <h3>Cartagena - Barrio Villa Estrella</h3>
+        <p>Cartagena de Indias, Barrio Villa Estrella</p>
+        <p>Bolívar, Colombia</p>
+        <p>Tel: +{{ whatsapp_number }}</p>
+    </div>
+
+    <div class="mapa-tiendas">
+        <h2>Mapa de ubicación</h2>
+        <p>Ubicación en Cartagena, barrio Villa Estrella:</p>
+        <div class="mapa-wrapper">
+            <iframe
+                src="https://www.google.com/maps?q=Cartagena%20Barrio%20Villa%20Estrella%20Colombia&output=embed"
+                width="100%"
+                height="400"
+                style="border:0;"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Productos destacados -->
+    <section class="productos-ubicacion">
+        <h2>Algunos de nuestros favoritos</h2>
+        <div class="productos-grid-ubicacion">
+            <div class="producto-item">
+                <img src="{% static 'img/vestido.jpeg' %}" alt="Vestido">
+                <p>Vestido midi floral</p>
+                <span class="precio-cop">COP 89.900</span>
+            </div>
+            <div class="producto-item">
+                <img src="{% static 'img/accesorios.jpeg' %}" alt="Accesorios">
+                <p>Set de accesorios</p>
+                <span class="precio-cop">COP 39.900</span>
+            </div>
+            <div class="producto-item">
+                <img src="{% static 'img/bolsos.jpeg' %}" alt="Bolsos">
+                <p>Bolso tote clásico</p>
+                <span class="precio-cop">COP 119.900</span>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- SECCIÓN DE REDES Y NEWSLETTER -->
+<div class="social-section">
+    <p>SIGUE CONECTADO</p>
+    <div class="social-icons">
+        <a href="#" class="social-icon">f</a>
+        <a href="#" class="social-icon">🐦</a>
+        <a href="#" class="social-icon">P</a>
+        <a href="#" class="social-icon">📷</a>
+    </div>
+
+    <p>ESCRÍBENOS</p>
+    <div class="newsletter">
+        <input type="email" placeholder="Ingresa tu email aquí*" />
+        <button type="button" class="btn">Enviar</button>
+    </div>
+
+    <footer>
+        <p>+{{ whatsapp_number }}</p>
+        <p>andreajimenezctg@gmail.com</p>
+        <p>© 2025 Andrea Jiménez</p>
+    </footer>
+</div>
+
+<a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" target="_blank" class="whatsapp-btn" aria-label="Contactar por WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<style>
+.whatsapp-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #25d366;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+}
+.whatsapp-btn:hover {
+    transform: scale(1.1);
+    color: white;
+}
+</style>
+
+</body>
+</html>

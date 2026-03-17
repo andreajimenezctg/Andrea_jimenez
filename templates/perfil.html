@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Andrea Jiménez</title>
+    <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="{% url 'home' %}">Andrea Jiménez</a>
+            </div>
+            <ul class="menu">
+                <li><a href="{% url 'home' %}">Inicio</a></li>
+                <li><a href="{% url 'logout' %}">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="perfil-container">
+        <h1>Mi Perfil</h1>
+
+        <div class="perfil-card">
+            <p><strong>Usuario:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Nombre:</strong> {{ user.first_name }}</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Andrea Jiménez</p>
+    </footer>
+
+</body>
+
+</html>

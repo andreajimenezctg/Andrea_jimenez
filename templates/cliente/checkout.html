@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Finalizar Compra - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency={{ paypal_currency }}&intent=capture"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-logo">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez">
+                </a>
+            </div>
+            <div class="nav-menu">
+                <a href="{% url 'home' %}">Inicio</a>
+                <div class="dropdown">
+                    <button class="dropdown-btn">
+                        Mi Cuenta <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{% url 'perfil_cliente' %}"><i class="fa-regular fa-user"></i> Mi Perfil</a>
+                        <a href="{% url 'carrito' %}"><i class="fa-solid fa-bag-shopping"></i> Carrito</a>
+                        <a href="{% url 'mis_ventas' %}"><i class="fa-solid fa-clock-rotate-left"></i> Mis Compras</a>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                        <a href="{% url 'logout' %}" style="color: #ff7a9c;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Finalizar Compra</h1>
+        <p>Revisa tu pedido y completa el pago de forma segura con <strong>PayPal</strong>.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrito_items %}
+                <tr>
+                    <td>{{ item.prenda.nombre }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td>${{ item.prenda.precio|floatformat:0 }}</td>
+                    <td>${{ item.subtotal|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total-box" style="margin: 20px 0; padding: 20px; background: #f9f9f9; border-radius: 8px; text-align: right;">
+            <p>Subtotal: ${{ total|floatformat:0 }}</p>
+            <p>Envío: $15.000</p>
+            <h2 style="color: #ff7a9c;">Total a Pagar: ${{ total|add:15000|floatformat:0 }}</h2>
+        </div>
+
+        <div class="checkout-form-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px;">
+            <div class="shipping-section">
+                <h3>Información de Envío</h3>
+                <form id="shipping-form">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Departamento</label>
+                        <select name="departamento" id="id_departamento" required class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Selecciona...</option>
+                            <option value="Antioquia">Antioquia</option>
+                            <option value="Atlántico">Atlántico</option>
+                            <option value="Bogotá D.C.">Bogotá D.C.</option>
+                            <option value="Bolívar">Bolívar</option>
+                            <option value="Caldas">Caldas</option>
+                            <option value="Cauca">Cauca</option>
+                            <option value="Cundinamarca">Cundinamarca</option>
+                            <option value="Huila">Huila</option>
+                            <option value="Meta">Meta</option>
+                            <option value="Nariño">Nariño</option>
+                            <option value="Quindío">Quindío</option>
+                            <option value="Risaralda">Risaralda</option>
+                            <option value="Santander">Santander</option>
+                            <option value="Tolima">Tolima</option>
+                            <option value="Valle del Cauca">Valle del Cauca</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Ciudad</label>
+                        <input type="text" name="ciudad" id="id_ciudad" placeholder="Ej: Cartagena" required class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Dirección Completa</label>
+                        <input type="text" name="direccion" id="id_direccion" placeholder="Calle 123 #45-67..." required class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                </form>
+            </div>
+
+            <div class="payment-section">
+                <h3>Método de Pago</h3>
+                <p id="payment-status-msg" style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">
+                    El total de <strong>${{ total|add:15000|floatformat:0 }} COP</strong> se pagará en dólares vía PayPal.
+                </p>
+                <div id="paypal-button-container"></div>
+            </div>
+        </div>
+
+        <p style="margin-top: 40px;"><a href="{% url 'carrito' %}" style="color: #666; text-decoration: none;">← Volver al carrito</a></p>
+    </main>
+
+    <script>
+        // Total convertido a USD para PayPal (Aproximación simple para demo)
+        const totalCOP = parseInt("{{ total }}") + 15000;
+        const tasaCambio = 4000; // 1 USD = 4000 COP aprox
+        const totalUSD = (totalCOP / tasaCambio).toFixed(2);
+
+        paypal.Buttons({
+            style: {
+                layout: 'vertical',
+                color:  'gold',
+                shape:  'rect',
+                label:  'paypal'
+            },
+            createOrder: function(data, actions) {
+                // Verificar si el formulario es válido antes de crear la orden
+                const form = document.getElementById('shipping-form');
+                if (!form.checkValidity()) {
+                    alert("Por favor completa todos los datos de envío antes de pagar.");
+                    return actions.reject();
+                }
+
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: totalUSD,
+                            currency_code: 'USD'
+                        },
+                        description: "Compra en Andrea Jiménez"
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(orderData) {
+                    const shippingData = {
+                        departamento: document.getElementById('id_departamento').value,
+                        ciudad: document.getElementById('id_ciudad').value,
+                        direccion: document.getElementById('id_direccion').value
+                    };
+
+                    // Enviar datos al servidor para procesar la orden
+                    fetch("{% url 'paypal_capture' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            orderID: data.orderID,
+                            shippingData: shippingData
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(orderDataServer => {
+                        if (orderDataServer.status === "success") {
+                            window.location.href = "{% url 'factura_imprimir' 0 %}".replace('0', orderDataServer.venta_id);
+                        } else {
+                            alert("Error al procesar el pago: " + orderDataServer.message);
+                        }
+                    });
+                });
+            }
+        }).render('#paypal-button-container');
+    </script>
+</body>
+</html>

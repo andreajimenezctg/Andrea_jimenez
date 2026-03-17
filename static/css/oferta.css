@@ -1,0 +1,27 @@
+/* =========================================
+   OFERTAS ESPECIALES — Andrea Jimenez
+   Estilos especificos para ofertas (complementa tienda.css)
+   ========================================= */
+
+/* Sobreescritura del badge para ofertas */
+.contenedor-ofertas .etiqueta-oferta {
+    background: var(--rosado, #E8B4B8);
+    color: var(--negro, #1A1A1A);
+    font-weight: 600;
+}
+
+/* Precio tachado en ofertas */
+.card-precio .precio-tachado {
+    text-decoration: line-through;
+    color: #aaa;
+    font-size: 0.95rem;
+}
+
+.card-precio .descuento-badge {
+    background: var(--rosado, #E8B4B8);
+    color: var(--negro, #1A1A1A);
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}

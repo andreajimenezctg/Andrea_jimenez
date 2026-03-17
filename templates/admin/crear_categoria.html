@@ -1,0 +1,130 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Crear Categoria{% endblock %}
+{% block breadcrumb %}Nueva Categoria{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/gestion_general.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Nueva <span>Categoria</span></h1>
+            <p class="page-subtitle">Crea una nueva categoria para tus productos</p>
+        </div>
+        <a href="{% url 'gestion_categorias' %}" class="btn btn-ghost">
+            <i class="fas fa-arrow-left"></i>
+            Volver al listado
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <h2 class="form-card-title">
+                <i class="fas fa-folder-plus"></i>
+                Informacion de la Categoria
+            </h2>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-card-body">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label class="form-label" for="nombre">
+                            Nombre de la Categoria <span>*</span>
+                        </label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               placeholder="Ej: Vestidos de Noche" required
+                               value="{{ form.nombre.value|default:'' }}">
+                        {% if form.nombre.errors %}
+                        <span class="form-error">{{ form.nombre.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="descripcion">
+                            Descripcion
+                        </label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" 
+                                  placeholder="Describe brevemente esta categoria...">{{ form.descripcion.value|default:'' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Imagen de la Categoria (opcional)</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" class="file-input" id="imagen" name="imagen" 
+                                   accept="image/*" onchange="previewImage(this)">
+                            <div class="file-input-display">
+                                <div class="file-input-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="file-input-text">
+                                    <span>Haz clic para subir</span> o arrastra la imagen aqui
+                                </div>
+                                <small>PNG, JPG o WEBP (Max. 2MB)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="image-preview-wrapper" id="previewWrapper" style="display: none;">
+                            <div class="image-preview">
+                                <img id="imagePreview" src="" alt="Preview">
+                            </div>
+                            <button type="button" class="btn btn-ghost btn-sm" onclick="removeImage()" style="margin-top: var(--spacing-sm);">
+                                <i class="fas fa-times"></i>
+                                Eliminar imagen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card-footer">
+                <a href="{% url 'gestion_categorias' %}" class="btn btn-ghost">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Guardar Categoria
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const wrapper = document.getElementById('previewWrapper');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            wrapper.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeImage() {
+    const input = document.getElementById('imagen');
+    const preview = document.getElementById('imagePreview');
+    const wrapper = document.getElementById('previewWrapper');
+    
+    input.value = '';
+    preview.src = '';
+    wrapper.style.display = 'none';
+}
+</script>
+{% endblock %}

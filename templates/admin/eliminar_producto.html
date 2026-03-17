@@ -1,0 +1,161 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Eliminar Producto{% endblock %}
+{% block breadcrumb %}Eliminar Producto{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/gestion_general.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="delete-confirmation-card">
+        <div class="delete-icon-wrapper">
+            <div class="delete-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+        </div>
+        
+        <h1 class="delete-title">Eliminar Producto</h1>
+        
+        <div class="delete-product-info">
+            {% if producto.imagen %}
+            <div class="delete-product-image">
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            </div>
+            {% endif %}
+            <div class="delete-product-details">
+                <h3>{{ producto.nombre }}</h3>
+                <p>Categoria: {{ producto.categoria.nombre|default:"Sin categoria" }}</p>
+                <p>Precio: COP ${{ producto.precio|floatformat:0 }}</p>
+                <p>Stock: {{ producto.stock }} unidades</p>
+            </div>
+        </div>
+        
+        <p class="delete-warning-message">
+            Estas segura de que deseas eliminar este producto?<br>
+            <strong>Esta accion no se puede deshacer.</strong>
+        </p>
+        
+        <div class="delete-actions">
+            <a href="{% url 'gestion_productos' %}" class="btn btn-ghost btn-lg">
+                <i class="fas fa-arrow-left"></i>
+                Cancelar
+            </a>
+            <form method="POST" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-lg">
+                    <i class="fas fa-trash"></i>
+                    Si, Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.delete-confirmation-card {
+    max-width: 500px;
+    margin: var(--spacing-xl) auto;
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+}
+
+.delete-icon-wrapper {
+    margin-bottom: var(--spacing-lg);
+}
+
+.delete-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--color-error-bg);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 2rem;
+    color: var(--color-error);
+}
+
+.delete-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--color-black);
+    margin-bottom: var(--spacing-xl);
+}
+
+.delete-product-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--color-cream-light);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    text-align: left;
+}
+
+.delete-product-image {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.delete-product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.delete-product-details h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: var(--spacing-sm);
+}
+
+.delete-product-details p {
+    font-size: 0.85rem;
+    color: var(--color-gray);
+    margin-bottom: var(--spacing-xs);
+}
+
+.delete-warning-message {
+    color: var(--color-gray-dark);
+    margin-bottom: var(--spacing-xl);
+    line-height: 1.6;
+}
+
+.delete-warning-message strong {
+    color: var(--color-error);
+}
+
+.delete-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .delete-product-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .delete-actions {
+        flex-direction: column;
+    }
+    
+    .delete-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

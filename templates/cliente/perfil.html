@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Perfil - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/perfil_cliente.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Inicio</a>
+            <a href="{% url 'perfil_cliente' %}">Mi Perfil</a>
+            <a href="{% url 'carrito' %}">Carrito</a>
+            <a href="{% url 'mis_ventas' %}">Mis Compras</a>
+            <a href="{% url 'logout' %}">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Mi Perfil</h1>
+
+        {% if cliente %}
+            <div class="perfil-container">
+                <table class="perfil-table">
+                    <tbody>
+                        <tr>
+                            <th>Nombre</th>
+                            <td>{{ cliente.user.first_name }} {{ cliente.user.last_name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Correo</th>
+                            <td>{{ cliente.user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Teléfono</th>
+                            <td>{{ cliente.telefono }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dirección</th>
+                            <td>{{ cliente.direccion }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <a href="{% url 'editar_perfil' %}">Editar Perfil</a>
+            </div>
+        {% else %}
+            <p class="empty-message">No se encontró información del perfil.</p>
+        {% endif %}
+    </main>
+</body>
+</html>

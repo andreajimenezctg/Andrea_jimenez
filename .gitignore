@@ -1,0 +1,14 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+db.sqlite3
+.env
+debug.log
+staticfiles/
+media/
+gunicorn.ctl
+.DS_Store
+*.swp
+*.bak
+*.tmp

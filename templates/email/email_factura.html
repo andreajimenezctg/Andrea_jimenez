@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura de Compra - Andrea Jiménez</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #fdf9f4;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #ff7a9c;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #ff7a9c;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin: 5px 0 0;
+        }
+
+        .content {
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #000000;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .summary-box {
+            background: #f9f9f9;
+            border-left: 4px solid #ff7a9c;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        /* Responsive Email */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 20px !important;
+                border-radius: 0 !important;
+            }
+            .header h1 {
+                font-size: 20px !important;
+            }
+            .btn {
+                display: block !important;
+                text-align: center !important;
+                padding: 15px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ANDREA JIMÉNEZ</h1>
+            <p>Alta Costura Colombiana</p>
+        </div>
+        <div class="content">
+            <p>Hola <strong>{{ cliente.user.username }}</strong>,</p>
+            <p>¡Gracias por tu compra! Tu pedido ha sido procesado correctamente y adjuntamos tu factura formal en
+                formato PDF a este correo.</p>
+
+            <div class="summary-box">
+                <p><strong>Factura Nº:</strong> Venta-{{ venta.id }}</p>
+                <p><strong>Total:</strong> ${{ total|floatformat:2 }}</p>
+                <p><strong>Método de Pago:</strong> {{ metodo_pago }}</p>
+            </div>
+
+            <p>Puedes ver tus compras y descargar tus facturas en cualquier momento desde tu panel de cliente.</p>
+
+            <center>
+                <a href="{{ site_url }}{% url 'mis_ventas' %}" class="btn">Ver Mis Compras</a>
+            </center>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ current_year }} Andrea Jiménez - Todos los derechos reservados.</p>
+            <p>Cartagena, Bolívar | Colombia</p>
+        </div>
+    </div>
+</body>
+
+</html>

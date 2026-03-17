@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Compras - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Inicio</a>
+            <a href="{% url 'perfil_cliente' %}">Mi Perfil</a>
+            <a href="{% url 'carrito' %}">Carrito</a>
+            <a href="{% url 'mis_ventas' %}">Mis Compras</a>
+            <a href="{% url 'logout' %}">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Mis Compras</h1>
+
+        {% if ventas %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Venta</th>
+                    <th>Fecha</th>
+                    <th>Estado Envío</th>
+                    <th>Guía</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas %}
+                <tr>
+                    <td>#{{ venta.id }}</td>
+                    <td>{{ venta.fecha_venta|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="badge badge-{{ venta.pago.pedido.estado|lower }}">
+                            {{ venta.pago.pedido.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if venta.pago.pedido.guia_rastreo %}
+                            <strong>{{ venta.pago.pedido.transportadora }}:</strong> {{ venta.pago.pedido.guia_rastreo }}
+                        {% else %}
+                            <span class="text-muted">Procesando...</span>
+                        {% endif %}
+                    </td>
+                    <td>${{ venta.total|floatformat:0 }}</td>
+                    <td>
+                        <a href="{% url 'factura_imprimir' venta.id %}" target="_blank" class="btn-sm">Factura</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No tienes compras realizadas aún.</p>
+        {% endif %}
+    </main>
+</body>
+
+</html>

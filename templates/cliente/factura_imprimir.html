@@ -1,0 +1,333 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Factura - Venta #{{ venta.id }}</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <style>
+        :root {
+            --primary: #000000;
+            --accent: #ff7a9c;
+            --bg-soft: #fdf9f4;
+            --border: #dddddd;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: #fff;
+            color: var(--primary);
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-elite {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .brand-info h1 {
+            font-size: 28px;
+            margin: 0;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        .brand-info p {
+            color: var(--accent);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 5px 0 0;
+        }
+
+        .summary-box {
+            background: var(--primary);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .summary-box .label {
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #aaa;
+        }
+
+        .summary-box .value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0;
+            display: block;
+        }
+
+        .summary-box .date {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .info-cell {
+            padding: 15px;
+            border: 0.5px solid var(--border);
+        }
+
+        .info-cell.highlight {
+            background-color: var(--bg-soft);
+        }
+
+        .info-cell label {
+            display: block;
+            font-size: 8px;
+            font-weight: bold;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-cell span {
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            text-transform: uppercase;
+            font-size: 10px;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .total-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .letras {
+            font-size: 12px;
+            max-width: 50%;
+        }
+
+        .letras label {
+            display: block;
+            font-size: 8px;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .totals-table {
+            width: 300px;
+            margin: 0;
+        }
+
+        .totals-table tr td:first-child {
+            font-size: 12px;
+        }
+
+        .totals-table tr td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .totals-table tr.grand-total {
+            background: var(--primary);
+            color: white;
+        }
+
+        .totals-table tr.grand-total td {
+            border-left: 4px solid var(--accent);
+            padding: 15px 12px;
+            font-size: 18px;
+        }
+
+        .no-print {
+            margin-top: 40px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-elite {
+            padding: 12px 25px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .btn-print {
+            background: #eee;
+            color: #333;
+        }
+
+        .btn-download {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-back {
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            background: transparent;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-elite">
+        <div class="brand-info">
+            <h1>ANDREA JIMÉNEZ</h1>
+            <p>Alta Costura Colombiana</p>
+        </div>
+        <div class="summary-box">
+            <span class="label">VENTA N°</span>
+            <span class="value">{{ venta.id|stringformat:"06d" }}</span>
+            <span class="date">{{ venta.fecha_venta|date:"M d, Y"|upper }}</span>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <div class="info-cell highlight">
+            <label>CLIENTE</label>
+            <span>{{ venta.cliente.user.get_full_name|default:venta.cliente.user.username }}</span>
+        </div>
+        <div class="info-cell">
+            <label>MÉTODO DE PAGO</label>
+            <span>{{ venta.pago.metodo|default:"PSE" }}</span>
+        </div>
+        <div class="info-cell">
+            <label>DIRECCIÓN</label>
+            <span>{{ venta.cliente.direccion|default:"CARTAGENA, COLOMBIA" }}</span>
+        </div>
+        <div class="info-cell">
+            <label>ESTADO</label>
+            <span>{{ venta.pago.estado|default:"APROBADO" }}</span>
+        </div>
+        <div class="info-cell">
+            <label>NIT / CC</label>
+            <span>900.123.456-1</span>
+        </div>
+        <div class="info-cell">
+            <label>CONTACTO</label>
+            <span style="font-size: 11px;">{{ venta.cliente.telefono|default:"N/A" }} | {{ venta.cliente.user.email }}</span>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>CÓDIGO</th>
+                <th>PRODUCTO</th>
+                <th>CÓDIGO DE BARRAS</th>
+                <th>CANT.</th>
+                <th>PRECIO</th>
+                <th>TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items_detalle %}
+            <tr>
+                <td>{{ item.codigo_barras }}</td>
+                <td><strong>{{ item.producto|upper }}</strong></td>
+                <td style="text-align: center;">
+                    {% if item.barcode_url %}
+                    <img src="{{ item.barcode_url }}" alt="Barcode" style="height: 35px; width: auto;">
+                    {% else %}
+                    —
+                    {% endif %}
+                </td>
+                <td>{{ item.cantidad }}</td>
+                <td>${{ item.precio_unitario|floatformat:0 }}</td>
+                <td>${{ item.subtotal|floatformat:0 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <div class="letras">
+            <label>VALOR EN LETRAS</label>
+            <p><strong>{{ valor_letras|default:"TREINTA Y OCHO MIL" }} PESOS M/CTE</strong></p>
+            
+            {% if venta.qr_code %}
+            <div style="margin-top: 30px; border: 1px solid #eee; padding: 10px; display: inline-block; background: white;">
+                <label style="display: block; font-size: 8px; font-weight: bold; color: var(--accent); margin-bottom: 5px;">CÓDIGO DE VALIDACIÓN (QR)</label>
+                <img src="{{ venta.qr_code.url }}" alt="QR Code" style="width: 120px; height: 120px;">
+            </div>
+            {% endif %}
+        </div>
+        <div class="totals-container">
+            <table class="totals-table">
+                <tr>
+                    <td>TOTAL BRUTO</td>
+                    <td>${{ total|floatformat:0 }}</td>
+                </tr>
+                <tr>
+                    <td>IVA (0%)</td>
+                    <td>$0</td>
+                </tr>
+                <tr class="grand-total">
+                    <td>TOTAL A PAGAR</td>
+                    <td>${{ total|floatformat:0 }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="no-print">
+        <button onclick="window.print();" class="btn-elite btn-print">Imprimir factura</button>
+        <a href="{% url 'descargar_factura_pdf' venta.id %}" class="btn-elite btn-download">Descargar PDF</a>
+        <a href="{% url 'mis_ventas' %}" class="btn-elite btn-back">Volver a mis compras</a>
+    </div>
+</body>
+
+</html>

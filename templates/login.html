@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+
+<body>
+    <div class="login-wrap">
+        <div class="login-card">
+            <header class="logo">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez">
+                </a>
+            </header>
+
+            <h1>Iniciar Sesión</h1>
+            <p class="subtitle">Bienvenida de nuevo</p>
+
+            {% if messages %}
+            <div class="messages" role="alert">
+                {% for message in messages %}
+                <p class="msg msg-{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="login-form">
+                {% csrf_token %}
+                <div class="input-group">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" name="username" placeholder="Nombre de usuario" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
+                </div>
+                <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Ingresar</button>
+                <div class="forgot-password">
+                    <a href="{% url 'password_reset' %}"><i class="fa-solid fa-key"></i> ¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
+
+            <p class="register-link">
+                ¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate aquí</a>
+            </p>
+        </div>
+    </div>
+
+    <footer class="login-footer">
+        <p>www.andreajimenez.com</p>
+    </footer>
+</body>
+
+</html>

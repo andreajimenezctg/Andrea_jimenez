@@ -1,0 +1,571 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Gestion de Ventas{% endblock %}
+{% block breadcrumb %}Ventas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/gestion_general.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="management-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Gestion de <span>Ventas</span></h1>
+            <p class="page-subtitle">Historial y analisis de ventas</p>
+        </div>
+        <a href="{% url 'escanear_venta' %}" class="btn btn-primary">
+            <i class="fas fa-barcode"></i>
+            Nueva Venta
+        </a>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="mini-stats">
+        <div class="mini-stat">
+            <i class="fas fa-shopping-bag"></i>
+            <div class="mini-stat-content">
+                <span class="mini-stat-value">{{ total_ventas|default:"0" }}</span>
+                <span class="mini-stat-label">Total Ventas</span>
+            </div>
+        </div>
+        <div class="mini-stat">
+            <i class="fas fa-calendar-day"></i>
+            <div class="mini-stat-content">
+                <span class="mini-stat-value">{{ ventas_hoy|default:"0" }}</span>
+                <span class="mini-stat-label">Ventas Hoy</span>
+            </div>
+        </div>
+        <div class="mini-stat">
+            <i class="fas fa-dollar-sign"></i>
+            <div class="mini-stat-content">
+                <span class="mini-stat-value">COP ${{ ingresos_mes|floatformat:0|default:"0" }}</span>
+                <span class="mini-stat-label">Ingresos del Mes</span>
+            </div>
+        </div>
+        <div class="mini-stat">
+            <i class="fas fa-chart-line"></i>
+            <div class="mini-stat-content">
+                <span class="mini-stat-value">COP ${{ promedio_venta|floatformat:0|default:"0" }}</span>
+                <span class="mini-stat-label">Promedio por Venta</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Chart Card -->
+    <div class="card sales-chart-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-chart-area"></i>
+                Ventas del Periodo
+            </h3>
+            <div class="chart-controls">
+                <select class="filter-select" id="chartPeriod">
+                    <option value="7">Ultimos 7 dias</option>
+                    <option value="30" selected>Ultimos 30 dias</option>
+                    <option value="90">Ultimos 3 meses</option>
+                    <option value="365">Este ano</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="sales-chart-wrapper">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="search-bar">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="searchInput" 
+                           placeholder="Buscar por numero de venta, cliente..." 
+                           value="{{ search_query }}">
+                </div>
+                <div class="filter-group">
+                    <input type="date" class="filter-select" id="dateFrom" placeholder="Desde">
+                    <input type="date" class="filter-select" id="dateTo" placeholder="Hasta">
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">Todos los estados</option>
+                        <option value="completada">Completadas</option>
+                        <option value="pendiente">Pendientes</option>
+                        <option value="cancelada">Canceladas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost btn-sm" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="btn btn-outline btn-sm" id="exportBtn">
+                    <i class="fas fa-file-excel"></i>
+                    Exportar
+                </button>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div class="table-container">
+            <table class="table sales-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"></th>
+                        <th class="w-100"><i class="fa-solid fa-hashtag"></i> VENTA <i class="fa-solid fa-sort"></i></th>
+                        <th class="w-200">CLIENTE</th>
+                        <th class="w-150">FECHA <i class="fa-solid fa-sort"></i></th>
+                        <th>PRODUCTOS</th>
+                        <th>TOTAL <i class="fa-solid fa-sort"></i></th>
+                        <th>ESTADO PAGO</th>
+                        <th>ESTADO ENVÍO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    {% for venta in ventas %}
+                    <tr class="expandable-row" data-id="{{ venta.id }}">
+                        <td>
+                            <button class="btn btn-icon btn-ghost sm expand-btn">
+                                <i class="fas fa-chevron-down expand-icon"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <span class="venta-numero"><strong>#{{ venta.id }}</strong></span>
+                        </td>
+                        <td>
+                            <div class="client-cell">
+                                <div class="client-avatar">
+                                    {{ venta.cliente.user.first_name|slice:":1"|upper|default:"C" }}
+                                </div>
+                                <span class="client-name">{{ venta.cliente.user.get_full_name|default:"Cliente General" }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fecha-cell">
+                                <span class="fecha-dia">{{ venta.fecha|date:"d M, Y" }}</span>
+                                <span class="fecha-hora">{{ venta.fecha|time:"H:i" }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="product-badge">{{ venta.detalles.count }} items</span>
+                        </td>
+                        <td>
+                            <span class="venta-total">COP ${{ venta.total|floatformat:0 }}</span>
+                        </td>
+                        <td>
+                            <div class="sale-status">
+                                <span class="badge {% if venta.pago.estado == 'Aprobado' %}badge-success{% else %}badge-warning{% endif %}">
+                                    {{ venta.pago.estado|default:"Pendiente"|upper }}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <form method="POST" action="{% url 'actualizar_estado_pedido' venta.pago.pedido.id %}" class="status-update-form">
+                                {% csrf_token %}
+                                <select name="nuevo_estado" onchange="this.form.submit()" class="filter-select sm" style="width: auto; padding: 4px 8px; font-size: 0.75rem;">
+                                    {% for code, label in venta.pago.pedido.ESTADOS %}
+                                    <option value="{{ code }}" {% if venta.pago.pedido.estado == code %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{% url 'factura_imprimir' venta.id %}" target="_blank" class="btn btn-icon btn-ghost" title="Ver Factura">
+                                    <i class="fas fa-print"></i>
+                                </a>
+                                <button class="btn btn-icon btn-ghost edit-shipping-btn" 
+                                        data-id="{{ venta.pago.pedido.id }}" 
+                                        data-guia="{{ venta.pago.pedido.guia_rastreo|default:'' }}"
+                                        data-trans="{{ venta.pago.pedido.transportadora|default:'' }}"
+                                        title="Editar Envío">
+                                    <i class="fas fa-truck"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="detail-row" data-parent="{{ venta.id }}">
+                        <td colspan="9">
+                            <div class="sale-details">
+                                <div class="sale-details-grid">
+                                    <div class="sale-detail-item">
+                                        <span class="sale-detail-label">Método de Pago</span>
+                                        <span class="sale-detail-value">{{ venta.pago.metodo|default:"Efectivo" }}</span>
+                                    </div>
+                                    <div class="sale-detail-item">
+                                        <span class="sale-detail-label">Subtotal</span>
+                                        <span class="sale-detail-value">COP ${{ venta.subtotal|floatformat:0|default:venta.total }}</span>
+                                    </div>
+                                    <div class="sale-detail-item">
+                                        <span class="sale-detail-label">Descuento</span>
+                                        <span class="sale-detail-value">COP ${{ venta.descuento|floatformat:0|default:"0" }}</span>
+                                    </div>
+                                </div>
+                                <div class="sale-products-list">
+                                    <h4 class="sale-products-title">Productos</h4>
+                                    {% for detalle in venta.detalles.all %}
+                                    <div class="sale-product-item">
+                                        <div class="sale-product-info">
+                                            <span class="sale-product-qty">{{ detalle.cantidad }}</span>
+                                            <span class="sale-product-name">{{ detalle.prenda.nombre }}</span>
+                                        </div>
+                                        <span class="sale-product-price">COP ${{ detalle.subtotal|floatformat:0 }}</span>
+                                    </div>
+                                    {% empty %}
+                                    <p style="color: var(--color-gray); font-size: 0.85rem;">No hay detalles disponibles</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <h4 class="empty-state-title">No hay ventas</h4>
+                                <p class="empty-state-text">Las ventas apareceran aqui cuando se registren</p>
+                                <a href="{% url 'escanear_venta' %}" class="btn btn-primary">
+                                    <i class="fas fa-barcode"></i>
+                                    Registrar Venta
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if ventas %}
+        <div class="pagination-wrapper">
+            <div class="pagination-info">
+                Mostrando <strong>{{ page_obj.start_index|default:"1" }}</strong> - <strong>{{ page_obj.end_index|default:ventas|length }}</strong> 
+                de <strong>{{ total_ventas|default:ventas|length }}</strong> ventas
+            </div>
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page=1" class="pagination-btn">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled"><i class="fas fa-angle-double-left"></i></span>
+                <span class="pagination-btn disabled"><i class="fas fa-angle-left"></i></span>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="pagination-btn active">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}" class="pagination-btn">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-btn">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled"><i class="fas fa-angle-right"></i></span>
+                <span class="pagination-btn disabled"><i class="fas fa-angle-double-right"></i></span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para Editar Envío -->
+<div class="modal-overlay" id="shippingModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Actualizar Información de Envío</h3>
+            <button class="modal-close" id="closeShippingModal">&times;</button>
+        </div>
+        <form id="shippingForm" method="POST">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Transportadora</label>
+                    <input type="text" name="transportadora" id="modalTransportadora" class="form-control" placeholder="Ej: Servientrega, Envia...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Número de Guía</label>
+                    <input type="text" name="guia_rastreo" id="modalGuia" class="form-control" placeholder="Ej: 123456789">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" id="cancelShipping">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Sales Chart Card */
+.sales-chart-card {
+    margin-bottom: var(--spacing-xl);
+}
+
+.sales-chart-wrapper {
+    height: 250px;
+}
+
+.chart-controls {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+/* Venta Numero */
+.venta-numero {
+    font-weight: 600;
+    color: var(--color-black);
+    font-family: var(--font-primary);
+}
+
+/* Client Avatar Small */
+.client-avatar.sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+}
+
+/* Fecha Cell */
+.fecha-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.fecha-dia {
+    font-weight: 500;
+    color: var(--color-black);
+    font-size: 0.9rem;
+}
+
+.fecha-hora {
+    font-size: 0.8rem;
+    color: var(--color-gray);
+}
+
+/* Productos Count */
+.productos-count {
+    font-size: 0.85rem;
+    color: var(--color-gray-dark);
+}
+
+/* Venta Total */
+.venta-total {
+    font-weight: 700;
+    color: var(--color-success);
+    font-size: 1rem;
+}
+
+/* Expand Button */
+.expand-btn {
+    padding: var(--spacing-xs);
+}
+
+.expand-icon {
+    transition: transform var(--transition-fast);
+}
+
+/* Sale Product Price */
+.sale-product-price {
+    font-weight: 500;
+    color: var(--color-black);
+}
+
+.sale-product-name {
+    font-size: 0.9rem;
+    color: var(--color-gray-dark);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sales Chart
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    const salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels|default:"['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']"|safe }},
+            datasets: [{
+                label: 'Ventas',
+                data: {{ data|default:"[12, 19, 15, 25, 22, 30, 28]"|safe }},
+                borderColor: '#E8B4B8',
+                backgroundColor: 'rgba(232, 180, 184, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#E8B4B8',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#1A1A1A',
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Expandable rows
+    document.querySelectorAll('.expandable-row').forEach(row => {
+        row.addEventListener('click', function(e) {
+            if (e.target.closest('.table-actions')) return;
+            
+            const id = this.dataset.id;
+            const detailRow = document.querySelector(`.detail-row[data-parent="${id}"]`);
+            
+            this.classList.toggle('expanded');
+            detailRow.classList.toggle('visible');
+        });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = this.value.trim();
+            const url = new URL(window.location);
+            if (query) {
+                url.searchParams.set('search', query);
+            } else {
+                url.searchParams.delete('search');
+            }
+            window.location = url;
+        }, 500);
+    });
+
+    // Date filters
+    document.getElementById('dateFrom').addEventListener('change', function() {
+        const url = new URL(window.location);
+        if (this.value) {
+            url.searchParams.set('from', this.value);
+        } else {
+            url.searchParams.delete('from');
+        }
+        window.location = url;
+    });
+
+    document.getElementById('dateTo').addEventListener('change', function() {
+        const url = new URL(window.location);
+        if (this.value) {
+            url.searchParams.set('to', this.value);
+        } else {
+            url.searchParams.delete('to');
+        }
+        window.location = url;
+    });
+
+    // Status filter
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        const url = new URL(window.location);
+        if (this.value) {
+            url.searchParams.set('status', this.value);
+        } else {
+            url.searchParams.delete('status');
+        }
+        window.location = url;
+    });
+
+    // Refresh button
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        window.location.reload();
+    });
+
+    // Export button
+    document.getElementById('exportBtn').addEventListener('click', () => {
+        window.location.href = '?export=excel';
+    });
+
+    // Print button
+    document.querySelectorAll('.print-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const id = this.dataset.id;
+            window.open(`/factura/${id}/`, '_blank');
+        });
+    });
+
+    // Shipping Modal functionality
+    const shippingModal = document.getElementById('shippingModal');
+    const shippingForm = document.getElementById('shippingForm');
+    const modalTransportadora = document.getElementById('modalTransportadora');
+    const modalGuia = document.getElementById('modalGuia');
+
+    document.querySelectorAll('.edit-shipping-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation(); // Evitar que la fila se expanda
+            const id = this.dataset.id;
+            const guia = this.dataset.guia;
+            const trans = this.dataset.trans;
+            
+            shippingForm.action = `/pedido/actualizar_envio/${id}/`;
+            modalTransportadora.value = trans;
+            modalGuia.value = guia;
+            shippingModal.classList.add('active');
+        });
+    });
+
+    document.getElementById('closeShippingModal').addEventListener('click', () => {
+        shippingModal.classList.remove('active');
+    });
+
+    document.getElementById('cancelShipping').addEventListener('click', () => {
+        shippingModal.classList.remove('active');
+    });
+
+    // Close modal on overlay click
+    shippingModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+</script>
+{% endblock %}

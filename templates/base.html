@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Andrea Jiménez{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+
+  
+
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Botón de WhatsApp Flotante -->
+  <a href="https://wa.me/573000000000" class="whatsapp-float" target="_blank" title="Chatea con nosotros">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <style>
+    .whatsapp-float {
+      position: fixed;
+      width: 60px;
+      height: 60px;
+      bottom: 40px;
+      right: 40px;
+      background-color: #25d366;
+      color: #FFF;
+      border-radius: 50px;
+      text-align: center;
+      font-size: 30px;
+      box-shadow: 2px 2px 15px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .whatsapp-float:hover {
+      background-color: #128c7e;
+      transform: scale(1.1);
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <footer>
+    <p>www.andreajimenez.com</p>
+  </footer>
+
+</body>
+</html>

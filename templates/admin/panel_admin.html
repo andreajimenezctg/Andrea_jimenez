@@ -1,0 +1,455 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/panel_admin.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Bienvenido(a), <span>{{ user.username|default:"Admin" }}</span></h1>
+            <p class="page-subtitle">Aqui tienes un resumen de tu tienda</p>
+        </div>
+        <a href="{% url 'crear_producto' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nuevo Producto
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <a href="{% url 'gestion_productos' %}" class="stat-card rose">
+            <div class="stat-icon">
+                <i class="fas fa-tshirt"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ total_productos|default:"0" }}</div>
+                <div class="stat-label">Productos Totales</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+{{ productos_mes|default:"0" }} este mes</span>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'gestion_ventas' %}" class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ total_ventas|default:"0" }}</div>
+                <div class="stat-label">Ventas Realizadas</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+{{ ventas_mes|default:"0" }} este mes</span>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'gestion_ventas' %}" class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ ingresos_totales|default:"$0" }}</div>
+                <div class="stat-label">Ingresos Totales</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+12% vs mes anterior</span>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'gestion_clientes' %}" class="stat-card info">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ total_clientes|default:"0" }}</div>
+                <div class="stat-label">Clientes Registrados</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+{{ clientes_mes|default:"0" }} este mes</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <!-- Sales Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Ventas del Mes
+                </h3>
+                <select class="chart-period-select" id="salesPeriod">
+                    <option value="7">Ultimos 7 dias</option>
+                    <option value="30" selected>Ultimos 30 dias</option>
+                    <option value="90">Ultimos 3 meses</option>
+                </select>
+            </div>
+            <div class="card-body">
+                <div class="chart-wrapper">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Ventas por Categoria
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if categorias_data %}
+                <div class="chart-wrapper chart-wrapper-pie">
+                    <canvas id="categoriesChart"></canvas>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h4 class="empty-state-title">Sin datos de ventas</h4>
+                    <p class="empty-state-text">Las ventas por categoria apareceran aqui</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Stats -->
+    <div class="progress-stats-grid">
+        <a href="{% url 'gestion_ventas' %}" class="card progress-card">
+            <div class="card-body">
+                <div class="progress-stat">
+                    <div class="progress-circle-wrapper">
+                        <svg class="progress-circle" viewBox="0 0 100 100">
+                            <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="progress-circle-fill" cx="50" cy="50" r="40"
+                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ meta_ventas_offset|floatformat:2 }};">
+                            </circle>
+                        </svg>
+                        <div class="progress-circle-text">{{ meta_ventas_porcentaje|floatformat:1 }}%</div>
+                    </div>
+                    <div class="progress-info">
+                        <h4>Meta de Ventas</h4>
+                        <p>{{ ventas_actuales }} de {{ meta_ventas }} ventas</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'gestion_productos' %}" class="card progress-card">
+            <div class="card-body">
+                <div class="progress-stat">
+                    <div class="progress-circle-wrapper">
+                        <svg class="progress-circle" viewBox="0 0 100 100">
+                            <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="progress-circle-fill success" cx="50" cy="50" r="40"
+                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ stock_offset|floatformat:2 }};">
+                            </circle>
+                        </svg>
+                        <div class="progress-circle-text">{{ stock_porcentaje|floatformat:1 }}%</div>
+                    </div>
+                    <div class="progress-info">
+                        <h4>Stock Disponible</h4>
+                        <p>{{ productos_en_stock }} de {{ total_productos }} productos</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'oferta' %}" class="card progress-card">
+            <div class="card-body">
+                <div class="progress-stat">
+                    <div class="progress-circle-wrapper">
+                        <svg class="progress-circle" viewBox="0 0 100 100">
+                            <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="progress-circle-fill warning" cx="50" cy="50" r="40"
+                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ ofertas_offset|floatformat:2 }};">
+                            </circle>
+                        </svg>
+                        <div class="progress-circle-text">{{ ofertas_porcentaje|floatformat:1 }}%</div>
+                    </div>
+                    <div class="progress-info">
+                        <h4>Productos en Oferta</h4>
+                        <p>{{ productos_oferta }} de {{ total_productos }} productos</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="dashboard-grid">
+        <!-- Recent Sales -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-clock"></i>
+                    Ventas Recientes
+                </h3>
+                <a href="{% url 'gestion_ventas' %}" class="btn btn-ghost btn-sm">
+                    Ver Todas
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% if ventas_recientes %}
+                <div class="recent-sales-list">
+                    {% for venta in ventas_recientes %}
+                    <a href="{% url 'factura_imprimir' venta.id %}" class="recent-sale-item">
+                        <div class="sale-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="sale-info">
+                            <span class="sale-customer">
+                                {{ venta.cliente.user.get_full_name|default:venta.cliente.user.username|default:"Cliente" }}
+                            </span>
+                            <span class="sale-date">{{ venta.fecha_venta|date:"d M, Y H:i" }}</span>
+                        </div>
+                        <div class="sale-amount">
+                            COP ${{ venta.total|floatformat:0 }}
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h4 class="empty-state-title">Sin ventas recientes</h4>
+                    <p class="empty-state-text">Las ultimas ventas apareceran aqui</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Low Stock Alert -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Productos con Bajo Stock
+                </h3>
+                <a href="{% url 'gestion_productos' %}" class="btn btn-ghost btn-sm">
+                    Ver Todos
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                {% if productos_bajo_stock %}
+                <div class="low-stock-list">
+                    {% for producto in productos_bajo_stock %}
+                    <a href="{% url 'editar_producto' producto.id %}" class="low-stock-item">
+                        <div class="product-thumb">
+                            {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                            {% else %}
+                            <div class="product-thumb-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="product-details">
+                            <span class="product-name">{{ producto.nombre }}</span>
+                            <span class="product-stock">Stock: {{ producto.stock }} unidades</span>
+                        </div>
+                        <span class="badge badge-warning">Bajo Stock</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4 class="empty-state-title">Stock saludable</h4>
+                    <p class="empty-state-text">Todos los productos tienen suficiente stock</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h3 class="quick-actions-title">Acciones Rapidas</h3>
+        <div class="quick-actions-grid">
+            <a href="{% url 'crear_producto' %}" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span>Nuevo Producto</span>
+            </a>
+            <a href="{% url 'crear_categoria' %}" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-folder-plus"></i>
+                </div>
+                <span>Nueva Categoria</span>
+            </a>
+            <a href="{% url 'escanear_venta' %}" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-barcode"></i>
+                </div>
+                <span>Escanear Venta</span>
+            </a>
+            <a href="{% url 'gestion_ventas' %}" class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <span>Ver Reportes</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Chart.js Configuration
+    Chart.defaults.font.family = "'Poppins', sans-serif";
+    Chart.defaults.color = '#6B6B6B';
+
+    // Sales Chart
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const salesChart = new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: {{ labels_grafica|safe }},
+            datasets: [{
+                label: 'Ventas',
+                data: {{ ventas_mensuales|safe }},
+                borderColor: '#E8B4B8',
+                backgroundColor: 'rgba(232, 180, 184, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#E8B4B8',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+    options: {
+        responsive: true,
+            maintainAspectRatio: false,
+                plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: '#1A1A1A',
+                    padding: 12,
+                        cornerRadius: 8,
+                            titleFont: {
+                    size: 14,
+                        weight: '600'
+                },
+                callbacks: {
+                    label: function(context) {
+                        return 'Ventas: ' + context.parsed.y;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                    grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: {
+                    padding: 10
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    padding: 10
+                }
+            }
+        },
+        interaction: {
+            intersect: false,
+                mode: 'index'
+        }
+    }
+});
+
+    // Categories Chart
+    const categoriesCanvas = document.getElementById('categoriesChart');
+    if (categoriesCanvas) {
+        const categoriesCtx = categoriesCanvas.getContext('2d');
+        const categoriesChart = new Chart(categoriesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ categorias_labels|default:"[]"|safe }},
+                datasets: [{
+                    data: {{ categorias_data|default:"[]"|safe }},
+            backgroundColor: [
+            '#E8B4B8',
+            '#D49AA0',
+            '#7AB87A',
+            '#E8C97A',
+            '#7AB8E8'
+        ],
+            borderWidth: 0,
+            hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+                maintainAspectRatio: false,
+                    cutout: '65%',
+                        plugins: {
+                legend: {
+                    position: 'right',
+                        labels: {
+                        padding: 20,
+                            usePointStyle: true,
+                                pointStyle: 'circle',
+                                    font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1A1A1A',
+                        padding: 12,
+                            cornerRadius: 8,
+                                callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    }
+
+    // Period selector
+    document.getElementById('salesPeriod').addEventListener('change', function () {
+        // Here you would fetch new data based on the selected period
+        console.log('Period changed to:', this.value);
+    });
+</script>
+{% endblock %}

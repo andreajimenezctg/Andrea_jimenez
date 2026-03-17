@@ -1,0 +1,351 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Gestion de Categorias{% endblock %}
+{% block breadcrumb %}Categorias{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/gestion_general.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="management-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Gestion de <span>Categorias</span></h1>
+            <p class="page-subtitle">Organiza tus productos por categorias</p>
+        </div>
+        <a href="{% url 'crear_categoria' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Nueva Categoria
+        </a>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="mini-stats">
+        <div class="mini-stat">
+            <i class="fas fa-tags"></i>
+            <div class="mini-stat-content">
+                <span class="mini-stat-value">{{ total_categorias|default:"0" }}</span>
+                <span class="mini-stat-label">Total Categorias</span>
+            </div>
+        </div>
+        <div class="mini-stat">
+            <i class="fas fa-box"></i>
+            <div class="mini-stat-content">
+                <span class="mini-stat-value">{{ total_productos|default:"0" }}</span>
+                <span class="mini-stat-label">Productos Totales</span>
+            </div>
+        </div>
+        <div class="mini-stat">
+            <i class="fas fa-star"></i>
+            <div class="mini-stat-content">
+                <span class="mini-stat-value">{{ categoria_mas_productos.nombre|default:"-" }}</span>
+                <span class="mini-stat-label">Mas Popular</span>
+            </div>
+        </div>
+        <div class="mini-stat">
+            <i class="fas fa-folder-open"></i>
+            <div class="mini-stat-content">
+                <span class="mini-stat-value">{{ categorias_activas|default:"0" }}</span>
+                <span class="mini-stat-label">Activas</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="search-bar">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="searchInput" 
+                           placeholder="Buscar categoria..." 
+                           value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost btn-sm" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Categories Grid -->
+        <div class="card-body">
+            {% if categorias %}
+            <div class="categories-grid">
+                {% for categoria in categorias %}
+                <div class="category-card" data-id="{{ categoria.id }}">
+                    <div class="category-card-header">
+                        <div class="category-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <div class="category-actions">
+                            <a href="{% url 'editar_categoria' categoria.id %}" class="btn btn-icon btn-ghost sm" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="btn btn-icon btn-ghost sm delete-btn" 
+                                    data-id="{{ categoria.id }}" 
+                                    data-name="{{ categoria.nombre }}"
+                                    data-count="{{ categoria.productos_count|default:0 }}"
+                                    title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="category-card-body">
+                        <h3 class="category-name">{{ categoria.nombre }}</h3>
+                        <p class="category-description">{{ categoria.descripcion|default:"Sin descripcion"|truncatewords:15 }}</p>
+                    </div>
+                    <div class="category-card-footer">
+                        <div class="category-stat">
+                            <i class="fas fa-tshirt"></i>
+                            <span>{{ categoria.productos_count|default:0 }} productos</span>
+                        </div>
+                        <a href="{% url 'gestion_productos' %}?categoria={{ categoria.id }}" class="btn btn-ghost btn-sm">
+                            Ver productos
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj %}
+            <div class="pagination-wrapper">
+                <div class="pagination-info">
+                    Mostrando <strong>{{ page_obj.start_index|default:"1" }}</strong> - <strong>{{ page_obj.end_index|default:categorias|length }}</strong> 
+                    de <strong>{{ total_categorias|default:categorias|length }}</strong> categorias
+                </div>
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <span class="pagination-btn active">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}" class="pagination-btn">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h4 class="empty-state-title">No hay categorias</h4>
+                <p class="empty-state-text">Comienza creando tu primera categoria para organizar tus productos</p>
+                <a href="{% url 'crear_categoria' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Crear Categoria
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Confirmar Eliminacion</h3>
+            <button class="modal-close" id="closeDeleteModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="delete-warning">
+                <div class="delete-warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <p>Estas segura de eliminar la categoria <strong id="categoryName"></strong>?</p>
+                <p class="delete-warning-text" id="productWarning"></p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" id="cancelDelete">Cancelar</button>
+            <form id="deleteForm" method="POST" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i>
+                    Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Categories Grid */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.category-card {
+    background: var(--color-cream-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition-normal);
+    border: 2px solid transparent;
+}
+
+.category-card:hover {
+    border-color: var(--color-rose-light);
+    box-shadow: var(--shadow-md);
+}
+
+.category-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    background: var(--color-cream);
+}
+
+.category-icon {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, var(--color-rose) 0%, var(--color-rose-dark) 100%);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+    font-size: 1.1rem;
+}
+
+.category-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+}
+
+.category-card-body {
+    padding: var(--spacing-lg);
+}
+
+.category-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: var(--spacing-sm);
+}
+
+.category-description {
+    font-size: 0.85rem;
+    color: var(--color-gray);
+    line-height: 1.5;
+}
+
+.category-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid var(--color-cream-dark);
+}
+
+.category-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.85rem;
+    color: var(--color-gray);
+}
+
+.category-stat i {
+    color: var(--color-rose);
+}
+
+@media (max-width: 768px) {
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const query = this.value.trim();
+            const url = new URL(window.location);
+            if (query) {
+                url.searchParams.set('search', query);
+            } else {
+                url.searchParams.delete('search');
+            }
+            window.location = url;
+        }, 500);
+    });
+
+    // Delete Modal
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteForm = document.getElementById('deleteForm');
+    const categoryNameSpan = document.getElementById('categoryName');
+    const productWarning = document.getElementById('productWarning');
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const name = this.dataset.name;
+            const count = parseInt(this.dataset.count);
+            
+            categoryNameSpan.textContent = name;
+            
+            if (count > 0) {
+                productWarning.textContent = `Esta categoria tiene ${count} producto(s). Los productos quedaran sin categoria.`;
+                productWarning.style.color = 'var(--color-warning)';
+            } else {
+                productWarning.textContent = 'Esta accion no se puede deshacer.';
+                productWarning.style.color = 'var(--color-gray)';
+            }
+            
+            deleteForm.action = `/admin/eliminar-categoria/${id}/`;
+            deleteModal.classList.add('active');
+        });
+    });
+
+    document.getElementById('closeDeleteModal').addEventListener('click', () => {
+        deleteModal.classList.remove('active');
+    });
+
+    document.getElementById('cancelDelete').addEventListener('click', () => {
+        deleteModal.classList.remove('active');
+    });
+
+    deleteModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+
+    // Refresh button
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        window.location.reload();
+    });
+});
+</script>
+{% endblock %}

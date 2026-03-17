@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="nav-logo">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez">
+                </a>
+            </div>
+            <div class="nav-menu">
+                <a href="{% url 'home' %}">Inicio</a>
+                <div class="dropdown">
+                    <button class="dropdown-btn">
+                        Mi Cuenta <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{% url 'perfil_cliente' %}"><i class="fa-regular fa-user"></i> Mi Perfil</a>
+                        <a href="{% url 'carrito' %}"><i class="fa-solid fa-bag-shopping"></i> Carrito</a>
+                        <a href="{% url 'mis_ventas' %}"><i class="fa-solid fa-clock-rotate-left"></i> Mis Compras</a>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;"></div>
+                        <a href="{% url 'logout' %}" style="color: #ff7a9c;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Mi Carrito</h1>
+
+        {% if carrito_items %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Imagen</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrito_items %}
+                {% if item.prenda %}
+                <tr>
+                    <td>
+                        <strong>{{ item.prenda.nombre }}</strong>
+                        {% if item.variacion %}
+                        <br><small>Talla: {{ item.variacion.talla }} | Color: {{ item.variacion.color|default:"N/A" }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.prenda.imagen %}
+                        <img src="{{ item.prenda.imagen.url }}" class="producto-img" alt="{{ item.prenda.nombre }}">
+                        {% else %}
+                        <div class="producto-img placeholder-img">Sin imagen</div>
+                        {% endif %}
+                    </td>
+                    <td>${{ item.prenda.precio }}</td>
+                    <td>
+                        <form action="{% url 'actualizar_cantidad' item.id %}" method="POST">
+                            {% csrf_token %}
+                            <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1">
+                            <button type="submit">Actualizar</button>
+                        </form>
+                    </td>
+                    <td>${{ item.subtotal|floatformat:2 }}</td>
+                    <td>
+                        <form action="{% url 'eliminar_item_carrito' item.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn">X</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total">
+            <strong>Total: ${{ total|floatformat:0 }}</strong>
+        </div>
+
+        <a href="{% url 'checkout' %}" class="btn-comprar">Finalizar Compra con PayPal</a>
+
+        {% else %}
+        <p>Tu carrito está vacío.</p>
+        {% endif %}
+    </div>
+</body>
+
+</html>

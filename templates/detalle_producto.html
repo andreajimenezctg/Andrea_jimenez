@@ -1,0 +1,344 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ producto.nombre }} - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tienda.css' %}">
+    <style>
+        .product-detail-container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+        }
+
+        .product-images {
+            display: flex;
+            gap: 20px;
+        }
+
+        .thumbnails {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .thumb {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            object-fit: cover;
+        }
+
+        .thumb:hover, .thumb.active {
+            border-color: #ff7a9c;
+        }
+
+        .main-image-container {
+            flex: 1;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-image {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .main-image:hover {
+            transform: scale(1.05);
+        }
+
+        .product-info-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .product-condition {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .product-title-detail {
+            font-size: 1.6rem;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .product-rating {
+            color: #3483fa;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stars {
+            color: #3483fa;
+        }
+
+        .price-section {
+            margin: 20px 0;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 1rem;
+        }
+
+        .current-price {
+            font-size: 2.2rem;
+            color: #333;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .discount-tag {
+            font-size: 1rem;
+            color: #00a650;
+            font-weight: 400;
+        }
+
+        .installments {
+            color: #00a650;
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .shipping-info {
+            background: #f6f6f6;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #00a650;
+            font-size: 0.9rem;
+        }
+
+        .shipping-info i {
+            color: #00a650;
+            margin-right: 10px;
+        }
+
+        .stock-info {
+            font-weight: 600;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .buy-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-buy-now {
+            background: #3483fa;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .btn-buy-now:hover {
+            background: #2968c8;
+        }
+
+        .btn-add-cart-detail {
+            background: rgba(65,137,230,0.1);
+            color: #3483fa;
+            border: none;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .btn-add-cart-detail:hover {
+            background: rgba(65,137,230,0.2);
+        }
+
+        .product-description-detail {
+            grid-column: 1 / span 2;
+            border-top: 1px solid #eee;
+            padding-top: 40px;
+            margin-top: 40px;
+        }
+
+        .product-description-detail h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .product-description-detail p {
+            color: #666;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        @media (max-width: 992px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+                margin: 80px 20px 20px;
+                padding: 20px;
+            }
+            .product-description-detail {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="logo-img">
+            </a>
+        </div>
+        <ul class="menu">
+            <li><a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a></li>
+            <li><a href="{% url 'tienda' %}"><i class="fa-solid fa-store"></i> Tienda</a></li>
+            <li><a href="{% url 'oferta' %}"><i class="fa-solid fa-tags"></i> Oferta</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="product-detail-container">
+    <div class="product-images">
+        <div class="thumbnails">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" class="thumb active" alt="{{ producto.nombre }}" onclick="changeImage(this.src)">
+            {% endif %}
+            <!-- Aquí podrían ir más imágenes si el modelo las tuviera -->
+        </div>
+        <div class="main-image-container">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" class="main-image" id="mainImage" alt="{{ producto.nombre }}">
+            {% else %}
+            <div class="sin-imagen"><i class="fa-regular fa-image" style="font-size: 5rem; color: #ddd;"></i></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="product-info-sidebar">
+        <div class="product-condition">Nuevo | +500 vendidos</div>
+        <h1 class="product-title-detail">{{ producto.nombre }}</h1>
+        
+        <div class="product-rating">
+            <div class="stars">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star-half-stroke"></i>
+            </div>
+            <span>(890)</span>
+        </div>
+
+        <div class="price-section">
+            {% if producto.precio_descuento %}
+                <span class="original-price">COP ${{ producto.precio }}</span>
+                <div class="current-price">
+                    COP ${{ producto.precio_descuento }}
+                    <span class="discount-tag">40% OFF</span>
+                </div>
+            {% else %}
+                <div class="current-price">COP ${{ producto.precio }}</div>
+            {% endif %}
+            <div class="installments">en 12x COP $ {{ cuotas_12|floatformat:0 }} sin interés</div>
+        </div>
+
+        <div class="shipping-info">
+            <p><i class="fa-solid fa-truck-fast"></i> <strong>Envío gratis</strong> por ser tu primera compra</p>
+            <p style="margin-left: 28px; color: #666; font-size: 0.8rem;">Llega gratis mañana</p>
+        </div>
+
+        <div class="stock-info">
+            Stock disponible: {{ producto.stock }} unidades
+        </div>
+
+        <form action="{% url 'agregar_al_carrito' producto.id %}" method="POST" id="buyForm">
+            {% csrf_token %}
+            {% if producto.variaciones.all %}
+                <div style="margin: 20px 0;">
+                    <label for="variacion_id" style="display: block; font-weight: 600; margin-bottom: 8px;">Selecciona Talla / Color:</label>
+                    <select name="variacion_id" id="variacion_id" required 
+                            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: white;">
+                        {% for v in producto.variaciones.all %}
+                            <option value="{{ v.id }}" {% if v.stock == 0 %}disabled{% endif %}>
+                                {{ v.talla }} {% if v.color %}- {{ v.color }}{% endif %} 
+                                {% if v.stock == 0 %}(Agotado){% else %}(Stock: {{ v.stock }}){% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+
+            <div class="buy-buttons">
+                {% if user.is_authenticated and es_cliente %}
+                    <button type="submit" class="btn-buy-now">Comprar ahora</button>
+                    <button type="submit" class="btn-add-cart-detail">Agregar al carrito</button>
+                {% elif user.is_authenticated and not es_cliente %}
+                    <!-- Caso Administrador o Trabajador (opcional permitirles comprar para testear) -->
+                    <button type="submit" class="btn-buy-now">Comprar ahora (Test Admin)</button>
+                    <button type="submit" class="btn-add-cart-detail">Agregar al carrito</button>
+                {% else %}
+                    <a href="{% url 'registro' %}" class="btn-buy-now">Regístrate para comprar</a>
+                    <a href="{% url 'login' %}" class="btn-add-cart-detail">Inicia sesión</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="product-description-detail">
+        <h2>Descripción</h2>
+        <p>{{ producto.descripcion|default:"Sin descripción disponible." }}</p>
+    </div>
+</main>
+
+<script>
+    function changeImage(src) {
+        document.getElementById('mainImage').src = src;
+        const thumbs = document.querySelectorAll('.thumb');
+        thumbs.forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
