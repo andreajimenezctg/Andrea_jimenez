@@ -2,74 +2,62 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Panel Cliente - Andrea Jiménez</title>
-
-<link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
-<link rel="stylesheet" href="{% static 'css/panel_cliente.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8">
+    <title>Panel Cliente - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/panel_cliente.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
 <body>
     {% include 'includes/navbar.html' %}
 
+    <div class="container" style="padding-top: 120px;">
+        <h1>Hola, {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</h1>
+        <p class="panel-subtitle">Desde aquí puedes gestionar tu perfil, revisar tu carrito y ver tus compras.</p>
 
-<div class="container">
+        <div class="panel-grid">
+            <a href="{% url 'perfil_cliente' %}" class="panel-card">
+                <i class="fa-regular fa-user" style="font-size: 2rem; color: var(--rosado); margin-bottom: 15px; display: block;"></i>
+                <h3>Mi Perfil</h3>
+                <p>Ver y editar tu información personal.</p>
+            </a>
 
-<h1>Bienvenido {{ user.first_name }}</h1>
+            <a href="{% url 'carrito' %}" class="panel-card">
+                <i class="fa-solid fa-bag-shopping" style="font-size: 2rem; color: var(--rosado); margin-bottom: 15px; display: block;"></i>
+                <h3>Carrito</h3>
+                <p>Revisa los productos que quieres comprar.</p>
+            </a>
 
-<p class="panel-subtitle">
-Desde aquí puedes gestionar tu perfil, revisar tu carrito y ver tus compras.
-</p>
+            <a href="{% url 'mis_ventas' %}" class="panel-card">
+                <i class="fa-solid fa-clock-rotate-left" style="font-size: 2rem; color: var(--rosado); margin-bottom: 15px; display: block;"></i>
+                <h3>Mis Compras</h3>
+                <p>Consulta tu historial de pedidos.</p>
+            </a>
 
+            <a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" class="panel-card whatsapp-card" target="_blank">
+                <i class="fab fa-whatsapp" style="font-size: 2rem; color: #25d366; margin-bottom: 15px; display: block;"></i>
+                <h3>Contacto WhatsApp</h3>
+                <p>Habla directamente con nosotros para soporte.</p>
+            </a>
+        </div>
+    </div>
 
-<div class="panel-grid">
-
-<a href="{% url 'perfil_cliente' %}" class="panel-card">
-
-<h3>Mi Perfil</h3>
-
-<p>Ver y editar tu información personal.</p>
-
-</a>
-
-
-<a href="{% url 'carrito' %}" class="panel-card">
-
-<h3>Carrito</h3>
-
-<p>Revisa los productos que quieres comprar.</p>
-
-</a>
-
-
-<a href="{% url 'mis_ventas' %}" class="panel-card">
-
-<h3>Mis Compras</h3>
-
-<p>Consulta tu historial de pedidos.</p>
-
-</a>
-
-
-<a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" class="panel-card whatsapp-card" target="_blank">
-<h3>Contacto WhatsApp</h3>
-<p>Habla directamente con nosotros para soporte.</p>
-</a>
-
-</div>
-
-</div>
-
-<style>
-.whatsapp-card {
-    border-left: 5px solid #25d366 !important;
-}
-.whatsapp-card:hover {
-    background-color: #e8f5e9 !important;
-}
-</style>
-
+    <style>
+        .panel-card {
+            border-radius: 15px;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .whatsapp-card {
+            border-bottom: 4px solid #25d366 !important;
+        }
+        .whatsapp-card:hover {
+            background-color: #f0fff0 !important;
+        }
+        @media (max-width: 768px) {
+            .container { padding-top: 100px !important; }
+        }
+    </style>
 </body>
 </html>

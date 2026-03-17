@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Finalizar Compra - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
     <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finalizar Compra - Andrea Jiménez</title>
     <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id|default:'sb' }}&currency={{ paypal_currency|default:'USD' }}&intent=capture"></script>
 </head>
@@ -22,7 +22,7 @@
             <table class="carrito-table" style="width: 100%; margin: 0;">
                 <thead>
                     <tr>
-                        <th>Producto</th>
+                        <th style="text-align: left; padding-left: 30px;">Producto</th>
                         <th>Cantidad</th>
                         <th>Precio</th>
                         <th>Subtotal</th>
@@ -31,28 +31,28 @@
                 <tbody>
                     {% for item in carrito_items %}
                     <tr>
-                        <td style="text-align: left; padding-left: 30px;">{{ item.prenda.nombre }}</td>
+                        <td style="text-align: left; padding-left: 30px; font-weight: 500;">{{ item.prenda.nombre }}</td>
                         <td>{{ item.cantidad }}</td>
                         <td>${{ item.prenda.precio|floatformat:0 }}</td>
-                        <td>${{ item.subtotal|floatformat:0 }}</td>
+                        <td style="font-weight: 600; color: var(--rosado);">${{ item.subtotal|floatformat:0 }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <div class="total-section" style="text-align: right; margin: 30px 0; padding: 20px; background: var(--blanco); border-radius: 15px; border: var(--borde-rosado);">
-            <p style="font-size: 1rem; color: var(--gris-texto);">Subtotal: ${{ total|floatformat:0 }}</p>
-            <p style="font-size: 1rem; color: var(--gris-texto);">Envío: $15.000</p>
-            <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: var(--rosado); margin-top: 10px;">
+        <div class="total-section" style="text-align: right; margin: 30px 0; padding: 30px; background: var(--blanco); border-radius: 15px; border: var(--borde-rosado); box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+            <p style="font-size: 1rem; color: var(--gris-texto); margin-bottom: 5px;">Subtotal: <span style="color: var(--negro); font-weight: 500;">${{ total|floatformat:0 }}</span></p>
+            <p style="font-size: 1rem; color: var(--gris-texto); margin-bottom: 15px;">Envío: <span style="color: var(--negro); font-weight: 500;">$15.000</span></p>
+            <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: var(--rosado); font-size: 1.8rem; border-top: 1px solid rgba(0,0,0,0.05); pt: 15px;">
                 Total a Pagar: ${{ total|add:15000|floatformat:0 }}
             </h2>
         </div>
 
         <div class="checkout-form-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
             <div class="shipping-info">
-                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 20px; color: var(--negro); border-bottom: 1px solid rgba(232, 180, 184, 0.2); padding-bottom: 10px;">
-                    Información de Envío
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 25px; color: var(--negro); border-bottom: 1px solid rgba(232, 180, 184, 0.3); padding-bottom: 10px;">
+                    <i class="fa-solid fa-truck-fast" style="color: var(--rosado); margin-right: 10px;"></i>Información de Envío
                 </h3>
                 <form id="shipping-form">
                     <div class="form-group">
@@ -88,19 +88,19 @@
             </div>
 
             <div class="shipping-info">
-                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 20px; color: var(--negro); border-bottom: 1px solid rgba(232, 180, 184, 0.2); padding-bottom: 10px;">
-                    Método de Pago
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 25px; color: var(--negro); border-bottom: 1px solid rgba(232, 180, 184, 0.3); padding-bottom: 10px;">
+                    <i class="fa-solid fa-credit-card" style="color: var(--rosado); margin-right: 10px;"></i>Método de Pago
                 </h3>
-                <p id="payment-status-msg" style="font-size: 0.9rem; color: var(--gris-texto); margin-bottom: 25px;">
-                    El total de <strong>${{ total|add:15000|floatformat:0 }} COP</strong> se pagará en dólares vía PayPal.
+                <p id="payment-status-msg" style="font-size: 0.9rem; color: var(--gris-texto); margin-bottom: 25px; line-height: 1.4;">
+                    El total de <strong style="color: var(--negro);">${{ total|add:15000|floatformat:0 }} COP</strong> se pagará de forma segura a través de la pasarela de PayPal (conversión automática a USD).
                 </p>
-                <div id="paypal-button-container"></div>
+                <div id="paypal-button-container" style="z-index: 1;"></div>
             </div>
         </div>
 
-        <p style="margin-top: 40px; text-align: center;">
-            <a href="{% url 'carrito' %}" style="color: var(--gris-texto); text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;">
-                ← Volver al carrito
+        <p style="margin-top: 50px; text-align: center;">
+            <a href="{% url 'carrito' %}" style="color: var(--gris-texto); text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; transition: color 0.3s ease;">
+                <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Volver al carrito
             </a>
         </p>
     </main>
@@ -149,6 +149,7 @@
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}"
                         },
                         body: JSON.stringify({
                             orderID: data.orderID,
@@ -167,5 +168,13 @@
             }
         }).render('#paypal-button-container');
     </script>
+
+    <style>
+        .container { padding-top: 120px !important; }
+        @media (max-width: 768px) {
+            .checkout-form-container { grid-template-columns: 1fr; }
+            .container { padding-top: 100px !important; }
+        }
+    </style>
 </body>
 </html>

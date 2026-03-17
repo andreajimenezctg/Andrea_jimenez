@@ -81,12 +81,12 @@
 
 .hero .frase p {
     color: var(--blanco);
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-family: 'Playfair Display', serif;
     font-weight: 400;
     letter-spacing: 1px;
-    margin-bottom: 2.5rem;
-    line-height: 1.1;
+    margin-bottom: 2rem;
+    line-height: 1.2;
     opacity: 0;
     transform: translateY(30px);
     animation: fadeInUp 1s 0.5s forwards;
@@ -94,11 +94,11 @@
 
 .hero .frase p .resaltado {
     display: block;
-    font-size: 5rem;
+    font-size: 4.2rem;
     font-weight: 700;
     color: var(--rosado);
     text-transform: uppercase;
-    letter-spacing: 10px;
+    letter-spacing: 8px;
     margin: 15px 0;
     text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }

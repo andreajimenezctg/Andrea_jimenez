@@ -1,5 +1,18 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+<style>
+    /* Asegurar que los links del dropdown no hereden estilos globales azules */
+    .dropdown-content a {
+        color: rgba(250, 240, 225, 0.7) !important;
+        text-decoration: none !important;
+        display: flex !important;
+        background: none !important;
+    }
+    .dropdown-content a:hover {
+        color: #faf0e1 !important;
+        background-color: rgba(232, 180, 184, 0.1) !important;
+    }
+</style>
 <header>
     <nav class="navbar">
         <div class="logo">
