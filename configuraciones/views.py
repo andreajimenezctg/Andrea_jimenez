@@ -132,25 +132,47 @@ def cerrar_sesion(request):
 
 from django.core.management import call_command
 
+from django.core.files import File
+from django.conf import settings
+from pathlib import Path
+
 def migrar_datos_produccion(request):
     """
-    Vista temporal para cargar datos y crear superusuario en Render
+    Vista temporal para cargar datos, crear superusuario e imágenes en Render
     """
     output = []
     
-    # 1. Cargar Datos desde Fixture (datos.json)
-    try:
-        call_command('loaddata', 'datos.json')
-        output.append("✅ Datos de 'datos.json' cargados con éxito.")
-    except Exception as e:
-        output.append(f"❌ Error al cargar datos.json: {str(e)}")
-
-    # 2. Ejecutar comando de creación de productos (crear_productos_tienda)
+    # 1. Ejecutar comando de creación de productos (crear_productos_tienda)
     try:
         call_command('crear_productos_tienda')
-        output.append("✅ Comando 'crear_productos_tienda' ejecutado con éxito.")
+        output.append("✅ Productos y categorías base creados.")
     except Exception as e:
-        output.append(f"❌ Error al ejecutar crear_productos_tienda: {str(e)}")
+        output.append(f"❌ Error en crear_productos_tienda: {str(e)}")
+
+    # 2. Forzar asignación de imágenes desde static/img a los productos creados
+    try:
+        # Mapeo de categorías a imágenes en static/img/
+        mapeo_imagenes = {
+            "Vestidos": "vestido.jpeg",
+            "Bolsos": "bolsos.jpeg",
+            "Accesorios": "accesorios.jpeg",
+        }
+        
+        for nombre_cat, nombre_img in mapeo_imagenes.items():
+            productos = Prenda.objects.filter(categoria__nombre=nombre_cat)
+            ruta_img = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
+            
+            if ruta_img.exists():
+                for p in productos:
+                    if not p.imagen:
+                        with open(ruta_img, "rb") as f:
+                            p.imagen.save(nombre_img, File(f), save=True)
+                output.append(f"✅ Imágenes asignadas a la categoría {nombre_cat}.")
+            else:
+                output.append(f"⚠️ No se encontró la imagen {nombre_img} en static/img/.")
+                
+    except Exception as e:
+        output.append(f"❌ Error al asignar imágenes: {str(e)}")
 
     # 3. Crear Superusuario si no existe
     if not User.objects.filter(username="admin").exists():
