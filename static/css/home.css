@@ -950,31 +950,36 @@ header.scrolled .logo-img {
 
     .menu {
         display: flex;
-        flex-direction: column;
+        flex-direction: column !important; /* Forzamos verticalidad */
         position: fixed;
         top: 0;
         right: -100%;
-        width: 80%;
+        width: 100%; /* Ocupa todo el ancho en móvil */
         height: 100vh;
         background: rgba(26, 26, 26, 0.98);
         backdrop-filter: blur(15px);
-        padding: 100px 40px;
-        gap: 2rem;
+        padding: 120px 40px;
+        gap: 2.5rem;
         transition: right 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
         z-index: 1000;
         box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        align-items: center; /* Centramos los links */
+        justify-content: flex-start;
     }
 
-    .menu.active {
-        right: 0;
+    .menu li {
+        width: 100%;
+        text-align: center;
     }
 
     .menu li a {
-        font-size: 1.2rem;
+        font-size: 1.5rem !important; /* Más grande para que sea fácil de tocar */
         width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 15px;
+        display: block;
+        padding: 10px 0;
+        color: var(--blanco);
+        text-transform: uppercase;
+        letter-spacing: 2px;
     }
 
     .navbar {
