@@ -81,7 +81,7 @@
 
 .hero .frase p {
     color: var(--blanco);
-    font-size: 1.8rem;
+    font-size: 3rem;
     font-family: 'Playfair Display', serif;
     font-weight: 400;
     letter-spacing: 1px;
@@ -92,15 +92,24 @@
     animation: fadeInUp 1s 0.5s forwards;
 }
 
-.hero .frase p .resaltado {
-    display: block;
-    font-size: 4.2rem;
-    font-weight: 700;
-    color: var(--rosado);
-    text-transform: uppercase;
-    letter-spacing: 8px;
-    margin: 15px 0;
-    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+.hero .frase p .resaltado-line {
+    display: inline-block;
+    font-size: 4rem;
+    font-weight: 400;
+    color: var(--blanco);
+    text-transform: lowercase;
+    position: relative;
+    padding-bottom: 2px;
+}
+
+.hero .frase p .resaltado-line::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--rosado);
 }
 
 .hero .frase p .cursiva {
@@ -170,147 +179,81 @@
 .carrusel-titulo {
     color: var(--blanco);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.6rem;
     font-weight: 500;
-    letter-spacing: 4px;
+    letter-spacing: 5px;
     text-transform: uppercase;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     text-align: center;
     opacity: 0.8;
 }
 
-.section-title {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.section-title h2 {
-    color: var(--rosado);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 6px;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-}
-
-.section-title .line {
-    width: 60px;
-    height: 2px;
-    background: var(--rosado);
-    margin: 0 auto;
-    opacity: 0.5;
-}
-
-/* Carrusel */
+/* Carrusel Container centered */
 .carrusel-container {
     position: relative;
-    max-width: 1400px;
+    max-width: 320px; /* Tamaño más pequeño para el carrusel en el hero */
     margin: 0 auto;
-    padding: 0 60px;
+    padding: 0;
 }
 
 .carrusel-wrapper {
     overflow: hidden;
     position: relative;
-    padding: 20px 0;
-}
-
-.carrusel {
-    display: flex;
-    gap: 30px;
-    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-    list-style: none;
     padding: 0;
-    margin: 0;
 }
 
 .carrusel-item {
-    min-width: calc(33.333% - 20px);
-    flex: 0 0 calc(33.333% - 20px);
+    min-width: 100%;
+    flex: 0 0 100%;
 }
 
 .carrusel-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(232, 180, 184, 0.1);
-    border-radius: 20px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     overflow: hidden;
     text-decoration: none;
     display: block;
     transition: var(--transicion);
-    height: 100%;
-}
-
-.carrusel-card:hover {
-    transform: translateY(-10px);
-    border-color: rgba(232, 180, 184, 0.4);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .carrusel-img {
     width: 100%;
-    height: 450px;
+    height: 400px;
     object-fit: cover;
-    transition: transform 0.8s ease;
-}
-
-.carrusel-card:hover .carrusel-img {
-    transform: scale(1.05);
+    border-radius: 0;
 }
 
 .carrusel-info {
-    padding: 30px;
-    text-align: center;
-}
-
-.carrusel-nombre {
-    display: block;
-    color: var(--blanco);
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    margin-bottom: 10px;
-    transition: color 0.3s ease;
-}
-
-.carrusel-card:hover .carrusel-nombre {
-    color: var(--rosado);
-}
-
-.carrusel-precio {
-    color: var(--rosado);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    letter-spacing: 1px;
+    display: none;
 }
 
 .carrusel-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 50px;
-    height: 50px;
-    background: rgba(232, 180, 184, 0.1);
-    border: 1px solid rgba(232, 180, 184, 0.2);
-    border-radius: 50%;
-    color: var(--rosado);
+    width: 30px;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.4);
+    border: none;
+    border-radius: 2px;
+    color: rgba(255, 255, 255, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 10;
     transition: var(--transicion);
-    backdrop-filter: blur(5px);
+    font-size: 0.8rem;
 }
 
 .carrusel-btn:hover {
-    background: var(--rosado);
-    color: var(--negro);
-    box-shadow: 0 10px 20px rgba(232, 180, 184, 0.2);
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--blanco);
 }
 
-.carrusel-prev { left: 0; }
-.carrusel-next { right: 0; }
+.carrusel-prev { left: -40px; }
+.carrusel-next { right: -40px; }
 
 /* Essence Section */
 .essence {
