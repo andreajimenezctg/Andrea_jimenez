@@ -111,6 +111,8 @@ STORAGES = {
 # Media files (para imágenes de productos)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT)
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

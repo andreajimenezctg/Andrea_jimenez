@@ -151,8 +151,7 @@ def migrar_datos_produccion(request):
 
     # 2. Forzar asignación de imágenes desde static/img a los productos creados
     try:
-    # 2. Forzar asignación de imágenes desde static/img a los productos creados
-    try:
+        import shutil
         # Mapeo de categorías a imágenes en static/img/
         mapeo_imagenes = {
             "Vestidos": "vestido.jpeg",
@@ -160,29 +159,29 @@ def migrar_datos_produccion(request):
             "Accesorios": "accesorios.jpeg",
         }
         
-        # Aseguramos que el directorio de destino existe
+        # Aseguramos que el directorio de destino existe dentro de MEDIA_ROOT
         media_productos = Path(settings.MEDIA_ROOT) / "productos"
         media_productos.mkdir(parents=True, exist_ok=True)
+        
+        output.append(f"📁 Directorio media: {settings.MEDIA_ROOT}")
         
         for nombre_cat, nombre_img_static in mapeo_imagenes.items():
             productos = Prenda.objects.filter(categoria__nombre=nombre_cat)
             ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img_static
             
             if ruta_img_static.exists():
+                # Nombre que guardaremos en la DB: 'productos/nombre.jpeg'
+                nombre_db = f"productos/{nombre_img_static}"
+                ruta_destino_media = Path(settings.MEDIA_ROOT) / "productos" / nombre_img_static
+                
+                # Copia física del archivo de static a media
+                shutil.copy2(ruta_img_static, ruta_destino_media)
+                output.append(f"📸 Copiada imagen {nombre_img_static} a media/productos/")
+                
                 for p in productos:
-                    # Usamos el nombre original sin sufijos aleatorios de Django
-                    nombre_destino = f"productos/{nombre_img_static}"
-                    ruta_destino = Path(settings.MEDIA_ROOT) / nombre_destino
-                    
-                    # Copiamos físicamente el archivo si no existe en media
-                    if not ruta_destino.exists():
-                        import shutil
-                        shutil.copy2(ruta_img_static, ruta_destino)
-                    
-                    # Actualizamos la base de datos para que apunte exactamente a ese nombre
-                    p.imagen = nombre_destino
+                    p.imagen = nombre_db
                     p.save()
-                output.append(f"✅ Imágenes sincronizadas para {nombre_cat}.")
+                output.append(f"✅ Productos de {nombre_cat} actualizados en DB con ruta: {nombre_db}")
             else:
                 output.append(f"⚠️ No se encontró {nombre_img_static} en static/img/.")
                 
