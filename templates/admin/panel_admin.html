@@ -11,6 +11,13 @@
 
 {% block content %}
 <div class="dashboard">
+    {% if error %}
+    <div class="alert alert-danger" style="background: #fee2e2; border: 1px solid #ef4444; padding: 20px; border-radius: 8px; margin-bottom: 20px; color: #b91c1c;">
+        <h3 style="margin-top: 0;">Error al cargar datos</h3>
+        <p>Ha ocurrido un problema técnico al generar las estadísticas. Por favor, intenta recargar la página o contacta a soporte.</p>
+    </div>
+    {% endif %}
+    
     <!-- Page Header -->
     <div class="page-header">
         <div>
@@ -98,9 +105,15 @@
                 </select>
             </div>
             <div class="card-body">
+                {% if ventas_mensuales %}
                 <div class="chart-wrapper">
                     <canvas id="salesChart"></canvas>
                 </div>
+                {% else %}
+                <div class="empty-state">
+                    <p>No hay datos suficientes para graficar ventas.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -139,14 +152,14 @@
                         <svg class="progress-circle" viewBox="0 0 100 100">
                             <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="progress-circle-fill" cx="50" cy="50" r="40"
-                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ meta_ventas_offset|floatformat:2 }};">
+                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ meta_ventas_offset|default:'251.2' }};">
                             </circle>
                         </svg>
-                        <div class="progress-circle-text">{{ meta_ventas_porcentaje|floatformat:1 }}%</div>
+                        <div class="progress-circle-text">{{ meta_ventas_porcentaje|default:"0"|floatformat:1 }}%</div>
                     </div>
                     <div class="progress-info">
                         <h4>Meta de Ventas</h4>
-                        <p>{{ ventas_actuales }} de {{ meta_ventas }} ventas</p>
+                        <p>{{ ventas_actuales|default:"0" }} de {{ meta_ventas|default:"100" }} ventas</p>
                     </div>
                 </div>
             </div>
@@ -159,14 +172,14 @@
                         <svg class="progress-circle" viewBox="0 0 100 100">
                             <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="progress-circle-fill success" cx="50" cy="50" r="40"
-                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ stock_offset|floatformat:2 }};">
+                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ stock_offset|default:'251.2' }};">
                             </circle>
                         </svg>
-                        <div class="progress-circle-text">{{ stock_porcentaje|floatformat:1 }}%</div>
+                        <div class="progress-circle-text">{{ stock_porcentaje|default:"0"|floatformat:1 }}%</div>
                     </div>
                     <div class="progress-info">
                         <h4>Stock Disponible</h4>
-                        <p>{{ productos_en_stock }} de {{ total_productos }} productos</p>
+                        <p>{{ productos_en_stock|default:"0" }} de {{ total_productos|default:"0" }} productos</p>
                     </div>
                 </div>
             </div>
@@ -179,14 +192,14 @@
                         <svg class="progress-circle" viewBox="0 0 100 100">
                             <circle class="progress-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="progress-circle-fill warning" cx="50" cy="50" r="40"
-                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ ofertas_offset|floatformat:2 }};">
+                                style="stroke-dasharray: 251.2; stroke-dashoffset: {{ ofertas_offset|default:'251.2' }};">
                             </circle>
                         </svg>
-                        <div class="progress-circle-text">{{ ofertas_porcentaje|floatformat:1 }}%</div>
+                        <div class="progress-circle-text">{{ ofertas_porcentaje|default:"0"|floatformat:1 }}%</div>
                     </div>
                     <div class="progress-info">
                         <h4>Productos en Oferta</h4>
-                        <p>{{ productos_oferta }} de {{ total_productos }} productos</p>
+                        <p>{{ productos_oferta|default:"0" }} de {{ total_productos|default:"0" }} productos</p>
                     </div>
                 </div>
             </div>

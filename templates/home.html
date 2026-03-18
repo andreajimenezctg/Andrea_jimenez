@@ -4,94 +4,160 @@
 {% block title %}Andrea Jiménez | Inicio{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}?v={% now 'U' %}">
+    <style>
+        /* CSS Crítico para asegurar que el inicio no se rompa */
+        body { 
+            background-color: #1a1a1a !important; 
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding-top: 80px;
+            /* Fallback background if video fails */
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static "img/vestido.jpeg" %}') center/cover no-repeat;
+        }
 
-<style>
-body { 
-    background-color: #1a1a1a !important; 
-    margin: 0; 
-    padding: 0;
-    overflow-x: hidden;
-}
+        #video-fondo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            filter: brightness(0.4);
+        }
 
-.hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 80px;
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static "img/vestido.jpeg" %}') center/cover no-repeat;
-}
+        .overlay-fondo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 1;
+            pointer-events: none;
+        }
 
-.frase {
-    z-index: 10;
-    margin-bottom: 40px;
-    text-align: center;
-}
+        .frase {
+            z-index: 10;
+            margin-bottom: 40px;
+            text-align: center;
+            width: 100%;
+            padding: 0 20px;
+        }
 
-.frase p {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 8vw, 4rem);
-    color: #FAF0E1;
-    line-height: 1.2;
-    margin: 0;
-}
+        .frase p {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: #FAF0E1 !important;
+            line-height: 1.2;
+            margin: 0;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
 
-.carrusel-container {
-    width: 100%;
-    max-width: 1000px;
-    z-index: 10;
-    padding: 0 20px;
-}
+        .carrusel-container {
+            width: 100%;
+            max-width: 1200px;
+            z-index: 10;
+            padding: 0 20px;
+        }
 
-.carrusel {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding: 20px 0;
-}
+        .carrusel {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: 20px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
 
-.carrusel-item {
-    flex: 0 0 280px;
-}
+        .carrusel::-webkit-scrollbar {
+            display: none;
+        }
 
-.carrusel-card {
-    background: rgba(26, 26, 26, 0.9);
-    border: 1px solid rgba(232, 180, 184, 0.3);
-    backdrop-filter: blur(10px);
-    text-decoration: none;
-}
+        .carrusel-item {
+            flex: 0 0 280px !important;
+            scroll-snap-align: start;
+        }
 
-.carrusel-img {
-    width: 100%;
-    height: 350px;
-    object-fit: cover;
-}
+        @media (max-width: 768px) {
+            .carrusel-item {
+                flex: 0 0 85% !important;
+            }
+            .frase p {
+                font-size: 2.5rem;
+            }
+        }
 
-.carrusel-info {
-    padding: 15px;
-    color: #FAF0E1;
-}
+        .carrusel-card {
+            background: rgba(26, 26, 26, 0.9) !important;
+            border: 1px solid rgba(232, 180, 184, 0.3) !important;
+            backdrop-filter: blur(10px);
+            display: block;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-.carrusel-btn-add {
-    display: block;
-    background: #E8B4B8;
-    color: #1A1A1A;
-    text-align: center;
-    padding: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    margin-top: 10px;
-}
-</style>
+        .carrusel-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+        }
+
+        .carrusel-info {
+            padding: 15px;
+            color: #FAF0E1 !important;
+        }
+
+        .carrusel-btn-add {
+            display: block;
+            background: #E8B4B8 !important;
+            color: #1A1A1A !important;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .carrusel-btn-add:hover {
+            background: #d4a0a4 !important;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
+<div class="page-loader">
+    <div class="loader-logo">
+        <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez Logo">
+    </div>
+</div>
 
-<section class="hero">
+<video autoplay muted loop playsinline id="video-fondo" preload="auto">
+    <source src="{% static 'img/video/fondo.mp4' %}" type="video/mp4">
+</video>
 
+<div class="overlay-fondo"></div>
+
+<section class="hero fade-in-section">
     <div class="frase">
         <p>
             "<span class="cursiva">Looks</span><br>
@@ -100,49 +166,35 @@ body {
         </p>
 
         <div class="carrusel-container">
-            <h3 style="color:white;">Selección Destacada</h3>
-
-            <div class="carrusel">
-                {% for producto in productos_carrusel %}
-                <div class="carrusel-item">
-
-                    <a href="{% url 'detalle_producto' producto.slug %}" class="carrusel-card">
-
-                        {% if producto.imagen %}
-                        <img src="{{ producto.imagen.url }}" class="carrusel-img">
-                        {% else %}
-                        <div style="height:350px; background:#333;"></div>
+            <h3 class="carrusel-titulo" style="color: #E8B4B8; letter-spacing: 3px; margin-bottom: 15px;">Selección Destacada</h3>
+            <div class="carrusel-wrapper" style="position: relative;">
+                <div class="carrusel">
+                    {% for producto in productos_carrusel %}
+                    <div class="carrusel-item">
+                        <a href="{% url 'detalle_producto' producto.slug %}" class="carrusel-card">
+                            <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}" class="carrusel-img">
+                            <div class="carrusel-info">
+                                <span class="carrusel-nombre" style="display:block; font-weight:500; margin-bottom:5px; font-size: 1rem;">{{ producto.nombre }}</span>
+                                <span class="carrusel-precio" style="color:#E8B4B8; font-weight: bold;">COP ${{ producto.precio }}</span>
+                            </div>
+                        </a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'agregar_al_carrito' producto.id %}" class="carrusel-btn-add"><i class="fa-solid fa-cart-plus"></i> Agregar</a>
                         {% endif %}
-
-                        <div class="carrusel-info">
-                            <span>{{ producto.nombre }}</span><br>
-                            <span style="color:#E8B4B8;">COP ${{ producto.precio }}</span>
-                        </div>
-
-                    </a>
-
-                    {% if user.is_authenticated %}
-                    <a href="{% url 'agregar_al_carrito' producto.id %}" class="carrusel-btn-add">
-                        Agregar
-                    </a>
-                    {% endif %}
-
+                    </div>
+                    {% empty %}
+                    <p class="carrusel-vacio" style="color: #FAF0E1;">Próximamente productos destacados. <a href="{% url 'tienda' %}" style="color: #E8B4B8;">Explorar tienda</a></p>
+                    {% endfor %}
                 </div>
-                {% empty %}
-                <p style="color:white;">Próximamente productos destacados</p>
-                {% endfor %}
             </div>
         </div>
 
         {% if not user.is_authenticated %}
-        <div style="margin-top:20px;">
-            <a href="{% url 'login' %}" class="carrusel-btn-add">Iniciar Sesión</a>
-            <a href="{% url 'registro' %}" class="carrusel-btn-add">Registrarse</a>
+        <div class="btn-group">
+            <a href="{% url 'login' %}" class="btn"><i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión</a>
+            <a href="{% url 'registro' %}" class="btn btn-secundario"><i class="fa-solid fa-user-plus"></i> Registrarse</a>
         </div>
         {% endif %}
-
     </div>
-
 </section>
-
 {% endblock %}

@@ -116,8 +116,6 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # ✅ WHITENOISE (IMPORTANTE)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -135,6 +133,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 os.makedirs(MEDIA_ROOT, exist_ok=True)
+os.makedirs(BASE_DIR / "static" / "img" / "video", exist_ok=True)
 
 # Default primary key
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

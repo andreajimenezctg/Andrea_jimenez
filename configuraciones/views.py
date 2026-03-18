@@ -732,101 +732,97 @@ def descargar_factura_pdf(request, venta_id):
 
 @user_passes_test(es_admin)
 def panel_admin(request):
-    # 1. Estadísticas Generales
-    total_productos = Prenda.objects.filter(is_archived=False).count()
-    total_ventas = Venta.objects.count()
-    ingresos_totales = Venta.objects.aggregate(total=Sum('total'))['total'] or 0
-    total_clientes = Cliente.objects.count()
+    try:
+        # 1. Estadísticas Generales
+        total_productos = Prenda.objects.filter(is_archived=False).count()
+        total_ventas = Venta.objects.count()
+        ingresos_totales = Venta.objects.aggregate(total=Sum('total'))['total'] or 0
+        total_clientes = Cliente.objects.count()
 
-    # 2. Estadísticas Mensuales (Mes actual)
-    hoy = timezone.now()
-    inicio_mes = hoy.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    
-    productos_mes = Prenda.objects.filter(created_at__gte=inicio_mes, is_archived=False).count()
-    ventas_mes = Venta.objects.filter(fecha_venta__gte=inicio_mes).count()
-    clientes_mes = User.objects.filter(date_joined__gte=inicio_mes, groups__name="Cliente").count()
-
-    # 3. Gráfico de Tendencia de Ventas (Últimos 12 meses)
-    ventas_mensuales = []
-    meses_nombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-    labels_grafica = []
-    
-    # Obtener datos de los últimos 12 meses incluyendo el actual
-    for i in range(11, -1, -1):
-        # Calcular mes y año para cada uno de los últimos 12 meses
-        mes_idx = (hoy.month - i - 1) % 12
-        anio_adj = hoy.year if (hoy.month - i) > 0 else hoy.year - 1
+        # 2. Estadísticas Mensuales (Mes actual)
+        hoy = timezone.now()
+        inicio_mes = hoy.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         
-        ventas_count = Venta.objects.filter(fecha_venta__month=mes_idx + 1, fecha_venta__year=anio_adj).count()
-        ventas_mensuales.append(ventas_count)
-        labels_grafica.append(meses_nombres[mes_idx])
+        productos_mes = Prenda.objects.filter(created_at__gte=inicio_mes, is_archived=False).count()
+        ventas_mes = Venta.objects.filter(fecha_venta__gte=inicio_mes).count()
+        clientes_mes = User.objects.filter(date_joined__gte=inicio_mes, groups__name="Cliente").count()
 
-    # 4. Gráfico de Distribución por Categorías
-    # Filtramos categorías que tengan al menos una unidad vendida para que la gráfica sea clara
-    categorias_qs = Categoria.objects.annotate(
-        num_ventas=Sum('prendas__detalleventa__cantidad')
-    ).filter(num_ventas__gt=0)
-    
-    categorias_labels = [cat.nombre for cat in categorias_qs]
-    total_unidades = sum(cat.num_ventas or 0 for cat in categorias_qs)
-    
-    if total_unidades > 0:
-        categorias_data = [round((cat.num_ventas or 0) * 100 / total_unidades, 1) for cat in categorias_qs]
-    else:
-        # Si no hay ventas en ninguna categoría, enviamos datos vacíos
-        categorias_labels = []
-        categorias_data = []
+        # 3. Gráfico de Tendencia de Ventas (Últimos 12 meses)
+        ventas_mensuales = []
+        meses_nombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+        labels_grafica = []
+        
+        for i in range(11, -1, -1):
+            target_date = hoy - datetime.timedelta(days=i*30)
+            mes_idx = target_date.month - 1
+            anio_adj = target_date.year
+            
+            ventas_count = Venta.objects.filter(fecha_venta__month=mes_idx + 1, fecha_venta__year=anio_adj).count()
+            ventas_mensuales.append(ventas_count)
+            labels_grafica.append(meses_nombres[mes_idx])
 
-    # 5. Actividad Reciente y Alertas
-    ventas_recientes = Venta.objects.select_related('cliente__user').order_by('-fecha_venta')[:5]
-    productos_bajo_stock = Prenda.objects.filter(stock__lt=5, is_archived=False).order_by('stock')[:5]
+        # 4. Gráfico de Distribución por Categorías
+        categorias_qs = Categoria.objects.annotate(
+            num_ventas=Sum('prendas__detalleventa__cantidad')
+        ).filter(num_ventas__gt=0)
+        
+        categorias_labels = [cat.nombre for cat in categorias_qs]
+        total_unidades = sum(cat.num_ventas or 0 for cat in categorias_qs)
+        
+        if total_unidades > 0:
+            categorias_data = [round((cat.num_ventas or 0) * 100 / total_unidades, 1) for cat in categorias_qs]
+        else:
+            categorias_labels = []
+            categorias_data = []
 
-    # 6. Indicadores de Progreso
-    # Stock
-    productos_en_stock = Prenda.objects.filter(stock__gt=0, is_archived=False).count()
-    if total_productos > 0:
-        stock_porcentaje = round(productos_en_stock * 100 / total_productos, 1)
-    else:
-        stock_porcentaje = 0
-    # El offset de SVG funciona al revés: 0 es lleno, 251.2 es vacío
-    stock_offset = 251.2 * (1 - (stock_porcentaje / 100))
+        # 5. Actividad Reciente
+        ventas_recientes = Venta.objects.select_related('cliente__user').order_by('-fecha_venta')[:5]
+        productos_bajo_stock = Prenda.objects.filter(stock__lt=5, is_archived=False).order_by('stock')[:5]
 
-    # Meta de ventas
-    meta_ventas = 100
-    ventas_actuales = ventas_mes
-    if meta_ventas > 0:
-        porcentaje_meta = min(round(ventas_actuales * 100 / meta_ventas, 1), 100)
-    else:
-        porcentaje_meta = 0
-    meta_ventas_offset = 251.2 * (1 - (porcentaje_meta / 100))
+        # 6. Indicadores de Progreso
+        productos_en_stock = Prenda.objects.filter(stock__gt=0, is_archived=False).count()
+        stock_porcentaje = round(productos_en_stock * 100 / total_productos, 1) if total_productos > 0 else 0
+        stock_offset = 251.2 * (1 - (stock_porcentaje / 100))
 
-    # Productos en Oferta
-    productos_oferta = Prenda.objects.filter(precio_descuento__isnull=False, is_archived=False).count()
-    if total_productos > 0:
-        ofertas_porcentaje = round(productos_oferta * 100 / total_productos, 1)
-    else:
-        ofertas_porcentaje = 0
-    ofertas_offset = 251.2 * (1 - (ofertas_porcentaje / 100))
+        meta_ventas = 100
+        ventas_actuales = ventas_mes
+        porcentaje_meta = min(round(ventas_actuales * 100 / meta_ventas, 1), 100) if meta_ventas > 0 else 0
+        meta_ventas_offset = 251.2 * (1 - (porcentaje_meta / 100))
 
-    context = {
-        "total_productos": total_productos,
-        "productos_mes": productos_mes,
-        "total_ventas": total_ventas,
-        "ventas_mes": ventas_mes,
-        "ingresos_totales": f"${int(ingresos_totales):,}",
-        "total_clientes": total_clientes,
-        "clientes_mes": clientes_mes,
-        "ventas_mensuales": ventas_mensuales,
-        "labels_grafica": labels_grafica,
-        "categorias_labels": categorias_labels,
-        "categorias_data": categorias_data,
-        "ventas_recientes": ventas_recientes,
-        "productos_bajo_stock": productos_bajo_stock,
-        "meta_ventas": meta_ventas,
-        "ventas_actuales": ventas_actuales,
-        "meta_ventas_porcentaje": porcentaje_meta,
-        "meta_ventas_offset": meta_ventas_offset,
-        "productos_en_stock": productos_en_stock,
+        productos_oferta = Prenda.objects.filter(precio_descuento__isnull=False, is_archived=False).count()
+        ofertas_porcentaje = round(productos_oferta * 100 / total_productos, 1) if total_productos > 0 else 0
+        ofertas_offset = 251.2 * (1 - (ofertas_porcentaje / 100))
+
+        context = {
+            "total_productos": total_productos,
+            "productos_mes": productos_mes,
+            "total_ventas": total_ventas,
+            "ventas_mes": ventas_mes,
+            "ingresos_totales": f"${int(ingresos_totales):,}",
+            "total_clientes": total_clientes,
+            "clientes_mes": clientes_mes,
+            "ventas_mensuales": ventas_mensuales,
+            "labels_grafica": labels_grafica,
+            "categorias_labels": categorias_labels,
+            "categorias_data": categorias_data,
+            "ventas_recientes": ventas_recientes,
+            "productos_bajo_stock": productos_bajo_stock,
+            "meta_ventas": meta_ventas,
+            "ventas_actuales": ventas_actuales,
+            "meta_ventas_porcentaje": porcentaje_meta,
+            "meta_ventas_offset": meta_ventas_offset,
+            "productos_en_stock": productos_en_stock,
+            "stock_porcentaje": stock_porcentaje,
+            "stock_offset": stock_offset,
+            "productos_oferta": productos_oferta,
+            "ofertas_porcentaje": ofertas_porcentaje,
+            "ofertas_offset": ofertas_offset,
+        }
+        return render(request, "admin/panel_admin.html", context)
+    except Exception as e:
+        logger.error(f"Error en panel_admin: {str(e)}")
+        # Fallback minimalista para evitar el 500
+        return render(request, "admin/panel_admin.html", {"error": True})
         "stock_porcentaje": stock_porcentaje,
         "stock_offset": stock_offset,
         "productos_oferta": productos_oferta,
