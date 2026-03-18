@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: andrea-jimenez
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn Andrea_jimenez.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 1 --worker-class sync --worker-tmp-dir /dev/shm --log-file -"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DJANGO_SETTINGS_MODULE
+        value: Andrea_jimenez.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
