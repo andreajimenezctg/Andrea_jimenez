@@ -823,14 +823,6 @@ def panel_admin(request):
         logger.error(f"Error en panel_admin: {str(e)}")
         # Fallback minimalista para evitar el 500
         return render(request, "admin/panel_admin.html", {"error": True})
-        "stock_porcentaje": stock_porcentaje,
-        "stock_offset": stock_offset,
-        "productos_oferta": productos_oferta,
-        "ofertas_porcentaje": ofertas_porcentaje,
-        "ofertas_offset": ofertas_offset,
-    }
-
-    return render(request, "admin/panel_admin.html", context)
 
 
 @login_required
