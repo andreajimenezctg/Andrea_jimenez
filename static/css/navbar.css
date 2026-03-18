@@ -36,8 +36,6 @@ body {
     background-color: var(--crema); 
     color: var(--negro); 
     line-height: 1.6; 
-    position: relative; 
-    z-index: 1; 
     -webkit-font-smoothing: antialiased; 
     -moz-osx-font-smoothing: grayscale; 
 } 

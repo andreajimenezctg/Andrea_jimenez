@@ -5,6 +5,9 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <style>
+        body { background-color: #1a1a1a !important; } /* Fondo oscuro mientras carga el video */
+    </style>
     <link rel="preload" href="{% static 'img/video/fondo.mp4' %}" as="video">
 {% endblock %}
 
@@ -109,8 +112,8 @@ window.addEventListener('load', function() {
     var loader = document.querySelector('.page-loader');
     if (loader) {
         setTimeout(function() {
-            loader.style.opacity = '0';
-            setTimeout(function() { loader.style.display = 'none'; }, 600);
+            loader.classList.add('hidden');
+            setTimeout(function() { loader.style.display = 'none'; }, 800);
         }, 800);
     }
 });
