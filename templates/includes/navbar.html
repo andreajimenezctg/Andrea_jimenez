@@ -3,7 +3,7 @@
     <nav class="navbar">
         <div class="nav-left">
             <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
+                <i class="fa-solid fa-bars"></i>
             </button>
             <div class="logo">
                 <a href="{% url 'home' %}">
@@ -14,14 +14,25 @@
 
         <ul class="menu" id="navMenu">
             <li class="mobile-only sidebar-header">
-                <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="sidebar-logo">
-                <button class="close-sidebar" id="closeSidebar">&times;</button>
+                <div class="sidebar-brand">
+                    <span class="brand-name">Andrea Jiménez</span>
+                    <span class="brand-sub">TIENDA ONLINE</span>
+                </div>
+                <button class="close-sidebar" id="closeSidebar"><i class="fa-solid fa-bars"></i></button>
             </li>
             <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}"><i class="fa-solid fa-house mobile-only"></i> Inicio</a></li>
             <li><a href="{% url 'tienda' %}" class="{% if 'tienda' in request.path %}active{% endif %}"><i class="fa-solid fa-store mobile-only"></i> Tienda</a></li>
             <li><a href="{% url 'oferta' %}" class="{% if 'oferta' in request.path %}active{% endif %}"><i class="fa-solid fa-tags mobile-only"></i> Oferta</a></li>
             <li><a href="{% url 'atencion' %}" class="{% if 'atencion' in request.path %}active{% endif %}"><i class="fa-solid fa-headset mobile-only"></i> Atención</a></li>
             <li><a href="{% url 'distribuidores' %}" class="{% if 'distribuidores' in request.path %}active{% endif %}"><i class="fa-solid fa-location-dot mobile-only"></i> Ubicación</a></li>
+            
+            <li class="mobile-only" style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 20px; padding-top: 10px;"></li>
+            {% if user.is_authenticated %}
+                <li class="mobile-only"><a href="{% url 'panel_cliente' %}"><i class="fa-solid fa-user-gear"></i> Mi Perfil</a></li>
+                <li class="mobile-only"><a href="{% url 'logout' %}" style="color: #e8b4b8;"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
+            {% else %}
+                <li class="mobile-only"><a href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión</a></li>
+            {% endif %}
         </ul>
 
         <div class="user-actions">

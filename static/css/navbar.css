@@ -467,13 +467,15 @@ header.scrolled .logo-img {
     }
 
     .mobile-menu-btn {
-        display: flex !important; /* Visible en móviles */
+        display: flex !important;
         align-items: center;
         justify-content: center;
         order: -1; 
         margin: 0;
         width: 45px;
-        height: 45px;
+        height: 100%; /* Toma el alto total del navbar */
+        border: none;
+        background: transparent;
     }
 
     .nav-left {
@@ -496,22 +498,21 @@ header.scrolled .logo-img {
         max-width: 140px;
     }
 
-    /* Sidebar Implementation (Similar al Panel Admin) */
+    /* Sidebar Implementation (Estilo Panel Admin) */
     .menu {
         position: fixed;
         top: 0;
-        left: -100%; /* Hidden by default */
-        width: 300px;
+        left: -100%; 
+        width: 280px;
         height: 100vh;
         background-color: #1a1a1a;
         flex-direction: column;
         align-items: flex-start;
         padding: 0;
         gap: 0;
-        transition: left 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+        transition: left 0.4s cubic-bezier(0.77,0.2,0.05,1.0);
         z-index: 2000;
-        border-right: 1px solid rgba(232, 180, 184, 0.2);
-        box-shadow: 15px 0 50px rgba(0,0,0,0.8);
+        box-shadow: 20px 0 50px rgba(0,0,0,0.6);
     }
 
     .menu.active {
@@ -520,66 +521,84 @@ header.scrolled .logo-img {
 
     .sidebar-header {
         width: 100%;
-        padding: 30px 25px;
+        padding: 40px 25px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: rgba(232, 180, 184, 0.03);
-        border-bottom: 1px solid rgba(232, 180, 184, 0.1);
+        background: #1a1a1a;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         margin-bottom: 10px;
     }
 
-    .sidebar-logo {
-        height: 40px;
-        filter: brightness(1.2);
+    .sidebar-brand {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .brand-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem;
+        color: #e8b4b8;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .brand-sub {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.55rem;
+        color: rgba(255,255,255,0.4);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-top: 5px;
     }
 
     .close-sidebar {
         background: none;
         border: none;
-        color: var(--rosado);
-        font-size: 2.2rem;
+        color: #fff;
+        font-size: 1.2rem;
         cursor: pointer;
-        line-height: 1;
-        transition: transform 0.3s ease;
-    }
-
-    .close-sidebar:hover {
-        transform: rotate(90deg);
     }
 
     .menu li {
         width: 100%;
-        height: auto;
+        padding: 5px 15px;
     }
 
     .menu li a {
         width: 100%;
-        padding: 18px 30px;
-        font-size: 0.8rem;
-        letter-spacing: 3px;
-        border-bottom: 1px solid rgba(255,255,255,0.02);
+        padding: 15px 20px;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        text-transform: none;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         gap: 15px;
-        color: rgba(250, 240, 225, 0.8);
+        color: rgba(255, 255, 255, 0.7);
+        border: none !important;
     }
 
     .menu li a i {
-        font-size: 1rem;
-        width: 20px;
+        font-size: 1.1rem;
+        width: 25px;
         text-align: center;
-        color: var(--rosado);
-    }
-
-    .menu li a::after {
-        display: none; /* No underline on mobile */
+        color: rgba(255, 255, 255, 0.5);
     }
 
     .menu li a.active {
-        background-color: rgba(232, 180, 184, 0.08);
-        border-left: 4px solid var(--rosado);
-        color: var(--rosado);
+        background-color: #e8b4b8;
+        color: #fff !important;
+        box-shadow: 0 4px 15px rgba(232, 180, 184, 0.3);
+    }
+
+    .menu li a.active i {
+        color: #fff !important;
+    }
+
+    .menu li a:hover:not(.active) {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #fff;
     }
 
     .sidebar-overlay {
