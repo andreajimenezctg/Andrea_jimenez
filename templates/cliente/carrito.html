@@ -75,7 +75,7 @@
                         </td>
                         <td style="text-align: center;">
                             <div class="qty-control" style="justify-content: center;">
-                                <a href="{% url 'restar_del_carrito' item.id %}" class="qty-btn">-</a>
+                                <a href="{% url 'restar_item' item.id %}" class="qty-btn">-</a>
                                 <span style="font-weight: 600;">{{ item.cantidad }}</span>
                                 <a href="{% url 'agregar_al_carrito' item.prenda.id %}" class="qty-btn">+</a>
                             </div>
