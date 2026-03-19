@@ -195,26 +195,20 @@ header.scrolled .logo-img {
     color: rgba(250, 240, 225, 0.75);
     background: none;
     border: none;
-    cursor: pointer;
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.65rem;
-    font-weight: 500;
-    letter-spacing: 2px;
+    font-size: 0.68rem;
+    font-weight: 400;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 0;
+    gap: 8px;
+    padding: 8px 15px;
     transition: var(--transicion);
-    white-space: nowrap;
 }
 
-.dropdown-btn i:first-child {
-    font-size: 1.1rem;
-    color: var(--rosado);
-}
-
-.dropdown:hover .dropdown-btn {
+.dropdown-btn:hover {
     color: var(--rosado);
 }
 
@@ -222,48 +216,46 @@ header.scrolled .logo-img {
     display: none;
     position: absolute;
     right: 0;
+    top: 100%;
     background-color: var(--negro);
-    min-width: 220px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    min-width: 200px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     z-index: 1001;
-    border: 1px solid rgba(232, 180, 184, 0.2);
-    border-top: 2px solid var(--rosado);
-    padding: 12px 0;
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(232, 180, 184, 0.15);
+    animation: fadeIn 0.3s ease;
 }
 
 .dropdown-content a {
-    color: rgba(250, 240, 225, 0.7);
-    padding: 12px 25px;
+    color: rgba(250, 240, 225, 0.8);
+    padding: 14px 20px;
     text-decoration: none;
-    display: flex !important;
+    display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 0.72rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    transition: var(--transicion);
+    font-size: 0.75rem;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
 }
 
 .dropdown-content a i {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    color: var(--rosado);
     width: 20px;
     text-align: center;
-    opacity: 0.8;
 }
 
 .dropdown-content a:hover {
-    background-color: rgba(232, 180, 184, 0.08);
+    background-color: rgba(232, 180, 184, 0.1);
     color: var(--rosado);
-    padding-left: 30px;
+    padding-left: 25px;
 }
 
 .dropdown:hover .dropdown-content {
     display: block;
-    animation: dropdownFade 0.3s ease;
 }
 
-@keyframes dropdownFade {
+@keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }

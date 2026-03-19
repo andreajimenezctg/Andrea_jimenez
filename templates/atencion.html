@@ -1,132 +1,75 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Atención al Cliente - Andrea Jiménez</title>
-    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/atencion.css' %}">
-    
-</head>
+{% block title %}Atención al Cliente - Andrea Jiménez{% endblock %}
 
-<body>
-    {% include 'includes/navbar.html' %}
-    <div class="container">
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/atencion.css' %}?v={% now 'U' %}">
+    <style>
+        .container {
+            padding-top: 140px !important;
+            background: transparent !important;
+        }
+        @media (max-width: 992px) {
+            .container {
+                padding-top: 100px !important;
+            }
+        }
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #25d366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+        .whatsapp-btn:hover {
+            transform: scale(1.1);
+            color: white;
+        }
+    </style>
+{% endblock %}
 
-        <!-- Título principal -->
-        <h1>ATENCIÓN AL CLIENTE</h1>
+{% block content %}
+<div class="container">
+    <!-- Título principal -->
+    <h1>ATENCIÓN AL CLIENTE</h1>
+    <p style="text-align: center; margin-bottom: 40px; color: var(--gris-texto);">¿Tienes alguna pregunta? ¡Estamos aquí para ayudarte!</p>
 
-        <p>¿Tienes alguna pregunta? ¡Estamos aquí para ayudarte!</p>
-
-        <!-- Formulario de contacto -->
+    <!-- Formulario de contacto -->
+    <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: var(--sombra-suave); border: var(--borde-rosado); max-width: 600px; margin: 0 auto;">
         <form method="POST">
             {% csrf_token %}
-            <div class="form-group">
-                <input type="text" name="nombre" class="form-control" placeholder="Nombre" required />
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="text" name="nombre" class="form-control" placeholder="Nombre" required style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px;" />
             </div>
-            <div class="form-group">
-                <input type="email" name="email" class="form-control" placeholder="Email" required />
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="email" name="email" class="form-control" placeholder="Email" required style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px;" />
             </div>
-            <div class="form-group">
-                <input type="tel" name="telefono" class="form-control" placeholder="Teléfono" required />
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="tel" name="telefono" class="form-control" placeholder="Teléfono" required style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px;" />
             </div>
-            <div class="form-group">
-                <textarea name="mensaje" class="form-control" placeholder="Escribe tu mensaje aquí..." required></textarea>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <textarea name="mensaje" class="form-control" placeholder="Escribe tu mensaje aquí..." required style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; min-height: 150px;"></textarea>
             </div>
-            <button type="submit" class="btn-submit">Enviar</button>
+            <button type="submit" class="btn-filtrar" style="width: 100%; border: none; background: var(--negro); color: white; padding: 15px; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Enviar Mensaje</button>
         </form>
-
-        <hr />
-
-        <!-- Información de contacto -->
-        <div class="contact-info">
-            <strong>Llámanos al:</strong><br />
-            +{{ whatsapp_number }}<br />
-            o envíanos un email:<br />
-            andreajimenezctg@gmail.com
-        </div>
-
-        <hr />
-
-        <!-- Devoluciones -->
-        <h2>DEVOLUCIONES</h2>
-        <p>Si no quedaste satisfecho con tu compra, puedes devolver o cambiar tu producto dentro de los 15 días
-            siguientes a la recepción, siempre que esté en perfectas condiciones y con sus etiquetas.</p>
-        <p>Para iniciar el proceso, escríbenos por WhatsApp o correo y te indicaremos los pasos.</p>
-
-        <hr />
-
-        <!-- FAQ -->
-        <h2>FAQ</h2>
-
-        <h3>¿Provees envíos internacionales?</h3>
-        <p>Actualmente solo realizamos envíos dentro de Colombia. Si vives fuera del país, puedes contactarnos para
-            coordinar opciones especiales.</p>
-
-        <h3>¿Cómo puedo devolver un producto?</h3>
-        <p>Envíanos un mensaje por WhatsApp o correo indicando el número de pedido y el motivo de la devolución. Te
-            enviaremos instrucciones para enviarlo.</p>
-
-        <h3>¿Cuánto tiempo tarda en llegar mi pedido?</h3>
-        <p>Los envíos nacionales toman entre 3 y 7 días hábiles desde que confirmamos el pago.</p>
-
-        <h3>¿Qué métodos de pago aceptan?</h3>
-        <p>Aceptamos tarjeta de crédito/débito, PayPal y transferencia bancaria.</p>
-
     </div>
 
-    <!-- Sección de redes y newsletter -->
-    <div style="background: #222; color: #ccc; text-align: center; padding: 40px 20px;">
-        <div class="social-icons">
-            <a href="#" class="social-icon">f</a>
-            <a href="#" class="social-icon">🐦</a>
-            <a href="#" class="social-icon">P</a>
-            <a href="#" class="social-icon">📷</a>
-        </div>
-
-        <div class="newsletter">
-            <p>ESCRÍBENOS</p>
-            <input type="email" placeholder="Ingresa tu email aquí*" />
-            <button type="button" class="btn">Enviar</button>
-        </div>
-
-        <p>+{{ whatsapp_number }}</p>
-        <p>andreajimenezctg@gmail.com</p>
-        <p>© 2025 Andrea Jiménez</p>
+    <div style="margin-top: 60px; text-align: center;">
+        <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 20px;">Información Adicional</h3>
+        <p style="color: var(--gris-texto); margin-bottom: 10px;">Aceptamos tarjeta de crédito/débito, PayPal y transferencia bancaria.</p>
+        <p style="color: var(--gris-texto);">Horario de atención: Lunes a Viernes 8:00 AM - 6:00 PM</p>
     </div>
-
-    <a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" target="_blank" class="whatsapp-btn" aria-label="Contactar por WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <style>
-    .whatsapp-btn {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background-color: #25d366;
-        color: white;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 30px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        z-index: 1000;
-        transition: transform 0.3s ease;
-        text-decoration: none;
-    }
-    .whatsapp-btn:hover {
-        transform: scale(1.1);
-        color: white;
-    }
-    </style>
-
-</body>
-
-</html>
+</div>
+{% endblock %}

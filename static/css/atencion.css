@@ -17,185 +17,14 @@
     --borde-rosado: 1px solid rgba(232, 180, 184, 0.2);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { overflow-y: scroll; scroll-behavior: smooth; }
-
-body {
-    font-family: 'Montserrat', sans-serif;
-    color: var(--negro);
-    background-color: var(--crema);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-}
-
-/* =========================================
-   HEADER & NAVBAR — Uniforme
-   ========================================= */
-header {
-    background-color: var(--negro);
-    padding: 0 40px;
-    width: 100%;
-    z-index: 1000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    min-height: 78px;
-    border-bottom: var(--borde-rosado);
-    transition: var(--transicion);
-}
-
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 78px;
-    min-height: 78px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.logo a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.logo img,
-.logo-img {
-    height: 48px;
-    width: auto;
-    display: block;
-    filter: brightness(1.15);
-    transition: var(--transicion);
-    margin-right: 35px;
-}
-
-.logo img:hover,
-.logo-img:hover {
-    opacity: 0.85;
-    transform: scale(1.02);
-}
-
-.menu {
-    display: flex;
-    list-style: none;
-    gap: 1.2rem;
-    margin: 0;
-    padding: 0;
-    align-items: center;
-    height: 100%;
-    flex: 1;
-    justify-content: flex-start;
-}
-
-.menu li {
-    position: relative;
-    height: 100%;
-    display: flex;
-    align-items: center;
-}
-
-.menu li a,
-.menu a {
-    color: rgba(250, 240, 225, 0.7);
-    text-decoration: none;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.6rem;
-    font-weight: 500;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 8px 0;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: color 0.4s ease;
-    position: relative;
-    white-space: nowrap;
-}
-
-.menu li a i { font-size: 0.8rem; opacity: 0.6; transition: opacity 0.4s ease, transform 0.3s ease; }
-
-.menu li a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--rosado);
-    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.menu li a:hover,
-.menu a:hover,
-.menu .active { color: var(--rosado); }
-.menu li a:hover i { opacity: 1; transform: translateY(-1px); }
-.menu li a:hover::after,
-.menu li a.active::after { width: 100%; }
-.menu li a.active { color: var(--rosado); }
-.menu li a.active i { opacity: 1; }
-
-.user-actions {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    height: 100%;
-}
-
-.cart { display: flex; align-items: center; height: 100%; }
-
-.cart a {
-    color: rgba(250, 240, 225, 0.7);
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    transition: color 0.3s ease, transform 0.3s ease;
-    text-decoration: none;
-}
-
-.cart a:hover { color: var(--rosado); transform: scale(1.1); }
-
-.user-name {
-    color: rgba(250, 240, 225, 0.55);
-    font-size: 0.75rem;
-    font-weight: 300;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.btn-logout {
-    color: rgba(250, 240, 225, 0.65);
-    text-decoration: none;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.68rem;
-    font-weight: 400;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border: 1px solid rgba(232, 180, 184, 0.35);
-    padding: 8px 18px;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    transition: var(--transicion);
-}
-
-.btn-logout:hover {
-    background: var(--rosado);
-    color: var(--negro);
-    border-color: var(--rosado);
-}
-
 /* =========================================
    CONTENEDOR PRINCIPAL
    ========================================= */
 .container {
     max-width: 900px;
-    margin: 120px auto 40px;
+    margin: 0 auto;
     padding: 50px;
-    background: var(--blanco);
-    box-shadow: var(--sombra-suave);
-    border: 1px solid rgba(232, 180, 184, 0.12);
+    background: transparent !important;
     animation: fadeInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
 }
 
@@ -243,13 +72,6 @@ p {
     line-height: 1.7;
 }
 
-hr {
-    border: 0;
-    height: 1px;
-    background: rgba(232, 180, 184, 0.2);
-    margin: 40px 0;
-}
-
 /* =========================================
    FORMULARIO DE CONTACTO
    ========================================= */
@@ -265,7 +87,7 @@ hr {
     font-size: 0.88rem;
     font-weight: 300;
     color: var(--negro);
-    background: var(--crema);
+    background: #fff;
     transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
 }
 
@@ -273,7 +95,6 @@ hr {
     outline: none;
     border-color: var(--rosado);
     box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.15);
-    background: var(--blanco);
 }
 
 .form-control::placeholder {
@@ -284,166 +105,6 @@ hr {
 textarea.form-control {
     height: 150px;
     resize: vertical;
-}
-
-.btn-submit {
-    background-color: var(--negro);
-    color: var(--crema);
-    border: 1px solid var(--negro);
-    padding: 16px;
-    width: 100%;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: var(--transicion);
-}
-
-.btn-submit:hover {
-    background-color: var(--rosado);
-    color: var(--negro);
-    border-color: var(--rosado);
-}
-
-/* =========================================
-   INFORMACION DE CONTACTO
-   ========================================= */
-.contact-info {
-    text-align: center;
-    margin: 40px 0;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 300;
-    color: var(--negro);
-    line-height: 2;
-}
-
-.contact-info strong {
-    display: block;
-    margin: 10px 0;
-    font-weight: 500;
-    color: var(--negro);
-}
-
-/* =========================================
-   REDES SOCIALES & NEWSLETTER (inline footer)
-   ========================================= */
-.social-icons {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin: 30px 0;
-}
-
-.social-icon {
-    font-size: 1.3rem;
-    color: rgba(250, 240, 225, 0.6);
-    text-decoration: none;
-    transition: var(--transicion);
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(232, 180, 184, 0.3);
-}
-
-.social-icon:hover {
-    color: var(--rosado);
-    border-color: var(--rosado);
-    transform: translateY(-3px);
-}
-
-.newsletter {
-    text-align: center;
-    margin: 30px auto;
-    max-width: 400px;
-}
-
-.newsletter p {
-    color: rgba(250, 240, 225, 0.6);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-}
-
-.newsletter input {
-    width: 100%;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.88rem;
-    background: var(--rosado);
-    color: var(--negro);
-    border: none;
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    transition: var(--transicion);
-}
-
-.newsletter input::placeholder {
-    color: rgba(26, 26, 26, 0.5);
-}
-
-.newsletter input:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.3);
-}
-
-.newsletter .btn {
-    background: transparent;
-    color: var(--rosado);
-    border: 1px solid rgba(232, 180, 184, 0.4);
-    padding: 14px;
-    width: 100%;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: var(--transicion);
-}
-
-.newsletter .btn:hover {
-    background: var(--rosado);
-    color: var(--negro);
-    border-color: var(--rosado);
-}
-
-/* =========================================
-   FOOTER
-   ========================================= */
-footer {
-    background: var(--negro);
-    color: rgba(250, 240, 225, 0.6);
-    text-align: center;
-    padding: 50px 20px;
-    margin-top: 0;
-    border-top: var(--borde-rosado);
-}
-
-footer p {
-    margin: 8px 0;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 300;
-    color: rgba(250, 240, 225, 0.5);
-}
-
-footer a {
-    color: var(--rosado);
-    text-decoration: none;
-    transition: opacity 0.3s ease;
-}
-
-footer a:hover {
-    opacity: 0.8;
 }
 
 /* =========================================
@@ -463,28 +124,8 @@ footer a:hover {
    RESPONSIVE
    ========================================= */
 @media (max-width: 768px) {
-    header { padding: 0 20px; }
-
-    .navbar {
-        flex-direction: column;
-        height: auto;
-        min-height: auto;
-        padding: 16px 0;
-        gap: 12px;
-    }
-
-    .menu {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.8rem;
-    }
-
-    .menu li a { font-size: 0.68rem; letter-spacing: 1.5px; }
-    .menu li a i { display: none; }
-
     .container {
-        margin: 100px 15px 30px;
-        padding: 30px;
+        padding: 30px 15px;
     }
 
     h1 { font-size: 2rem; }

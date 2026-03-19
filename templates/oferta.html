@@ -1,16 +1,13 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Andrea Jimenez | Ofertas Especiales</title>
-    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/tienda.css' %}">
+
+{% block title %}Andrea Jiménez | Ofertas Especiales{% endblock %}
+
+{% block extra_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="{% static 'css/oferta.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tienda.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'css/oferta.css' %}?v={% now 'U' %}">
     <style>
         .swiper {
             width: 100%;
@@ -28,15 +25,21 @@
         .swiper-pagination-bullet-active {
             background: #ff7a9c;
         }
+        .contenedor-ofertas {
+            padding-top: 140px !important;
+        }
+        @media (max-width: 992px) {
+            .contenedor-ofertas {
+                padding-top: 100px !important;
+            }
+        }
     </style>
-</head>
-<body>
+{% endblock %}
 
+{% block content %}
 <div class="page-loader">
-    <div class="loader-logo">Andrea Jimenez</div>
+    <div class="loader-logo">Andrea Jiménez</div>
 </div>
-
-{% include 'includes/navbar.html' %}
 
 <main class="contenedor-ofertas fade-in-section">
     <div class="titulo-ofertas">
@@ -64,13 +67,13 @@
                             {% endif %}
                             
                             <div class="card-precio">
-                                <span class="precio-oferta">COP ${{ producto.precio }}</span>
+                                <span class="precio-oferta">COP ${{ producto.precio|floatformat:0 }}</span>
                             </div>
                             
                             {% if user.is_authenticated and es_cliente %}
                                 <a href="{% url 'agregar_al_carrito' producto.id %}" class="card-boton"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</a>
                             {% elif not user.is_authenticated %}
-                                <a href="{% url 'registro' %}" class="card-boton iniciar-sesion"><i class="fa-solid fa-user-plus"></i> Registrate para comprar</a>
+                                <a href="{% url 'registro' %}" class="card-boton iniciar-sesion"><i class="fa-solid fa-user-plus"></i> Regístrate para comprar</a>
                             {% endif %}
                         </div>
                     </div>
@@ -90,39 +93,9 @@
         </div>
     {% endif %}
 </main>
+{% endblock %}
 
-<footer class="footer">
-    <div class="footer-container">
-        <div class="footer-col">
-            <h3>Conecta</h3>
-            <div class="social-icons">
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-            </div>
-        </div>
-        <div class="footer-col">
-            <h3>Newsletter</h3>
-            <form action="#">
-                <input type="email" placeholder="Tu email" required>
-                <button type="submit"><i class="fa-solid fa-paper-plane"></i> Suscribirse</button>
-            </form>
-        </div>
-        <div class="footer-col">
-            <h3>Contacto</h3>
-            <p><i class="fa-solid fa-phone"></i> +{{ whatsapp_number }}</p>
-            <p><i class="fa-solid fa-envelope"></i> info@andreajimenez.com</p>
-        </div>
-    </div>
-    <div class="footer-bottom">
-        <p>&copy; 2025 Andrea Jimenez</p>
-    </div>
-</footer>
-
-<a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" target="_blank" class="whatsapp-btn" aria-label="Contactar por WhatsApp">
-    <i class="fab fa-whatsapp"></i>
-</a>
-
+{% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -155,28 +128,8 @@
                 },
             },
         });
-
-        let currentPage = 1;
-        const totalPages = {{ page_obj.paginator.num_pages }};
-        
-        swiper.on('reachEnd', function () {
-            if (currentPage < totalPages) {
-                currentPage++;
-                fetch(`?page=${currentPage}&ajax=1`)
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newSlides = doc.querySelectorAll('.swiper-slide');
-                        newSlides.forEach(slide => {
-                            swiper.appendSlide(slide);
-                        });
-                    });
-            }
-        });
      });
 
-     // Animaciones de scroll (Restore)
      const observer = new IntersectionObserver((entries) => {
          entries.forEach(entry => {
              if (entry.isIntersecting) {
@@ -187,22 +140,14 @@
 
      document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
 
-     window.addEventListener('scroll', () => {
-         const header = document.querySelector('header');
-         if (window.scrollY > 60) {
-             header.classList.add('scrolled');
-         } else {
-             header.classList.remove('scrolled');
-         }
-     });
-
      window.addEventListener('load', () => {
         const loader = document.querySelector('.page-loader');
-        loader.classList.add('fade-out');
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500);
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }
     });
 </script>
-</body>
-</html>
+{% endblock %}

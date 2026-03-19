@@ -1,119 +1,73 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ubicación - Andrea Jiménez</title>
-    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
-    <link rel="stylesheet" href="{% static 'css/distribuidores.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
 
-{% include 'includes/navbar.html' %}
+{% block title %}Ubicación - Andrea Jiménez{% endblock %}
 
-<!-- CONTENIDO PRINCIPAL -->
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/distribuidores.css' %}?v={% now 'U' %}">
+    <style>
+        .container {
+            padding-top: 140px !important;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+        @media (max-width: 992px) {
+            .container {
+                padding-top: 100px !important;
+            }
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--negro);
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--gris-texto);
+            margin-bottom: 50px;
+            font-style: italic;
+        }
+        .store-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--sombra-suave);
+            border: var(--borde-rosado);
+            margin-bottom: 40px;
+        }
+        .mapa-wrapper {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--sombra-media);
+            border: var(--borde-rosado);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
 <div class="container">
-    <h1>UBICACIÓN ANDREA JIMÉNEZ</h1>
-    <p class="subtitle">Encuentra nuestra sede en Cartagena, barrio Villa Estrella</p>
+    <h1>NUESTRA SEDE</h1>
+    <p class="subtitle">Visítanos en el corazón de Cartagena</p>
 
-    <div class="store">
-        <h3>Cartagena - Barrio Villa Estrella</h3>
-        <p>Cartagena de Indias, Barrio Villa Estrella</p>
-        <p>Bolívar, Colombia</p>
-        <p>Tel: +{{ whatsapp_number }}</p>
-    </div>
-
-    <div class="mapa-tiendas">
-        <h2>Mapa de ubicación</h2>
-        <p>Ubicación en Cartagena, barrio Villa Estrella:</p>
+    <div class="store-card">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 15px;">Sede Principal - Villa Estrella</h3>
+        <p style="margin-bottom: 8px;"><i class="fa-solid fa-location-dot" style="color: var(--rosado); margin-right: 10px;"></i> Cartagena de Indias, Barrio Villa Estrella</p>
+        <p style="margin-bottom: 8px;"><i class="fa-solid fa-map" style="color: var(--rosado); margin-right: 10px;"></i> Bolívar, Colombia</p>
+        <p style="margin-bottom: 20px;"><i class="fa-solid fa-phone" style="color: var(--rosado); margin-right: 10px;"></i> Tel: +{{ whatsapp_number }}</p>
+        
         <div class="mapa-wrapper">
             <iframe
                 src="https://www.google.com/maps?q=Cartagena%20Barrio%20Villa%20Estrella%20Colombia&output=embed"
                 width="100%"
-                height="400"
+                height="450"
                 style="border:0;"
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade">
             </iframe>
         </div>
     </div>
-
-    <!-- Productos destacados -->
-    <section class="productos-ubicacion">
-        <h2>Algunos de nuestros favoritos</h2>
-        <div class="productos-grid-ubicacion">
-            <div class="producto-item">
-                <img src="{% static 'img/vestido.jpeg' %}" alt="Vestido">
-                <p>Vestido midi floral</p>
-                <span class="precio-cop">COP 89.900</span>
-            </div>
-            <div class="producto-item">
-                <img src="{% static 'img/accesorios.jpeg' %}" alt="Accesorios">
-                <p>Set de accesorios</p>
-                <span class="precio-cop">COP 39.900</span>
-            </div>
-            <div class="producto-item">
-                <img src="{% static 'img/bolsos.jpeg' %}" alt="Bolsos">
-                <p>Bolso tote clásico</p>
-                <span class="precio-cop">COP 119.900</span>
-            </div>
-        </div>
-    </section>
 </div>
-
-<!-- SECCIÓN DE REDES Y NEWSLETTER -->
-<div class="social-section">
-    <p>SIGUE CONECTADO</p>
-    <div class="social-icons">
-        <a href="#" class="social-icon">f</a>
-        <a href="#" class="social-icon">🐦</a>
-        <a href="#" class="social-icon">P</a>
-        <a href="#" class="social-icon">📷</a>
-    </div>
-
-    <p>ESCRÍBENOS</p>
-    <div class="newsletter">
-        <input type="email" placeholder="Ingresa tu email aquí*" />
-        <button type="button" class="btn">Enviar</button>
-    </div>
-
-    <footer>
-        <p>+{{ whatsapp_number }}</p>
-        <p>andreajimenezctg@gmail.com</p>
-        <p>© 2025 Andrea Jiménez</p>
-    </footer>
-</div>
-
-<a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" target="_blank" class="whatsapp-btn" aria-label="Contactar por WhatsApp">
-    <i class="fab fa-whatsapp"></i>
-</a>
-
-<style>
-.whatsapp-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background-color: #25d366;
-    color: white;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 1000;
-    transition: transform 0.3s ease;
-    text-decoration: none;
-}
-.whatsapp-btn:hover {
-    transform: scale(1.1);
-    color: white;
-}
-</style>
-
-</body>
-</html>
+{% endblock %}
