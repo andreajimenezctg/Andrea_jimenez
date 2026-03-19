@@ -1,180 +1,185 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Finalizar Compra - Andrea Jiménez</title>
-    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
-    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id|default:'sb' }}&currency={{ paypal_currency|default:'USD' }}&intent=capture"></script>
-</head>
-<body>
-    {% include 'includes/navbar.html' %}
 
-    <main class="container">
-        <h1>Finalizar Compra</h1>
-        <p style="text-align: center; color: var(--gris-texto); margin-bottom: 30px;">Revisa tu pedido y completa el pago de forma segura con <strong>PayPal</strong>.</p>
+{% block title %}Finalizar Compra - Andrea Jiménez{% endblock %}
 
-        <div class="shipping-info" style="padding: 0; overflow: hidden;">
-            <table class="carrito-table" style="width: 100%; margin: 0;">
-                <thead>
-                    <tr>
-                        <th style="text-align: left; padding-left: 30px;">Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in carrito_items %}
-                    <tr>
-                        <td style="text-align: left; padding-left: 30px; font-weight: 500;">{{ item.prenda.nombre }}</td>
-                        <td>{{ item.cantidad }}</td>
-                        <td>${{ item.prenda.precio|floatformat:0 }}</td>
-                        <td style="font-weight: 600; color: var(--rosado);">${{ item.subtotal|floatformat:0 }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/carrito.css' %}?v={% now 'U' %}">
+<style>
+    .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; padding-top: 120px !important; }
+    h1 { font-family: 'Playfair Display', serif; text-align: center; font-size: 2.5rem; color: var(--negro); margin-bottom: 40px; }
+    .checkout-form-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+    .shipping-info { background: #fff; padding: 30px; border-radius: 8px; box-shadow: var(--sombra-suave); }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 500; }
+    .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Montserrat', sans-serif; }
+    .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    .summary-table th { text-align: left; padding: 10px; border-bottom: 2px solid var(--crema); font-size: 0.75rem; text-transform: uppercase; }
+    .summary-table td { padding: 15px 10px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+    .total-box { background: var(--crema); padding: 20px; border-radius: 4px; text-align: right; margin-top: 20px; }
+    .total-box p { font-size: 0.9rem; margin-bottom: 5px; color: var(--gris-texto); }
+    .total-box h2 { font-size: 1.5rem; color: var(--negro); }
+    
+    @media (max-width: 768px) {
+        .checkout-form-container { grid-template-columns: 1fr; }
+        .container { padding-top: 100px !important; }
+    }
+</style>
+<!-- PayPal SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id|default:'sb' }}&currency=USD&intent=capture"></script>
+{% endblock %}
+
+{% block content %}
+<main class="container">
+    <h1>Finalizar Compra</h1>
+    <p style="text-align: center; color: var(--gris-texto); margin-bottom: 30px;">Revisa tu pedido y completa el pago de forma segura con <strong>PayPal</strong>.</p>
+
+    <div class="shipping-info" style="margin-bottom: 40px;">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 20px;">Resumen del Pedido</h3>
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="text-align: center;">Cant.</th>
+                    <th style="text-align: right;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrito_items %}
+                <tr>
+                    <td>{{ item.prenda.nombre }}</td>
+                    <td style="text-align: center;">{{ item.cantidad }}</td>
+                    <td style="text-align: right; font-weight: 600;">COP ${{ item.subtotal|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="total-box">
+            <p>Subtotal: COP ${{ total|floatformat:0 }}</p>
+            <p>Envío: COP $15.000</p>
+            <h2 style="color: var(--rosado);">Total: COP ${{ total|add:15000|floatformat:0 }}</h2>
+        </div>
+    </div>
+
+    <div class="checkout-form-container">
+        <div class="shipping-info">
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 25px; color: var(--negro); border-bottom: 1px solid var(--crema); padding-bottom: 10px;">
+                <i class="fa-solid fa-truck-fast" style="color: var(--rosado); margin-right: 10px;"></i>Envío
+            </h3>
+            <form id="shipping-form">
+                <div class="form-group">
+                    <label>Departamento</label>
+                    <select name="departamento" id="id_departamento" required class="form-control">
+                        <option value="">Selecciona...</option>
+                        <option value="Antioquia">Antioquia</option>
+                        <option value="Atlántico">Atlántico</option>
+                        <option value="Bogotá D.C.">Bogotá D.C.</option>
+                        <option value="Bolívar">Bolívar</option>
+                        <option value="Bolívar">Cartagena</option>
+                        <option value="Caldas">Caldas</option>
+                        <option value="Cauca">Cauca</option>
+                        <option value="Cundinamarca">Cundinamarca</option>
+                        <option value="Huila">Huila</option>
+                        <option value="Meta">Meta</option>
+                        <option value="Nariño">Nariño</option>
+                        <option value="Quindío">Quindío</option>
+                        <option value="Risaralda">Risaralda</option>
+                        <option value="Santander">Santander</option>
+                        <option value="Tolima">Tolima</option>
+                        <option value="Valle del Cauca">Valle del Cauca</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ciudad</label>
+                    <input type="text" name="ciudad" id="id_ciudad" placeholder="Ej: Cartagena" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Dirección Completa</label>
+                    <input type="text" name="direccion" id="id_direccion" placeholder="Calle 123 #45-67..." required class="form-control">
+                </div>
+            </form>
         </div>
 
-        <div class="total-section" style="text-align: right; margin: 30px 0; padding: 30px; background: var(--blanco); border-radius: 15px; border: var(--borde-rosado); box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
-            <p style="font-size: 1rem; color: var(--gris-texto); margin-bottom: 5px;">Subtotal: <span style="color: var(--negro); font-weight: 500;">${{ total|floatformat:0 }}</span></p>
-            <p style="font-size: 1rem; color: var(--gris-texto); margin-bottom: 15px;">Envío: <span style="color: var(--negro); font-weight: 500;">$15.000</span></p>
-            <h2 style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: var(--rosado); font-size: 1.8rem; border-top: 1px solid rgba(0,0,0,0.05); pt: 15px;">
-                Total a Pagar: ${{ total|add:15000|floatformat:0 }}
-            </h2>
+        <div class="shipping-info">
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 25px; color: var(--negro); border-bottom: 1px solid var(--crema); padding-bottom: 10px;">
+                <i class="fa-solid fa-credit-card" style="color: var(--rosado); margin-right: 10px;"></i>Pago Seguro
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--gris-texto); margin-bottom: 25px; line-height: 1.5;">
+                El total de <strong>${{ total|add:15000|floatformat:0 }} COP</strong> se convertirá automáticamente a USD para procesar el pago a través de PayPal.
+            </p>
+            <div id="paypal-button-container"></div>
         </div>
+    </div>
 
-        <div class="checkout-form-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
-            <div class="shipping-info">
-                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 25px; color: var(--negro); border-bottom: 1px solid rgba(232, 180, 184, 0.3); padding-bottom: 10px;">
-                    <i class="fa-solid fa-truck-fast" style="color: var(--rosado); margin-right: 10px;"></i>Información de Envío
-                </h3>
-                <form id="shipping-form">
-                    <div class="form-group">
-                        <label>Departamento</label>
-                        <select name="departamento" id="id_departamento" required class="form-control">
-                            <option value="">Selecciona...</option>
-                            <option value="Antioquia">Antioquia</option>
-                            <option value="Atlántico">Atlántico</option>
-                            <option value="Bogotá D.C.">Bogotá D.C.</option>
-                            <option value="Bolívar">Bolívar</option>
-                            <option value="Caldas">Caldas</option>
-                            <option value="Cauca">Cauca</option>
-                            <option value="Cundinamarca">Cundinamarca</option>
-                            <option value="Huila">Huila</option>
-                            <option value="Meta">Meta</option>
-                            <option value="Nariño">Nariño</option>
-                            <option value="Quindío">Quindío</option>
-                            <option value="Risaralda">Risaralda</option>
-                            <option value="Santander">Santander</option>
-                            <option value="Tolima">Tolima</option>
-                            <option value="Valle del Cauca">Valle del Cauca</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Ciudad</label>
-                        <input type="text" name="ciudad" id="id_ciudad" placeholder="Ej: Cartagena" required class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Dirección Completa</label>
-                        <input type="text" name="direccion" id="id_direccion" placeholder="Calle 123 #45-67..." required class="form-control">
-                    </div>
-                </form>
-            </div>
+    <p style="margin-top: 50px; text-align: center;">
+        <a href="{% url 'carrito' %}" style="color: var(--gris-texto); text-decoration: none; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500;">
+            <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Volver al carrito
+        </a>
+    </p>
+</main>
+{% endblock %}
 
-            <div class="shipping-info">
-                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 25px; color: var(--negro); border-bottom: 1px solid rgba(232, 180, 184, 0.3); padding-bottom: 10px;">
-                    <i class="fa-solid fa-credit-card" style="color: var(--rosado); margin-right: 10px;"></i>Método de Pago
-                </h3>
-                <p id="payment-status-msg" style="font-size: 0.9rem; color: var(--gris-texto); margin-bottom: 25px; line-height: 1.4;">
-                    El total de <strong style="color: var(--negro);">${{ total|add:15000|floatformat:0 }} COP</strong> se pagará de forma segura a través de la pasarela de PayPal (conversión automática a USD).
-                </p>
-                <div id="paypal-button-container" style="z-index: 1;"></div>
-            </div>
-        </div>
+{% block extra_js %}
+<script>
+    // Total convertido a USD para PayPal
+    const totalCOP = parseInt("{{ total }}") + 15000;
+    const tasaCambio = 4000; // 1 USD = 4000 COP aprox
+    const totalUSD = (totalCOP / tasaCambio).toFixed(2);
 
-        <p style="margin-top: 50px; text-align: center;">
-            <a href="{% url 'carrito' %}" style="color: var(--gris-texto); text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; transition: color 0.3s ease;">
-                <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Volver al carrito
-            </a>
-        </p>
-    </main>
-
-    <script>
-        // Total convertido a USD para PayPal (Aproximación simple para demo)
-        const totalCOP = parseInt("{{ total }}") + 15000;
-        const tasaCambio = 4000; // 1 USD = 4000 COP aprox
-        const totalUSD = (totalCOP / tasaCambio).toFixed(2);
-
-        paypal.Buttons({
-            style: {
-                layout: 'vertical',
-                color:  'gold',
-                shape:  'rect',
-                label:  'paypal'
-            },
-            createOrder: function(data, actions) {
-                // Verificar si el formulario es válido antes de crear la orden
-                const form = document.getElementById('shipping-form');
-                if (!form.checkValidity()) {
-                    alert("Por favor completa todos los datos de envío antes de pagar.");
-                    return actions.reject();
-                }
-
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: totalUSD,
-                            currency_code: 'USD'
-                        },
-                        description: "Compra en Andrea Jiménez"
-                    }]
-                });
-            },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(orderData) {
-                    const shippingData = {
-                        departamento: document.getElementById('id_departamento').value,
-                        ciudad: document.getElementById('id_ciudad').value,
-                        direccion: document.getElementById('id_direccion').value
-                    };
-
-                    // Enviar datos al servidor para procesar la orden
-                    fetch("{% url 'paypal_capture' %}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": "{{ csrf_token }}"
-                        },
-                        body: JSON.stringify({
-                            orderID: data.orderID,
-                            shippingData: shippingData
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(orderDataServer => {
-                        if (orderDataServer.status === "success") {
-                            window.location.href = "{% url 'factura_imprimir' 0 %}".replace('0', orderDataServer.venta_id);
-                        } else {
-                            alert("Error al procesar el pago: " + orderDataServer.message);
-                        }
-                    });
-                });
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color:  'black',
+            shape:  'rect',
+            label:  'paypal'
+        },
+        createOrder: function(data, actions) {
+            const form = document.getElementById('shipping-form');
+            if (!form.checkValidity()) {
+                alert("Por favor completa todos los datos de envío.");
+                form.reportValidity();
+                return actions.reject();
             }
-        }).render('#paypal-button-container');
-    </script>
 
-    <style>
-        .container { padding-top: 120px !important; }
-        @media (max-width: 768px) {
-            .checkout-form-container { grid-template-columns: 1fr; }
-            .container { padding-top: 100px !important; }
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: totalUSD,
+                        currency_code: 'USD'
+                    },
+                    description: "Compra en Andrea Jiménez"
+                }]
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(orderData) {
+                const shippingData = {
+                    departamento: document.getElementById('id_departamento').value,
+                    ciudad: document.getElementById('id_ciudad').value,
+                    direccion: document.getElementById('id_direccion').value
+                };
+
+                fetch("{% url 'paypal_capture' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({
+                        orderID: data.orderID,
+                        shippingData: shippingData
+                    })
+                })
+                .then(response => response.json())
+                .then(orderDataServer => {
+                    if (orderDataServer.status === "success") {
+                        window.location.href = "{% url 'factura_imprimir' 0 %}".replace('0', orderDataServer.venta_id);
+                    } else {
+                        alert("Error al procesar el pago: " + orderDataServer.message);
+                    }
+                });
+            });
         }
-    </style>
-</body>
-</html>
+    }).render('#paypal-button-container');
+</script>
+{% endblock %}
