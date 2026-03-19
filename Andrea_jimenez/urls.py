@@ -70,6 +70,7 @@ urlpatterns = [
     # ----------------------------
     path("carrito/", views.carrito, name="carrito"),
     path("agregar/<int:prenda_id>/", views.agregar_al_carrito, name="agregar_al_carrito"),
+    path("restar/<int:item_id>/", views.restar_del_carrito, name="restar_del_carrito"),
     path("agregar_al_carrito/<int:prenda_id>/", views.agregar_al_carrito, name="agregar_al_carrito_alt"),  # alias
     path("eliminar/<int:item_id>/", views.eliminar_item_carrito, name="eliminar_item_carrito"),
     path("actualizar/<int:item_id>/", views.actualizar_cantidad, name="actualizar_cantidad"),

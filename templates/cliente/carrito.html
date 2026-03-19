@@ -75,14 +75,14 @@
                         </td>
                         <td style="text-align: center;">
                             <div class="qty-control" style="justify-content: center;">
-                                <a href="{% url 'restar_del_carrito' item.prenda.id %}" class="qty-btn">-</a>
+                                <a href="{% url 'restar_del_carrito' item.id %}" class="qty-btn">-</a>
                                 <span style="font-weight: 600;">{{ item.cantidad }}</span>
                                 <a href="{% url 'agregar_al_carrito' item.prenda.id %}" class="qty-btn">+</a>
                             </div>
                         </td>
                         <td style="text-align: right; font-weight: 600;">${{ item.subtotal|floatformat:0 }}</td>
                         <td style="text-align: right;">
-                            <a href="{% url 'eliminar_del_carrito' item.prenda.id %}" class="btn-remove" title="Eliminar"><i class="fa-solid fa-trash-can"></i></a>
+                            <a href="{% url 'eliminar_item_carrito' item.id %}" class="btn-remove" title="Eliminar"><i class="fa-solid fa-trash-can"></i></a>
                         </td>
                     </tr>
                     {% endfor %}

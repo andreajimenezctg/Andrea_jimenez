@@ -403,10 +403,21 @@ def actualizar_cantidad(request, item_id):
 
 @login_required
 @user_passes_test(es_cliente)
+def restar_del_carrito(request, item_id):
+    item = get_object_or_404(ItemCarrito, id=item_id)
+    if item.cantidad > 1:
+        item.cantidad -= 1
+        item.save()
+    else:
+        item.delete()
+    return redirect("carrito")
+
+
+@login_required
+@user_passes_test(es_cliente)
 def eliminar_item_carrito(request, item_id):
     item = get_object_or_404(ItemCarrito, id=item_id)
-    if request.method == "POST":
-        item.delete()
+    item.delete()
     return redirect("carrito")
 
 
