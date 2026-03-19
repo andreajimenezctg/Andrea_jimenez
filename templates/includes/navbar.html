@@ -1,18 +1,27 @@
 {% load static %}
 <header>
     <nav class="navbar">
-        <div class="logo">
-            <a href="{% url 'home' %}">
-                <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="logo-img">
-            </a>
+        <div class="nav-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+            <div class="logo">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="logo-img">
+                </a>
+            </div>
         </div>
 
-        <ul class="menu">
-            <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">Inicio</a></li>
-            <li><a href="{% url 'tienda' %}" class="{% if 'tienda' in request.path %}active{% endif %}">Tienda</a></li>
-            <li><a href="{% url 'oferta' %}" class="{% if 'oferta' in request.path %}active{% endif %}">Oferta</a></li>
-            <li><a href="{% url 'atencion' %}" class="{% if 'atencion' in request.path %}active{% endif %}">Atención</a></li>
-            <li><a href="{% url 'distribuidores' %}" class="{% if 'distribuidores' in request.path %}active{% endif %}">Ubicación</a></li>
+        <ul class="menu" id="navMenu">
+            <li class="mobile-only sidebar-header">
+                <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="sidebar-logo">
+                <button class="close-sidebar" id="closeSidebar">&times;</button>
+            </li>
+            <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}"><i class="fa-solid fa-house mobile-only"></i> Inicio</a></li>
+            <li><a href="{% url 'tienda' %}" class="{% if 'tienda' in request.path %}active{% endif %}"><i class="fa-solid fa-store mobile-only"></i> Tienda</a></li>
+            <li><a href="{% url 'oferta' %}" class="{% if 'oferta' in request.path %}active{% endif %}"><i class="fa-solid fa-tags mobile-only"></i> Oferta</a></li>
+            <li><a href="{% url 'atencion' %}" class="{% if 'atencion' in request.path %}active{% endif %}"><i class="fa-solid fa-headset mobile-only"></i> Atención</a></li>
+            <li><a href="{% url 'distribuidores' %}" class="{% if 'distribuidores' in request.path %}active{% endif %}"><i class="fa-solid fa-location-dot mobile-only"></i> Ubicación</a></li>
         </ul>
 
         <div class="user-actions">
@@ -26,35 +35,59 @@
                 {% endif %}
 
                 <div class="dropdown" style="position: relative; display: inline-block;">
-                    <button class="dropdown-btn" style="background: none; border: none; color: rgba(250, 240, 225, 0.7); font-family: 'Montserrat', sans-serif; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <button class="dropdown-btn" id="userDropdownBtn">
                         <i class="fa-regular fa-user"></i> 
-                        {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}
-                        <i class="fa-solid fa-chevron-down" style="font-size: 0.6rem;"></i>
+                        <span class="desktop-only">{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</span>
+                        <i class="fa-solid fa-chevron-down desktop-only" style="font-size: 0.6rem;"></i>
                     </button>
-                    <div class="dropdown-content" style="display: none; position: absolute; right: 0; background-color: #1a1a1a; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1001; border: 1px solid rgba(232, 180, 184, 0.1);">
+                    <div class="dropdown-content" id="userDropdownContent">
                         {% if user.groups.first.name == "Cliente" %}
-                            <a href="{% url 'panel_cliente' %}" style="color: #FAF0E1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;">Mi Perfil</a>
-                            <a href="{% url 'mis_ventas' %}" style="color: #FAF0E1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;">Mis Compras</a>
+                            <a href="{% url 'panel_cliente' %}">Mi Perfil</a>
+                            <a href="{% url 'mis_ventas' %}">Mis Compras</a>
                         {% elif user.is_staff %}
-                            <a href="{% url 'panel_admin' %}" style="color: #FAF0E1; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;">Panel Admin</a>
+                            <a href="{% url 'panel_admin' %}">Panel Admin</a>
                         {% endif %}
                         <div style="border-top: 1px solid rgba(232, 180, 184, 0.1);"></div>
-                        <a href="{% url 'logout' %}" style="color: #E8B4B8; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;">Cerrar Sesión</a>
+                        <a href="{% url 'logout' %}" style="color: #E8B4B8;">Cerrar Sesión</a>
                     </div>
                 </div>
-                <script>
-                    document.querySelector('.dropdown-btn').addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const content = document.querySelector('.dropdown-content');
-                        content.style.display = content.style.display === 'block' ? 'none' : 'block';
-                    });
-                    document.addEventListener('click', function() {
-                        document.querySelector('.dropdown-content').style.display = 'none';
-                    });
-                </script>
             {% else %}
-                <a href="{% url 'login' %}" class="btn-logout" style="border: 1px solid rgba(232, 180, 184, 0.3); padding: 8px 20px; color: #FAF0E1; text-decoration: none; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Entrar</a>
+                <a href="{% url 'login' %}" class="btn-login-nav">Entrar</a>
             {% endif %}
         </div>
     </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 </header>
+
+<script>
+    // Sidebar Logic
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const navMenu = document.getElementById('navMenu');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+        navMenu.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
+        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+    }
+
+    if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+    if(closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
+    if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    // Dropdown Logic
+    const userDropdownBtn = document.getElementById('userDropdownBtn');
+    const userDropdownContent = document.getElementById('userDropdownContent');
+
+    if(userDropdownBtn) {
+        userDropdownBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userDropdownContent.style.display = userDropdownContent.style.display === 'block' ? 'none' : 'block';
+        });
+    }
+
+    document.addEventListener('click', function() {
+        if(userDropdownContent) userDropdownContent.style.display = 'none';
+    });
+</script>
