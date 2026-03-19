@@ -128,14 +128,14 @@ header.scrolled .logo-img {
     color: rgba(250, 240, 225, 0.85); 
     text-decoration: none; 
     font-family: 'Montserrat', sans-serif; 
-    font-size: 0.68rem; 
+    font-size: 0.62rem; /* Reducido de 0.68rem para un balance perfecto */
     font-weight: 500; 
-    letter-spacing: 1.5px; 
+    letter-spacing: 1.2px; 
     text-transform: uppercase; 
     padding: 8px 0; 
     display: flex; 
     align-items: center; 
-    gap: 5px; 
+    gap: 4px; 
     transition: all 0.4s ease; 
     position: relative; 
     white-space: nowrap;
