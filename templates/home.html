@@ -88,14 +88,18 @@
         .carrusel-item {
             flex: 0 0 350px !important;
             scroll-snap-align: start;
+            padding: 0 10px;
         }
 
         @media (max-width: 992px) {
             .carrusel-item {
-                flex: 0 0 85% !important;
+                flex: 0 0 95% !important; /* Aumentado a 95% para teléfonos */
+            }
+            .carrusel-img {
+                height: 500px !important; /* Aún más alto para que se vea mejor */
             }
             .frase p {
-                font-size: 2.5rem;
+                font-size: 2rem; /* Reducido para que quepa bien en teléfonos */
             }
         }
 
