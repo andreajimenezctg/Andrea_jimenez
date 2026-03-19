@@ -429,10 +429,12 @@ def checkout(request):
         return redirect("carrito")
 
     total = sum(i.subtotal for i in items)
+    paypal_id = str(settings.PAYPAL_CLIENT_ID) if settings.PAYPAL_CLIENT_ID else 'sb'
+    
     return render(request, "cliente/checkout.html", {
         "carrito_items": items,
         "total": total,
-        "paypal_client_id": settings.PAYPAL_CLIENT_ID,
+        "paypal_client_id": paypal_id,
         "paypal_currency": settings.PAYPAL_CURRENCY,
     })
 

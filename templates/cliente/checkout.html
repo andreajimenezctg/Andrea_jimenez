@@ -29,8 +29,8 @@
     .form-control { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 0; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; background: #fcfcfc; }
     
     .payment-method-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 20px; color: #1a1a1a; }
-    #paypal-button-container { min-height: 150px; position: relative; z-index: 10; width: 100%; margin-top: 20px; }
-</style>    
+    #paypal-button-container { min-height: 150px; width: 100%; margin-top: 20px; display: block !important; visibility: visible !important; opacity: 1 !important; }
+
     @media (max-width: 992px) {
         .checkout-grid { grid-template-columns: 1fr; }
         .container { padding-top: 100px !important; }
@@ -38,7 +38,7 @@
     }
 </style>
 <!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id|default:'sb' }}&currency=USD&intent=capture"></script>
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&intent=capture"></script>
 {% endblock %}
 
 {% block content %}
@@ -125,7 +125,16 @@
             <p style="font-size: 0.85rem; color: #666; margin-bottom: 25px; line-height: 1.6;">
                 El total de <strong>${{ total|add:15000|floatformat:0 }} COP</strong> se pagará en dólares vía PayPal.
             </p>
+            <div id="paypal-loading" style="text-align: center; padding: 20px; color: #888;">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Cargando opciones de pago...
+            </div>
             <div id="paypal-button-container"></div>
+            <div id="payment-fallback" style="margin-top: 20px; text-align: center;">
+                <p style="font-size: 0.75rem; color: #888;">¿Problemas con el pago?</p>
+                <a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20tengo%20problemas%20para%20pagar%20mi%20pedido%20de%20${{ total|add:15000|floatformat:0 }}%20en%20la%20web." target="_blank" style="color: #25d366; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                    <i class="fab fa-whatsapp"></i> Pagar por WhatsApp
+                </a>
+            </div>
         </div>
     </div>
 
@@ -139,26 +148,32 @@
 
 {% block extra_js %}
 <script>
-    console.log("PayPal script loading check...");
-    
     // Total convertido a USD para PayPal
-    const totalCOP = parseInt("{{ total }}") + 15000;
-    const tasaCambio = 4000; // 1 USD = 4000 COP aprox
+    const totalRaw = "{{ total }}";
+    const totalCOP = (parseInt(totalRaw.replace(/[^0-9]/g, '')) || 0) + 15000;
+    const tasaCambio = 4000; 
     const totalUSD = (totalCOP / tasaCambio).toFixed(2);
     
     console.log("Total COP:", totalCOP);
     console.log("Total USD:", totalUSD);
 
     function initPayPalButton() {
+        const loadingEl = document.getElementById('paypal-loading');
+        const containerEl = document.getElementById('paypal-button-container');
+
         if (!window.paypal) {
-            console.error("PayPal SDK not loaded yet.");
-            setTimeout(initPayPalButton, 1000);
+            console.error("PayPal SDK not loaded. Retrying in 2 seconds...");
+            setTimeout(initPayPalButton, 2000);
             return;
         }
         
-        console.log("Initializing PayPal Buttons...");
+        // Limpiar el contenedor antes de renderizar
+        if (containerEl) containerEl.innerHTML = '';
         
-        paypal.Buttons({
+        console.log("Rendering PayPal Buttons with ID:", "{{ paypal_client_id }}");
+        if ("{{ paypal_client_id }}" === "sb") {
+            console.warn("Using PayPal Sandbox (sb) ID. Payment might not work if live is intended.");
+        }
             style: {
                 layout: 'vertical',
                 color:  'gold',
@@ -214,18 +229,15 @@
             },
             onError: function(err) {
                 console.error("PayPal Error:", err);
-                alert("Hubo un error con PayPal. Por favor intenta de nuevo.");
+                alert("Hubo un error con PayPal. Asegúrate de que los datos de envío sean correctos.");
             }
         }).render('#paypal-button-container').then(() => {
-            console.log("PayPal Buttons rendered successfully!");
-        }).catch((err) => {
-            console.error("Failed to render PayPal Buttons:", err);
+            if (loadingEl) loadingEl.style.display = 'none';
+            console.log("PayPal Buttons rendered.");
         });
     }
 
-    // Esperar a que el DOM esté listo
-    document.addEventListener('DOMContentLoaded', function() {
-        initPayPalButton();
-    });
+    // Inicializar cuando la página cargue
+    window.addEventListener('load', initPayPalButton);
 </script>
 {% endblock %}

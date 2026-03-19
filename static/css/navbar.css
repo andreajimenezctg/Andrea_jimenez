@@ -109,13 +109,13 @@ header.scrolled .logo-img {
 .menu { 
     display: flex; 
     list-style: none; 
-    gap: 1.2rem; 
+    gap: 0.8rem; /* Reducido de 1.2rem para más espacio */
     margin: 0; 
-    padding: 0 10px; 
+    padding: 0 5px; 
     align-items: center; 
     height: 100%; 
     justify-content: center;
-    flex: 1; /* Menú flexible */
+    flex: 1; 
 } 
 
 .menu li { 
@@ -128,9 +128,9 @@ header.scrolled .logo-img {
     color: rgba(250, 240, 225, 0.85); 
     text-decoration: none; 
     font-family: 'Montserrat', sans-serif; 
-    font-size: 0.62rem; /* Reducido de 0.68rem para un balance perfecto */
+    font-size: 0.62rem; 
     font-weight: 500; 
-    letter-spacing: 1.2px; 
+    letter-spacing: 0.8px; /* Reducido de 1.2px */
     text-transform: uppercase; 
     padding: 8px 0; 
     display: flex; 
