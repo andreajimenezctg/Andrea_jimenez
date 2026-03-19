@@ -181,7 +181,7 @@ header.scrolled .logo-img {
 .user-actions { 
     display: flex; 
     align-items: center; 
-    gap: 15px; 
+    gap: 10px; /* Reducido de 15px */
     height: 100%; 
     justify-content: flex-end;
     flex-shrink: 0;
@@ -208,19 +208,21 @@ header.scrolled .logo-img {
     transform: scale(1.1); 
 } 
 
-.dropdown-btn {
-    background: none;
-    border: none;
-    color: rgba(250, 240, 225, 0.7);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: color 0.3s ease;
+.dropdown-btn { 
+    color: rgba(250, 240, 225, 0.8); 
+    background: none; 
+    border: none; 
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 0.65rem; 
+    font-weight: 500; 
+    letter-spacing: 1px; 
+    text-transform: uppercase; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    padding: 5px 10px; /* Reducido */
+    transition: var(--transicion); 
 }
 
 .dropdown-btn:hover {

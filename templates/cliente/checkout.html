@@ -128,10 +128,10 @@
             <div id="paypal-loading" style="text-align: center; padding: 20px; color: #888;">
                 <i class="fa-solid fa-circle-notch fa-spin"></i> Cargando opciones de pago...
             </div>
-            <div id="paypal-button-container"></div>
-            <div id="payment-fallback" style="margin-top: 20px; text-align: center;">
-                <p style="font-size: 0.75rem; color: #888;">¿Problemas con el pago?</p>
-                <a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20tengo%20problemas%20para%20pagar%20mi%20pedido%20de%20${{ total|add:15000|floatformat:0 }}%20en%20la%20web." target="_blank" style="color: #25d366; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+            <div id="paypal-button-container" style="display: block !important;"></div>
+            <div id="payment-fallback" style="margin-top: 20px; text-align: center; display: none;">
+                <p style="font-size: 0.75rem; color: #888;">¿No cargan las opciones de pago?</p>
+                <a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20tengo%20problemas%20con%20PayPal%20para%20pagar%20mi%20pedido%20de%20${{ total|add:15000|floatformat:0 }}." target="_blank" style="color: #25d366; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
                     <i class="fab fa-whatsapp"></i> Pagar por WhatsApp
                 </a>
             </div>
@@ -160,6 +160,14 @@
     function initPayPalButton() {
         const loadingEl = document.getElementById('paypal-loading');
         const containerEl = document.getElementById('paypal-button-container');
+        const fallbackEl = document.getElementById('payment-fallback');
+
+        // Mostrar fallback si tarda mucho
+        setTimeout(() => {
+            if (loadingEl && loadingEl.style.display !== 'none') {
+                if (fallbackEl) fallbackEl.style.display = 'block';
+            }
+        }, 8000);
 
         if (!window.paypal) {
             console.error("PayPal SDK not loaded. Retrying in 2 seconds...");
