@@ -62,8 +62,6 @@ header {
 header.scrolled { 
     height: 65px; 
     min-height: 65px; 
-    background-color: var(--negro); 
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4); 
 } 
 
 .navbar { 
@@ -74,38 +72,28 @@ header.scrolled {
     width: 100%;
     max-width: 1400px; 
     margin: 0 auto; 
-    transition: var(--transicion); 
-} 
-
-header.scrolled .navbar { 
-    height: 100%; 
 } 
 
 .nav-left {
     display: flex;
     align-items: center;
     gap: 20px;
+    flex: 1;
 }
 
 .mobile-menu-btn {
-    display: none !important; /* Estrictamente oculto en escritorio */
+    display: none !important; 
     background: none;
     border: none;
     color: var(--crema);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 10px;
-    transition: color 0.3s ease;
-}
-
-.mobile-menu-btn:hover {
-    color: var(--rosado);
 }
 
 .logo-img { 
-    height: 48px; 
+    height: 45px; 
     width: auto; 
-    max-width: 180px; 
     display: block; 
     object-fit: contain;
     filter: brightness(1.15); 
@@ -113,19 +101,14 @@ header.scrolled .navbar {
 } 
 
 header.scrolled .logo-img { 
-    height: 40px; 
-} 
-
-.logo-img:hover { 
-    opacity: 0.85; 
-    transform: scale(1.02); 
+    height: 35px; 
 } 
 
 /* Menu Principal */ 
 .menu { 
     display: flex; 
     list-style: none; 
-    gap: 3.5rem; 
+    gap: 2.5rem; 
     margin: 0; 
     padding: 0; 
     align-items: center; 
@@ -145,14 +128,14 @@ header.scrolled .logo-img {
     color: rgba(250, 240, 225, 0.85); 
     text-decoration: none; 
     font-family: 'Montserrat', sans-serif; 
-    font-size: 0.8rem; 
+    font-size: 0.75rem; 
     font-weight: 500; 
-    letter-spacing: 3.5px; 
+    letter-spacing: 2px; 
     text-transform: uppercase; 
     padding: 10px 0; 
     display: flex; 
     align-items: center; 
-    gap: 10px; 
+    gap: 8px; 
     transition: all 0.4s ease; 
     position: relative; 
 } 
@@ -160,7 +143,6 @@ header.scrolled .logo-img {
 .menu li a i { 
     font-size: 0.8rem; 
     opacity: 0.6; 
-    transition: opacity 0.4s ease, transform 0.3s ease; 
 } 
 
 .menu li a::after { 
@@ -178,11 +160,6 @@ header.scrolled .logo-img {
     color: var(--rosado); 
 } 
 
-.menu li a:hover i { 
-    opacity: 1; 
-    transform: translateY(-1px); 
-} 
-
 .menu li a:hover::after, 
 .menu li a.active::after { 
     width: 100%; 
@@ -192,16 +169,10 @@ header.scrolled .logo-img {
     color: var(--rosado); 
 } 
 
-.menu li a.active i { 
-    opacity: 1; 
-} 
-
-/* Sidebar Only Elements */
 .mobile-only {
-    display: none;
+    display: none !important;
 }
 
-/* Acciones de usuario */ 
 .user-actions { 
     display: flex; 
     align-items: center; 
@@ -599,20 +570,6 @@ header.scrolled .logo-img {
     .menu li a:hover:not(.active) {
         background-color: rgba(255, 255, 255, 0.05);
         color: #fff;
-    }
-
-    .sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        backdrop-filter: blur(5px);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.4s ease;
-        z-index: 1999;
     }
 
     .sidebar-overlay {
