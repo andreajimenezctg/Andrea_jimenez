@@ -198,6 +198,7 @@ PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID', 'sb')
 PAYPAL_SECRET = os.getenv('PAYPAL_SECRET', '')
 PAYPAL_MODE = os.getenv('PAYPAL_MODE', 'sandbox')
 PAYPAL_CURRENCY = 'USD'
+SITE_URL = os.getenv('SITE_URL', 'https://andrea-jimenez.onrender.com')
 
 # Wompi
 WOMPI_PUBLIC_KEY = os.getenv('WOMPI_PUBLIC_KEY', '')

@@ -6,23 +6,35 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/carrito.css' %}?v={% now 'U' %}">
 <style>
-    .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; padding-top: 120px !important; }
-    h1 { font-family: 'Playfair Display', serif; text-align: center; font-size: 2.5rem; color: var(--negro); margin-bottom: 40px; }
-    .checkout-form-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
-    .shipping-info { background: #fff; padding: 30px; border-radius: 8px; box-shadow: var(--sombra-suave); }
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 500; }
-    .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Montserrat', sans-serif; }
-    .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    .summary-table th { text-align: left; padding: 10px; border-bottom: 2px solid var(--crema); font-size: 0.75rem; text-transform: uppercase; }
-    .summary-table td { padding: 15px 10px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-    .total-box { background: var(--crema); padding: 20px; border-radius: 4px; text-align: right; margin-top: 20px; }
-    .total-box p { font-size: 0.9rem; margin-bottom: 5px; color: var(--gris-texto); }
-    .total-box h2 { font-size: 1.5rem; color: var(--negro); }
+    body { background-color: #f8f4f0 !important; }
+    .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; padding-top: 140px !important; }
+    h1 { font-family: 'Playfair Display', serif; text-align: center; font-size: 3rem; color: #1a1a1a; margin-bottom: 10px; font-weight: 400; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 50px; font-size: 1rem; }
     
-    @media (max-width: 768px) {
-        .checkout-form-container { grid-template-columns: 1fr; }
+    .checkout-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: start; }
+    
+    .card-panel { background: #fff; padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
+    
+    .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    .summary-table thead { background: #1a1a1a; color: #fff; }
+    .summary-table th { padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 500; }
+    .summary-table td { padding: 20px 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #333; }
+    
+    .totals-area { margin-top: 30px; border-top: 2px solid #1a1a1a; padding-top: 20px; }
+    .total-row { display: flex; justify-content: flex-end; gap: 50px; margin-bottom: 10px; font-size: 0.95rem; }
+    .total-row.grand-total { margin-top: 15px; font-size: 1.4rem; color: #e8b4b8; font-weight: 600; }
+    
+    .form-group { margin-bottom: 25px; }
+    .form-group label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; font-weight: 600; color: #444; }
+    .form-control { width: 100%; padding: 15px; border: 1px solid #e0e0e0; border-radius: 0; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; transition: border-color 0.3s; background: #fafafa; }
+    .form-control:focus { outline: none; border-color: #e8b4b8; background: #fff; }
+    
+    .payment-method-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+    
+    @media (max-width: 992px) {
+        .checkout-grid { grid-template-columns: 1fr; }
         .container { padding-top: 100px !important; }
+        h1 { font-size: 2.2rem; }
     }
 </style>
 <!-- PayPal SDK -->
@@ -32,40 +44,49 @@
 {% block content %}
 <main class="container">
     <h1>Finalizar Compra</h1>
-    <p style="text-align: center; color: var(--gris-texto); margin-bottom: 30px;">Revisa tu pedido y completa el pago de forma segura con <strong>PayPal</strong>.</p>
+    <p class="subtitle">Revisa tu pedido y completa el pago de forma segura con PayPal.</p>
 
-    <div class="shipping-info" style="margin-bottom: 40px;">
-        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 20px;">Resumen del Pedido</h3>
+    <div class="card-panel" style="margin-bottom: 40px;">
         <table class="summary-table">
             <thead>
                 <tr>
                     <th>Producto</th>
-                    <th style="text-align: center;">Cant.</th>
+                    <th style="text-align: center;">Cantidad</th>
+                    <th style="text-align: right;">Precio</th>
                     <th style="text-align: right;">Subtotal</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in carrito_items %}
                 <tr>
-                    <td>{{ item.prenda.nombre }}</td>
+                    <td style="font-weight: 500;">{{ item.prenda.nombre }}</td>
                     <td style="text-align: center;">{{ item.cantidad }}</td>
-                    <td style="text-align: right; font-weight: 600;">COP ${{ item.subtotal|floatformat:0 }}</td>
+                    <td style="text-align: right;">${{ item.prenda.precio|floatformat:0 }}</td>
+                    <td style="text-align: right; font-weight: 600;">${{ item.subtotal|floatformat:0 }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <div class="total-box">
-            <p>Subtotal: COP ${{ total|floatformat:0 }}</p>
-            <p>Envío: COP $15.000</p>
-            <h2 style="color: var(--rosado);">Total: COP ${{ total|add:15000|floatformat:0 }}</h2>
+        
+        <div class="totals-area">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span style="min-width: 120px; text-align: right;">${{ total|floatformat:0 }}</span>
+            </div>
+            <div class="total-row">
+                <span>Envío:</span>
+                <span style="min-width: 120px; text-align: right;">$15.000</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total a Pagar:</span>
+                <span style="min-width: 120px; text-align: right;">${{ total|add:15000|floatformat:0 }}</span>
+            </div>
         </div>
     </div>
 
-    <div class="checkout-form-container">
-        <div class="shipping-info">
-            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 25px; color: var(--negro); border-bottom: 1px solid var(--crema); padding-bottom: 10px;">
-                <i class="fa-solid fa-truck-fast" style="color: var(--rosado); margin-right: 10px;"></i>Envío
-            </h3>
+    <div class="checkout-grid">
+        <div class="card-panel">
+            <h3 class="payment-method-title">Información de Envío</h3>
             <form id="shipping-form">
                 <div class="form-group">
                     <label>Departamento</label>
@@ -74,8 +95,7 @@
                         <option value="Antioquia">Antioquia</option>
                         <option value="Atlántico">Atlántico</option>
                         <option value="Bogotá D.C.">Bogotá D.C.</option>
-                        <option value="Bolívar">Bolívar</option>
-                        <option value="Bolívar">Cartagena</option>
+                        <option value="Bolívar">Bolívar (Cartagena)</option>
                         <option value="Caldas">Caldas</option>
                         <option value="Cauca">Cauca</option>
                         <option value="Cundinamarca">Cundinamarca</option>
@@ -100,19 +120,20 @@
             </form>
         </div>
 
-        <div class="shipping-info">
-            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 25px; color: var(--negro); border-bottom: 1px solid var(--crema); padding-bottom: 10px;">
-                <i class="fa-solid fa-credit-card" style="color: var(--rosado); margin-right: 10px;"></i>Pago Seguro
-            </h3>
-            <p style="font-size: 0.85rem; color: var(--gris-texto); margin-bottom: 25px; line-height: 1.5;">
-                El total de <strong>${{ total|add:15000|floatformat:0 }} COP</strong> se convertirá automáticamente a USD para procesar el pago a través de PayPal.
+        <div class="card-panel">
+            <h3 class="payment-method-title">Método de Pago</h3>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 25px; line-height: 1.6;">
+                El total de <strong>${{ total|add:15000|floatformat:0 }} COP</strong> se pagará en dólares vía PayPal.
             </p>
             <div id="paypal-button-container"></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/AM_mc_vs_dc_ae.jpg" alt="Pagos seguros" style="height: 30px; opacity: 0.7;">
+            </div>
         </div>
     </div>
 
-    <p style="margin-top: 50px; text-align: center;">
-        <a href="{% url 'carrito' %}" style="color: var(--gris-texto); text-decoration: none; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500;">
+    <p style="margin-top: 60px; text-align: center;">
+        <a href="{% url 'carrito' %}" style="color: #999; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; transition: color 0.3s;">
             <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Volver al carrito
         </a>
     </p>
