@@ -19,6 +19,7 @@ from django.conf import settings
 from django.utils import timezone
 import datetime
 import logging
+import time
 from django.core.paginator import Paginator
 
 logger = logging.getLogger(__name__)
@@ -536,7 +537,7 @@ def confirmar_compra(request):
         pago = Pago.objects.create(
             pedido=pedido,
             metodo="Wompi",
-            estado="Aprobado"
+            estado="Pendiente"
         )
 
         venta = Venta.objects.create(
@@ -638,13 +639,21 @@ def factura_imprimir(request, venta_id):
         for d in items
     ]
     total = venta.total or 0
+    total_cents = int(total * 100)
     valor_letras = numero_a_letras(total)
 
+    # Configuración de Wompi para el pago
+    wompi_referencia = f"AJ-{venta.id}-{int(time.time())}"
+    
     return render(request, "cliente/factura_imprimir.html", {
         "venta": venta,
         "items_detalle": items_detalle,
         "total": total,
+        "total_cents": total_cents,
         "valor_letras": valor_letras,
+        "wompi_public_key": settings.WOMPI_PUBLIC_KEY,
+        "wompi_referencia": wompi_referencia,
+        "site_url": settings.SITE_URL,
     })
 
 

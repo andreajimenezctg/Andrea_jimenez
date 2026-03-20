@@ -324,6 +324,37 @@
     </div>
 
     <div class="no-print">
+        {% if venta.pago.estado == 'Pendiente' %}
+        <div style="width: 100%; max-width: 400px; background: #fff; padding: 25px; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <p style="font-size: 14px; margin-bottom: 20px; font-weight: 500;">Tu pedido ha sido registrado. Para completar tu compra, por favor realiza el pago:</p>
+            <form>
+                <script
+                    src="https://checkout.wompi.co/widget.js"
+                    data-render="button"
+                    data-public-key="{{ wompi_public_key }}"
+                    data-currency="COP"
+                    data-amount-in-cents="{{ total_cents }}"
+                    data-reference="{{ wompi_referencia }}"
+                    data-redirect-url="{{ site_url }}{% url 'mis_ventas' %}"
+                ></script>
+            </form>
+            <style>
+                .wompi-method-button {
+                    width: 100% !important;
+                    background: var(--primary) !important;
+                    color: #fff !important;
+                    padding: 15px !important;
+                    font-weight: bold !important;
+                    text-transform: uppercase !important;
+                    border-radius: 4px !important;
+                    letter-spacing: 1px !important;
+                }
+            </style>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="no-print" style="margin-top: 20px;">
         <button onclick="window.print();" class="btn-elite btn-print">Imprimir factura</button>
         <a href="{% url 'descargar_factura_pdf' venta.id %}" class="btn-elite btn-download">Descargar PDF</a>
         <a href="{% url 'mis_ventas' %}" class="btn-elite btn-back">Volver a mis compras</a>
