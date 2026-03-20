@@ -19,8 +19,12 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
-    '127.0.0.1,localhost,.onrender.com'
+    '127.0.0.1,localhost,.onrender.com,.up.railway.app'
 ).split(',')
+
+RAILWAY_STATIC_URL = os.getenv('RAILWAY_STATIC_URL')
+if RAILWAY_STATIC_URL:
+    ALLOWED_HOSTS.append(RAILWAY_STATIC_URL)
 
 RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
@@ -160,8 +164,6 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-SITE_URL = os.getenv('SITE_URL', 'http://localhost:8000')
-
 PASSWORD_RESET_TIMEOUT = 14400
 
 # Seguridad en producción
@@ -202,7 +204,15 @@ LOGGING = {
 }
 
 # Configuración del Sitio
-SITE_URL = os.getenv('SITE_URL', 'https://andrea-jimenez.onrender.com')
+SITE_URL = os.getenv('SITE_URL')
+if not SITE_URL:
+    RAILWAY_URL = os.getenv('RAILWAY_STATIC_URL')
+    if RAILWAY_URL:
+        SITE_URL = f"https://{RAILWAY_URL}"
+    elif DEBUG:
+        SITE_URL = 'http://localhost:8000'
+    else:
+        SITE_URL = 'https://andrea-jimenez.onrender.com'
 
 # WhatsApp
 WHATSAPP_NUMBER = os.getenv('WHATSAPP_NUMBER', '573014717412')
