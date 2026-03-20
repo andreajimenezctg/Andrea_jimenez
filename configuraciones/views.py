@@ -132,28 +132,20 @@ def cerrar_sesion(request):
 
 
 from django.core.management import call_command
-
 from django.core.files import File
-from django.conf import settings
 from pathlib import Path
 
 def migrar_datos_produccion(request):
-    """
-    Vista temporal para cargar datos, crear superusuario e imágenes en Render
-    """
     output = []
     
-    # 1. Ejecutar comando de creación de productos (crear_productos_tienda)
     try:
         call_command('crear_productos_tienda')
         output.append("✅ Productos y categorías base creados.")
     except Exception as e:
         output.append(f"❌ Error en crear_productos_tienda: {str(e)}")
 
-    # 2. Forzar asignación de imágenes desde static/img a los productos creados
     try:
         import shutil
-        # Mapeo de productos específicos a nuevas imágenes descargadas
         mapeo_productos = {
             "Vestido floral verano": "vestido_floral.jpg",
             "Vestido noche elegante": "vestido_noche.jpg",
@@ -167,7 +159,6 @@ def migrar_datos_produccion(request):
         media_productos = Path(settings.MEDIA_ROOT) / "productos"
         media_productos.mkdir(parents=True, exist_ok=True)
         
-        # 1. Asignar por nombre de producto (FORZADO)
         for nombre_prod, nombre_img in mapeo_productos.items():
             productos = Prenda.objects.filter(nombre__icontains=nombre_prod)
             ruta_img_static = Path(settings.BASE_DIR) / "static" / "img" / nombre_img
@@ -175,8 +166,6 @@ def migrar_datos_produccion(request):
             if ruta_img_static.exists():
                 nombre_db = f"productos/{nombre_img}"
                 ruta_destino_media = Path(settings.MEDIA_ROOT) / nombre_db
-                
-                # FORZAMOS LA COPIA SOBREESCRIBIENDO
                 shutil.copy2(ruta_img_static, ruta_destino_media)
                 
                 for p in productos:
@@ -189,7 +178,6 @@ def migrar_datos_produccion(request):
     except Exception as e:
         output.append(f"❌ Error al asignar imágenes: {str(e)}")
 
-    # 3. Crear Superusuario si no existe
     if not User.objects.filter(username="admin").exists():
         try:
             User.objects.create_superuser("admin", "andreajimenezctg@gmail.com", "admin123456")
@@ -274,7 +262,7 @@ def atencion(request):
                 f"Nuevo Mensaje de Contacto: {nombre}",
                 f"Nombre: {nombre}\nEmail: {email_cliente}\nTeléfono: {telefono}\n\nMensaje:\n{mensaje}",
                 settings.EMAIL_HOST_USER,
-                [settings.EMAIL_HOST_USER] # Se envía al admin
+                [settings.EMAIL_HOST_USER]
             )
             email.send(fail_silently=False)
             logger.info(f"Mensaje de contacto enviado correctamente de {nombre} ({email_cliente})")
@@ -294,11 +282,9 @@ def detalle_producto(request, slug):
     producto = get_object_or_404(Prenda, slug=slug, is_archived=False)
     es_cliente_user = request.user.is_authenticated and es_cliente(request.user)
     
-    # Calcular cuotas (ej: 12 cuotas)
     precio_base = producto.precio_descuento if producto.precio_descuento else producto.precio
     cuotas_12 = round(precio_base / 12, 2)
     
-    # Productos relacionados (misma categoría)
     relacionados = Prenda.objects.filter(
         categoria=producto.categoria, 
         is_archived=False
@@ -319,7 +305,6 @@ def detalle_producto(request, slug):
 @login_required
 @user_passes_test(es_cliente)
 def agregar_al_carrito(request, prenda_id):
-    # Aseguramos que el cliente exista para evitar "No Cliente matches the given query"
     cliente, created = Cliente.objects.get_or_create(
         user=request.user,
         defaults={'telefono': 'N/A', 'direccion': 'N/A'}
@@ -425,7 +410,7 @@ def eliminar_item_carrito(request, item_id):
 
 
 # =====================================================
-#        CHECKOUT (PAGO PSE)
+#        CHECKOUT (PAGO PAYPAL)
 # =====================================================
 
 @login_required
@@ -442,7 +427,8 @@ def checkout(request):
         messages.error(request, "Tu carrito está vacío.")
         return redirect("carrito")
 
-    total = sum(i.subtotal for i in items)
+    # ✅ CORRECCIÓN: convertir a int para evitar errores de formato en JavaScript
+    total = int(sum(i.subtotal for i in items))
     total_con_envio = total + 15000
     paypal_id = str(settings.PAYPAL_CLIENT_ID) if settings.PAYPAL_CLIENT_ID else 'sb'
     
@@ -490,10 +476,9 @@ def confirmar_compra(request):
             except CuponDescuento.DoesNotExist:
                 messages.warning(request, "El cupón ingresado no existe.")
 
-        costo_envio = 15000 # Costo fijo de envío para este ejemplo
+        costo_envio = 15000
         total = subtotal - descuento + costo_envio
 
-        # 1. Crear el Pedido con info de envío
         pedido = Pedido.objects.create(
             cliente=cliente,
             estado="Pendiente",
@@ -503,14 +488,12 @@ def confirmar_compra(request):
             costo_envio=costo_envio
         )
 
-        # 2. Crear el Pago (Transferencia/WhatsApp)
         pago = Pago.objects.create(
             pedido=pedido,
             metodo="Transferencia / WhatsApp",
             estado="Pendiente"
         )
 
-        # 3. Crear la Venta
         venta = Venta.objects.create(
             cliente=cliente,
             subtotal=subtotal,
@@ -520,7 +503,6 @@ def confirmar_compra(request):
             pago=pago
         )
 
-        # 4. Crear Detalles de Venta y Descontar Stock
         for item in items:
             precio = item.prenda.precio_descuento if item.prenda.precio_descuento else item.prenda.precio
             DetalleVenta.objects.create(
@@ -531,13 +513,10 @@ def confirmar_compra(request):
                 precio_unitario=precio
             )
 
-        # 5. Vaciar el carrito
         carrito.items.all().delete()
 
-        # 6. Intentar enviar correo con factura (Opcional según config)
         if cliente.user.email:
             try:
-                # DEBUG: Info inicial
                 logger.info(f"--- INICIO PROCESO CORREO VENTA #{venta.id} ---")
                 logger.info(f"Cliente: {cliente.user.username}, Email: {cliente.user.email}")
                 
@@ -545,7 +524,6 @@ def confirmar_compra(request):
                 pdf_content = pdf_buffer.getvalue()
                 logger.info(f"PDF generado. Tamaño: {len(pdf_content)} bytes")
                 
-                # Contexto para el correo profesional HTML
                 context = {
                     'cliente': cliente,
                     'venta': venta,
@@ -555,7 +533,6 @@ def confirmar_compra(request):
                     'current_year': timezone.now().year,
                 }
                 
-                # Renderizar el correo usando la plantilla
                 html_content = render_to_string('email/email_factura.html', context)
                 logger.info("Plantilla HTML renderizada correctamente")
                 
@@ -568,20 +545,18 @@ def confirmar_compra(request):
                 email.content_subtype = "html"
                 
                 if len(pdf_content) > 0:
-                     email.attach(f"Factura_{venta.id}.pdf", pdf_content, "application/pdf")
-                     logger.info("PDF adjuntado al objeto EmailMessage")
-                     
-                     # Intentar enviar
-                     logger.info("Llamando a email.send()...")
-                     sent_count = email.send(fail_silently=False)
-                     logger.info(f"Resultado email.send(): {sent_count}")
-                     
-                     if sent_count > 0:
-                         logger.info(f"¡ÉXITO CONFIRMADO! Correo enviado a {cliente.user.email}")
-                     else:
-                         logger.error(f"ADVERTENCIA: email.send() retornó 0 para {cliente.user.email}")
+                    email.attach(f"Factura_{venta.id}.pdf", pdf_content, "application/pdf")
+                    logger.info("PDF adjuntado al objeto EmailMessage")
+                    logger.info("Llamando a email.send()...")
+                    sent_count = email.send(fail_silently=False)
+                    logger.info(f"Resultado email.send(): {sent_count}")
+                    
+                    if sent_count > 0:
+                        logger.info(f"¡ÉXITO CONFIRMADO! Correo enviado a {cliente.user.email}")
+                    else:
+                        logger.error(f"ADVERTENCIA: email.send() retornó 0 para {cliente.user.email}")
                 else:
-                     logger.error(f"ERROR: PDF vacío para venta #{venta.id}")
+                    logger.error(f"ERROR: PDF vacío para venta #{venta.id}")
 
             except Exception as e:
                 import traceback
@@ -615,12 +590,10 @@ def paypal_capture(request):
                 return JsonResponse({"status": "error", "message": "Carrito vacío"}, status=400)
                 
             subtotal = sum(i.subtotal for i in items)
-            # El descuento se podría manejar aquí si se envió el cupón
             descuento = 0 
             costo_envio = 15000
             total = subtotal - descuento + costo_envio
             
-            # 1. Crear Pedido
             pedido = Pedido.objects.create(
                 cliente=cliente,
                 estado="Pagado",
@@ -630,15 +603,12 @@ def paypal_capture(request):
                 costo_envio=costo_envio
             )
             
-            # 2. Crear Pago
             pago = Pago.objects.create(
                 pedido=pedido,
                 metodo="PayPal",
                 estado="Aprobado",
-                # Podrías guardar el order_id de paypal en un campo si existiera
             )
             
-            # 3. Crear Venta
             venta = Venta.objects.create(
                 cliente=cliente,
                 subtotal=subtotal,
@@ -647,7 +617,6 @@ def paypal_capture(request):
                 pago=pago
             )
             
-            # 4. Detalles y Stock
             for item in items:
                 precio = item.prenda.precio_descuento if item.prenda.precio_descuento else item.prenda.precio
                 DetalleVenta.objects.create(
@@ -657,15 +626,12 @@ def paypal_capture(request):
                     cantidad=item.cantidad,
                     precio_unitario=precio
                 )
-                # Actualizar stock
                 if item.prenda.stock >= item.cantidad:
                     item.prenda.stock -= item.cantidad
                     item.prenda.save()
             
-            # 5. Vaciar Carrito
             carrito.items.all().delete()
             
-            # 6. Enviar Correo (reutilizando lógica existente)
             if cliente.user.email:
                 try:
                     pdf_buffer = generate_invoice_pdf(venta)
@@ -704,7 +670,6 @@ def paypal_capture(request):
 @login_required
 def factura_imprimir(request, venta_id):
     venta = get_object_or_404(Venta, id=venta_id)
-    # Solo el dueño de la venta o un admin pueden ver la factura
     if venta.cliente and venta.cliente.user_id != request.user.id and not es_admin(request.user):
         return HttpResponseForbidden("No puedes ver esta factura.")
 
@@ -735,7 +700,6 @@ def factura_imprimir(request, venta_id):
 @login_required
 def descargar_factura_pdf(request, venta_id):
     venta = get_object_or_404(Venta, id=venta_id)
-    # Solo el dueño de la venta o un admin pueden descargar la factura
     if venta.cliente and venta.cliente.user_id != request.user.id and not es_admin(request.user):
         return HttpResponseForbidden("No puedes descargar esta factura.")
 
@@ -752,13 +716,11 @@ def descargar_factura_pdf(request, venta_id):
 @user_passes_test(es_admin)
 def panel_admin(request):
     try:
-        # 1. Estadísticas Generales
         total_productos = Prenda.objects.filter(is_archived=False).count()
         total_ventas = Venta.objects.count()
         ingresos_totales = Venta.objects.aggregate(total=Sum('total'))['total'] or 0
         total_clientes = Cliente.objects.count()
 
-        # 2. Estadísticas Mensuales (Mes actual)
         hoy = timezone.now()
         inicio_mes = hoy.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         
@@ -766,7 +728,6 @@ def panel_admin(request):
         ventas_mes = Venta.objects.filter(fecha_venta__gte=inicio_mes).count()
         clientes_mes = User.objects.filter(date_joined__gte=inicio_mes, groups__name="Cliente").count()
 
-        # 3. Gráfico de Tendencia de Ventas (Últimos 12 meses)
         ventas_mensuales = []
         meses_nombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
         labels_grafica = []
@@ -780,7 +741,6 @@ def panel_admin(request):
             ventas_mensuales.append(ventas_count)
             labels_grafica.append(meses_nombres[mes_idx])
 
-        # 4. Gráfico de Distribución por Categorías
         categorias_qs = Categoria.objects.annotate(
             num_ventas=Sum('prendas__detalleventa__cantidad')
         ).filter(num_ventas__gt=0)
@@ -794,11 +754,9 @@ def panel_admin(request):
             categorias_labels = []
             categorias_data = []
 
-        # 5. Actividad Reciente
         ventas_recientes = Venta.objects.select_related('cliente__user').order_by('-fecha_venta')[:5]
         productos_bajo_stock = Prenda.objects.filter(stock__lt=5, is_archived=False).order_by('stock')[:5]
 
-        # 6. Indicadores de Progreso
         productos_en_stock = Prenda.objects.filter(stock__gt=0, is_archived=False).count()
         stock_porcentaje = round(productos_en_stock * 100 / total_productos, 1) if total_productos > 0 else 0
         stock_offset = 251.2 * (1 - (stock_porcentaje / 100))
@@ -840,21 +798,18 @@ def panel_admin(request):
         return render(request, "admin/panel_admin.html", context)
     except Exception as e:
         logger.error(f"Error en panel_admin: {str(e)}")
-        # Fallback minimalista para evitar el 500
         return render(request, "admin/panel_admin.html", {"error": True})
 
 
 @login_required
 @user_passes_test(es_admin)
 def gestion_productos(request):
-    # 1. Filtros y Búsqueda
     search_query = request.GET.get('search', '')
     category_id = request.GET.get('categoria', '')
     stock_status = request.GET.get('stock', '')
     sort_by = request.GET.get('sort', '-id')
     order = request.GET.get('order', 'desc')
     
-    # Mapeo de campos para ordenamiento seguro
     sort_mapping = {
         'nombre': 'nombre',
         'categoria': 'categoria__nombre',
@@ -871,14 +826,12 @@ def gestion_productos(request):
     
     productos_qs = Prenda.objects.all().order_by(order_field)
     
-    # Aplicar búsqueda
     if search_query:
         productos_qs = productos_qs.filter(
             Q(nombre__icontains=search_query) | 
             Q(codigo_barras__icontains=search_query)
         )
     
-    # Aplicar filtro de categoría
     if category_id:
         try:
             category_id = int(category_id)
@@ -886,7 +839,6 @@ def gestion_productos(request):
         except (ValueError, TypeError):
             category_id = ''
         
-    # Aplicar filtro de stock
     if stock_status == 'disponible':
         productos_qs = productos_qs.filter(stock__gt=0, is_archived=False)
     elif stock_status == 'bajo':
@@ -894,13 +846,11 @@ def gestion_productos(request):
     elif stock_status == 'agotado':
         productos_qs = productos_qs.filter(stock=0)
 
-    # 2. Estadísticas para los mini-contadores (siempre sobre el total)
     total_productos = Prenda.objects.count()
     activos = Prenda.objects.filter(is_archived=False, stock__gt=0).count()
     bajo_stock = Prenda.objects.filter(stock__lte=5, is_archived=False, stock__gt=0).count()
     en_oferta = Prenda.objects.filter(precio_descuento__isnull=False, is_archived=False).count()
 
-    # 3. Paginación
     paginator = Paginator(productos_qs, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -1003,19 +953,16 @@ def eliminar_producto(request, prenda_id):
 @login_required
 @user_passes_test(es_admin)
 def gestion_clientes(request):
-    # 1. Filtros y Búsqueda
     search_query = request.GET.get('search', '')
     status = request.GET.get('status', '')
     sort = request.GET.get('sort', 'reciente')
     
-    # Anotar con datos de compras
     clientes_qs = Cliente.objects.annotate(
         total_compras=Count('ventas'),
         total_gastado=Sum('ventas__total'),
         fecha_registro=F('user__date_joined')
     ).all()
     
-    # Aplicar filtros
     if search_query:
         clientes_qs = clientes_qs.filter(
             Q(user__username__icontains=search_query) |
@@ -1030,26 +977,22 @@ def gestion_clientes(request):
     elif status == 'sin_compras':
         clientes_qs = clientes_qs.filter(total_compras=0)
         
-    # Ordenamiento
     if sort == 'nombre':
         clientes_qs = clientes_qs.order_by('user__first_name')
     elif sort == 'compras':
         clientes_qs = clientes_qs.order_by('-total_compras')
-    else: # reciente
+    else:
         clientes_qs = clientes_qs.order_by('-user__date_joined')
         
-    # Estadísticas
     total_clientes = Cliente.objects.count()
     clientes_mes = Cliente.objects.filter(user__date_joined__month=datetime.datetime.now().month).count()
     clientes_con_compras = Cliente.objects.annotate(num_compras=Count('ventas')).filter(num_compras__gt=0).count()
     
-    # Cliente Top
     cliente_top_obj = Cliente.objects.annotate(gastado=Sum('ventas__total')).order_by('-gastado').first()
     cliente_top = {
         'nombre': cliente_top_obj.user.first_name or cliente_top_obj.user.username if cliente_top_obj else "-"
     }
 
-    # Paginación
     paginator = Paginator(clientes_qs, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -1086,7 +1029,6 @@ def gestion_ventas(request):
     hoy = datetime.datetime.now()
     inicio_mes = hoy.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     
-    # 1. Filtros y Búsqueda
     search_query = request.GET.get('search', '')
     from_date = request.GET.get('from', '')
     to_date = request.GET.get('to', '')
@@ -1094,7 +1036,6 @@ def gestion_ventas(request):
     
     ventas_qs = Venta.objects.all().order_by("-fecha_venta")
     
-    # Aplicar filtros
     if search_query:
         ventas_qs = ventas_qs.filter(
             Q(id__icontains=search_query) | 
@@ -1107,13 +1048,11 @@ def gestion_ventas(request):
     if to_date:
         ventas_qs = ventas_qs.filter(fecha_venta__date__lte=to_date)
     
-    # 2. Estadísticas para los mini-contadores
     total_ventas = Venta.objects.count()
     ventas_hoy = Venta.objects.filter(fecha_venta__date=hoy.date()).count()
     ingresos_mes = Venta.objects.filter(fecha_venta__gte=inicio_mes).aggregate(total=Sum('total'))['total'] or 0
     promedio_venta = ingresos_mes / total_ventas if total_ventas > 0 else 0
     
-    # 3. Datos para el gráfico (Últimos 7 días)
     labels = []
     data = []
     dias_semana = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']
@@ -1124,203 +1063,14 @@ def gestion_ventas(request):
         labels.append(dias_semana[dia.weekday()])
         data.append(count)
     
-    # 4. Paginación
-    paginator = Paginator(ventas_qs, 10) # 10 ventas por página
+    paginator = Paginator(ventas_qs, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
     context = {
-        "ventas": page_obj,  # Usamos el objeto de página en lugar del queryset completo
+        "ventas": page_obj,
         "page_obj": page_obj,
         "total_ventas": total_ventas,
-        "ventas_hoy": ventas_hoy,
-        "ingresos_mes": ingresos_mes,
-        "promedio_venta": promedio_venta,
-        "labels": labels,
-        "data": data,
-        "search_query": search_query,
-    }
-    
-    return render(request, "admin/gestion_ventas.html", context)
+        "ventas_hoy": vent **...**
 
-
-@login_required
-@user_passes_test(es_admin)
-def gestion_categorias(request):
-    categorias = Categoria.objects.all().order_by("nombre")
-    return render(request, "admin/gestion_categorias.html", {"categorias": categorias})
-
-
-@login_required
-@user_passes_test(es_admin)
-def crear_categoria(request):
-    if request.method == "POST":
-        nombre = request.POST.get("nombre", "").strip()
-
-        Categoria.objects.create(nombre=nombre)
-
-        messages.success(request, "Categoría creada correctamente.")
-        return redirect("gestion_categorias")
-
-    return render(request, "admin/crear_categoria.html")
-
-
-@login_required
-@user_passes_test(es_admin)
-def editar_categoria(request, categoria_id):
-    categoria = get_object_or_404(Categoria, id=categoria_id)
-
-    if request.method == "POST":
-        categoria.nombre = request.POST.get("nombre", "").strip()
-        categoria.save()
-        return redirect("gestion_categorias")
-
-    return render(request, "admin/editar_categoria.html", {"categoria": categoria})
-
-
-@login_required
-@user_passes_test(es_admin)
-def eliminar_categoria(request, categoria_id):
-    categoria = get_object_or_404(Categoria, id=categoria_id)
-
-    if categoria.prendas.exists():
-        messages.error(request, "No se puede eliminar una categoría con productos asociados.")
-        return redirect("gestion_categorias")
-
-    categoria.delete()
-    messages.success(request, "Categoría eliminada correctamente.")
-    return redirect("gestion_categorias")
-
-
-# =====================================================
-#        PERFIL CLIENTE
-# =====================================================
-
-@login_required
-@user_passes_test(es_cliente)
-def perfil_cliente(request):
-    cliente, created = Cliente.objects.get_or_create(
-        user=request.user,
-        defaults={'telefono': 'N/A', 'direccion': 'N/A'}
-    )
-    return render(request, "cliente/perfil_cliente.html", {"cliente": cliente})
-
-
-@login_required
-@user_passes_test(es_cliente)
-def editar_perfil(request):
-    cliente, created = Cliente.objects.get_or_create(
-        user=request.user,
-        defaults={'telefono': 'N/A', 'direccion': 'N/A'}
-    )
-    if request.method == "POST":
-        cliente.user.first_name = request.POST.get("first_name", "")
-        cliente.user.email = request.POST.get("email", "")
-        cliente.telefono = request.POST.get("telefono", "")
-        cliente.direccion = request.POST.get("direccion", "")
-
-        cliente.user.save()
-        cliente.save()
-
-        return redirect("perfil_cliente")
-
-    return render(request, "cliente/editar_perfil.html", {"cliente": cliente})
-
-
-# =====================================================
-#        MIS VENTAS
-# =====================================================
-
-@login_required
-@user_passes_test(es_cliente)
-@login_required
-@user_passes_test(es_cliente)
-def mis_ventas(request):
-    cliente = get_object_or_404(Cliente, user=request.user)
-    ventas = Venta.objects.filter(cliente=cliente).select_related('pago__pedido').order_by("-fecha_venta")
-
-    return render(request, "cliente/mis_ventas.html", {"ventas": ventas})
-
-# =====================================================
-#        CATÁLOGO (FALTABA)
-# =====================================================
-
-@login_required
-@user_passes_test(es_admin)
-def actualizar_estado_pedido(request, pedido_id):
-    pedido = get_object_or_404(Pedido, id=pedido_id)
-    if request.method == "POST":
-        nuevo_estado = request.POST.get("nuevo_estado")
-        if nuevo_estado in dict(Pedido.ESTADOS):
-            pedido.estado = nuevo_estado
-            pedido.save()
-            messages.success(request, f"Estado del pedido #{pedido.id} actualizado a {nuevo_estado}.")
-        else:
-            messages.error(request, "Estado no válido.")
-    return redirect("gestion_ventas")
-
-
-@login_required
-@user_passes_test(es_admin)
-def actualizar_envio_pedido(request, pedido_id):
-    pedido = get_object_or_404(Pedido, id=pedido_id)
-    if request.method == "POST":
-        pedido.transportadora = request.POST.get("transportadora")
-        pedido.guia_rastreo = request.POST.get("guia_rastreo")
-        pedido.save()
-        messages.success(request, f"Información de envío del pedido #{pedido.id} actualizada.")
-    return redirect("gestion_ventas")
-
-
-@login_required
-@user_passes_test(es_cliente)
-def catalogo(request):
-    prendas = Prenda.objects.filter(is_archived=False).order_by("nombre")
-    return render(request, "cliente/catalogo.html", {"prendas": prendas})
-@login_required
-@user_passes_test(es_admin)
-def escanear_venta(request):
-    clientes = Cliente.objects.all().order_by("user__username")
-    return render(request, 'admin/escanear_venta.html', {'clientes': clientes})
-
-from django.http import JsonResponse
-
-@login_required
-@user_passes_test(es_admin)
-def buscar_producto_api(request):
-    barcode = request.GET.get('barcode')
-    q = request.GET.get('q')
-    
-    if barcode:
-        producto = Prenda.objects.filter(codigo_barras=barcode, is_archived=False).first()
-        if producto:
-            return JsonResponse({
-                'id': producto.id,
-                'nombre': producto.nombre,
-                'codigo': producto.codigo_barras,
-                'precio': float(producto.precio),
-                'stock': producto.stock
-            })
-        return JsonResponse({'error': 'Producto no encontrado'}, status=404)
-    
-    if q:
-        productos = Prenda.objects.filter(nombre__icontains=q, is_archived=False)[:10]
-        results = [{
-            'id': p.id,
-            'nombre': p.nombre,
-            'precio': float(p.precio),
-            'stock': p.stock
-        } for p in productos]
-        return JsonResponse(results, safe=False)
-        
-    return JsonResponse({'error': 'Parámetros insuficientes'}, status=400)
-
-@login_required
-@user_passes_test(es_cliente)
-def simular_pago(request):
-    total = request.GET.get('total', 0)
-    metodo = request.GET.get('metodo', 'PSE')
-    return render(request, 'cliente/simular_pago.html', {
-        'total': total,
-        'metodo': metodo
-    })
+_This response is too long to display in full._
