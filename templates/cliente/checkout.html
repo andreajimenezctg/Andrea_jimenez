@@ -41,7 +41,7 @@
 {% block content %}
 <main class="container">
     <h1>Finalizar Compra</h1>
-    <p class="subtitle">Revisa tu pedido y completa el pago de forma segura con Wompi.</p>
+    <p class="subtitle">Revisa tu pedido y completa el pago de forma segura con PayPal.</p>
 
     <div class="card-panel" style="margin-bottom: 40px;">
         <table class="summary-table">
@@ -127,25 +127,14 @@
             <div class="payment-instructions" style="background: #fdfcfb; padding: 20px; border-radius: 4px; border: 1px dashed #e8b4b8; margin-bottom: 25px;">
                 <p style="font-size: 0.8rem; color: #555; margin-bottom: 10px;">
                     <i class="fa-solid fa-info-circle" style="color: #e8b4b8;"></i> 
-                    Al hacer clic en el botón, tu pedido se registrará y podrás pagar de forma segura con <strong>Wompi</strong>.
+                    Al hacer clic en el botón, tu pedido se registrará y podrás pagar de forma segura con <strong>PayPal</strong>.
                 </p>
             </div>
 
-            <button type="button" id="btn-wompi-checkout" class="btn-confirmar" style="width: 100%; padding: 20px; background: #1a1a1a; color: #fff; border: none; border-radius: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
-                <span id="btn-text">Pagar con Wompi</span>
-                <i class="fa-solid fa-shield-halved" style="font-size: 0.9rem;"></i>
-            </button>
+            <div id="paypal-button-container"></div>
 
             <style>
-                .btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; }
-                .btn-confirmar:hover:not(:disabled) {
-                    background: #333;
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-                }
-                .btn-confirmar:active:not(:disabled) {
-                    transform: translateY(0);
-                }
+                #paypal-button-container { min-height: 150px; width: 100%; margin-top: 20px; }
             </style>
 
             <div id="payment-fallback" style="margin-top: 25px; text-align: center;">
@@ -166,70 +155,96 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Wompi Widget Script -->
-<script src="https://checkout.wompi.co/widget.js"></script>
+<!-- PayPal SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&disable-funding=credit,card,venmo"></script>
 
 <script>
-    document.getElementById('btn-wompi-checkout').addEventListener('click', function() {
-        const shippingForm = document.getElementById('shipping-form');
-        const btn = this;
-        const btnText = document.getElementById('btn-text');
-        
-        // 1. Validar formulario
-        if (!shippingForm.checkValidity()) {
-            shippingForm.reportValidity();
-            return;
-        }
+    const shippingForm = document.getElementById('shipping-form');
+    
+    // Total convertido a USD para PayPal (Simulado con tasa fija)
+    const totalCOP = parseInt("{{ total_con_envio|floatformat:0 }}".replace(/\./g, '')) || 0;
+    const tasaCambio = 4000; 
+    const totalUSD = (totalCOP / tasaCambio).toFixed(2);
 
-        // 2. Bloquear botón
-        btn.disabled = true;
-        btnText.innerText = "Procesando...";
-
-        // 3. Crear venta preliminar vía AJAX
-        const formData = {
-            departamento: document.getElementById('id_departamento').value,
-            ciudad: document.getElementById('id_ciudad').value,
-            direccion: document.getElementById('id_direccion').value
-        };
-
-        fetch("{% url 'api_crear_venta_preliminar' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // 4. Abrir Widget de Wompi
-                var checkout = new WidgetCheckout({
-                    currency: 'COP',
-                    amountInCents: data.total_cents,
-                    reference: data.referencia,
-                    publicKey: data.public_key,
-                    redirectUrl: '{{ site_url }}{% url "mis_ventas" %}'
-                });
-
-                checkout.open(function ( result ) {
-                    var transaction = result.transaction;
-                    console.log('Transacción finalizada: ', transaction);
-                    // Redirigir al historial para ver el estado
-                    window.location.href = '{% url "mis_ventas" %}';
-                });
-            } else {
-                alert("Error al procesar el pedido: " + data.message);
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal'
+        },
+        createOrder: function(data, actions) {
+            // 1. Validar formulario
+            if (!shippingForm.checkValidity()) {
+                shippingForm.reportValidity();
+                return actions.reject();
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("Ocurrió un error inesperado. Intenta nuevamente.");
-        })
-        .finally(() => {
-            btn.disabled = false;
-            btnText.innerText = "Pagar con Wompi";
-        });
-    });
+
+            // 2. Registrar venta preliminar vía AJAX antes de abrir PayPal
+            const formData = {
+                departamento: document.getElementById('id_departamento').value,
+                ciudad: document.getElementById('id_ciudad').value,
+                direccion: document.getElementById('id_direccion').value
+            };
+
+            return fetch("{% url 'api_crear_venta_preliminar' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(resData => {
+                if (resData.status === 'success') {
+                    // Guardamos el venta_id para la captura final
+                    window.currentVentaId = resData.venta_id;
+                    
+                    // Crear orden en PayPal
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: totalUSD,
+                                currency_code: 'USD'
+                            },
+                            description: "Compra en Andrea Jiménez #" + resData.venta_id
+                        }]
+                    });
+                } else {
+                    alert("Error al registrar el pedido: " + resData.message);
+                    return actions.reject();
+                }
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(function(orderData) {
+                // 3. Confirmar pago en el servidor
+                return fetch("{% url 'paypal_capture' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        venta_id: window.currentVentaId,
+                        orderID: data.orderID
+                    })
+                })
+                .then(response => response.json())
+                .then(captureData => {
+                    if (captureData.status === 'success') {
+                        window.location.href = "{% url 'factura_imprimir' 0 %}".replace('0', captureData.venta_id);
+                    } else {
+                        alert("Error al confirmar el pago: " + captureData.message);
+                    }
+                });
+            });
+        },
+        onError: function(err) {
+            console.error('PayPal Error:', err);
+            alert("Ocurrió un error con el pago de PayPal.");
+        }
+    }).render('#paypal-button-container');
 </script>
 {% endblock %}

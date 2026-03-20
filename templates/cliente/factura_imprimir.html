@@ -326,30 +326,59 @@
     <div class="no-print">
         {% if venta.pago.estado == 'Pendiente' %}
         <div style="width: 100%; max-width: 400px; background: #fff; padding: 25px; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 30px;">
-            <p style="font-size: 14px; margin-bottom: 20px; font-weight: 500;">Tu pedido ha sido registrado. Para completar tu compra, por favor realiza el pago:</p>
-            <form>
-                <script
-                    src="https://checkout.wompi.co/widget.js"
-                    data-render="button"
-                    data-public-key="{{ wompi_public_key }}"
-                    data-currency="COP"
-                    data-amount-in-cents="{{ total_cents }}"
-                    data-reference="{{ wompi_referencia }}"
-                    data-redirect-url="{{ site_url }}{% url 'mis_ventas' %}"
-                ></script>
-            </form>
-            <style>
-                .wompi-method-button {
-                    width: 100% !important;
-                    background: var(--primary) !important;
-                    color: #fff !important;
-                    padding: 15px !important;
-                    font-weight: bold !important;
-                    text-transform: uppercase !important;
-                    border-radius: 4px !important;
-                    letter-spacing: 1px !important;
-                }
-            </style>
+            <p style="font-size: 14px; margin-bottom: 20px; font-weight: 500;">Tu pedido ha sido registrado. Para completar tu compra, por favor realiza el pago con PayPal:</p>
+            <div id="paypal-button-container"></div>
+            
+            <!-- PayPal SDK -->
+             <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&disable-funding=credit,card,venmo"></script>
+             <script>
+                const totalCOP = parseInt("{{ total|floatformat:0 }}".replace(/\./g, '')) || 0;
+                const tasaCambio = 4000; 
+                const totalUSD = (totalCOP / tasaCambio).toFixed(2);
+
+                paypal.Buttons({
+                    style: {
+                        layout: 'vertical',
+                        color: 'gold',
+                        shape: 'rect',
+                        label: 'paypal'
+                    },
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: totalUSD,
+                                    currency_code: 'USD'
+                                },
+                                description: "Pago de Factura #{{ venta.id }} - Andrea Jiménez"
+                            }]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(orderData) {
+                            return fetch("{% url 'paypal_capture' %}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': '{{ csrf_token }}'
+                                },
+                                body: JSON.stringify({
+                                    venta_id: "{{ venta.id }}",
+                                    orderID: data.orderID
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(captureData => {
+                                if (captureData.status === 'success') {
+                                    window.location.reload();
+                                } else {
+                                    alert("Error al confirmar el pago: " + captureData.message);
+                                }
+                            });
+                        });
+                    }
+                }).render('#paypal-button-container');
+             </script>
         </div>
         {% endif %}
     </div>
