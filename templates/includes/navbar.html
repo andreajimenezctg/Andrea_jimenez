@@ -37,7 +37,7 @@
 
         <div class="user-actions">
             {% if user.is_authenticated %}
-                {% if user.groups.first.name == "Cliente" %}
+                {% if es_cliente %}
                 <div class="cart">
                     <a href="{% url 'carrito' %}" aria-label="Bolsa de compras" style="margin-right: 15px;">
                         <i class="fa-solid fa-bag-shopping" style="font-size: 1.1rem; color: var(--rosado);"></i>
@@ -52,10 +52,10 @@
                         <i class="fa-solid fa-chevron-down desktop-only" style="font-size: 0.6rem;"></i>
                     </button>
                     <div class="dropdown-content" id="userDropdownContent">
-                        {% if user.groups.first.name == "Cliente" %}
+                        {% if es_cliente %}
                             <a href="{% url 'panel_cliente' %}">Mi Perfil</a>
                             <a href="{% url 'mis_ventas' %}">Mis Compras</a>
-                        {% elif user.is_staff %}
+                        {% elif user.is_staff or user.is_superuser %}
                             <a href="{% url 'panel_admin' %}">Panel Admin</a>
                         {% endif %}
                         <div style="border-top: 1px solid rgba(232, 180, 184, 0.1);"></div>

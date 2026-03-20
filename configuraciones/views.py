@@ -49,6 +49,48 @@ def panel_cliente(request):
     return render(request, "cliente/panel_cliente.html", {"cliente": cliente})
 
 
+@login_required
+@user_passes_test(es_cliente)
+def perfil_cliente(request):
+    cliente = get_object_or_404(Cliente, user=request.user)
+    return render(request, "cliente/perfil.html", {"cliente": cliente})
+
+
+@login_required
+@user_passes_test(es_cliente)
+def editar_perfil(request):
+    cliente = get_object_or_404(Cliente, user=request.user)
+    if request.method == "POST":
+        user = request.user
+        user.first_name = request.POST.get("first_name")
+        user.last_name = request.POST.get("last_name")
+        user.email = request.POST.get("email")
+        user.save()
+        
+        cliente.telefono = request.POST.get("telefono")
+        cliente.direccion = request.POST.get("direccion")
+        cliente.save()
+        
+        messages.success(request, "Perfil actualizado con éxito.")
+        return redirect("perfil_cliente")
+    
+    return render(request, "cliente/editar_perfil.html", {"cliente": cliente})
+
+
+@login_required
+@user_passes_test(es_cliente)
+def mis_ventas(request):
+    cliente = get_object_or_404(Cliente, user=request.user)
+    ventas = Venta.objects.filter(cliente=cliente).order_by("-fecha_venta")
+    return render(request, "cliente/mis_ventas.html", {"ventas": ventas})
+
+
+def catalogo(request):
+    """Vista para ver el catálogo general de productos"""
+    productos = Prenda.objects.filter(disponible=True).order_by("-id")
+    return render(request, "tienda.html", {"productos": productos})
+
+
 # =====================================================
 #        AUTENTICACIÓN
 # =====================================================

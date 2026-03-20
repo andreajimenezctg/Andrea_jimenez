@@ -34,12 +34,16 @@
                     <td>#{{ venta.id }}</td>
                     <td>{{ venta.fecha_venta|date:"d/m/Y" }}</td>
                     <td>
+                        {% if venta.pago and venta.pago.pedido %}
                         <span class="badge badge-{{ venta.pago.pedido.estado|lower }}">
                             {{ venta.pago.pedido.estado }}
                         </span>
+                        {% else %}
+                        <span class="badge badge-pendiente">Pendiente</span>
+                        {% endif %}
                     </td>
                     <td>
-                        {% if venta.pago.pedido.guia_rastreo %}
+                        {% if venta.pago and venta.pago.pedido and venta.pago.pedido.guia_rastreo %}
                             <strong>{{ venta.pago.pedido.transportadora }}:</strong> {{ venta.pago.pedido.guia_rastreo }}
                         {% else %}
                             <span class="text-muted">Procesando...</span>
