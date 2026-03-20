@@ -29,7 +29,6 @@
     .form-control { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 0; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; background: #fcfcfc; }
     
     .payment-method-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 20px; color: #1a1a1a; }
-    #paypal-button-container { min-height: 150px; width: 100%; margin-top: 20px; }
 
     @media (max-width: 992px) {
         .checkout-grid { grid-template-columns: 1fr; }
@@ -42,7 +41,7 @@
 {% block content %}
 <main class="container">
     <h1>Finalizar Compra</h1>
-    <p class="subtitle">Revisa tu pedido y completa el pago de forma segura con PayPal.</p>
+    <p class="subtitle">Revisa tu pedido y completa el pago de forma segura con Wompi.</p>
 
     <div class="card-panel" style="margin-bottom: 40px;">
         <table class="summary-table">
@@ -132,30 +131,20 @@
                 </p>
             </div>
 
-            <button type="submit" form="shipping-form" class="btn-confirmar" style="width: 100%; padding: 20px; background: #1a1a1a; color: #fff; border: none; border-radius: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
-                <span>Confirmar y Pagar</span>
-                <i class="fa-solid fa-arrow-right" style="font-size: 0.9rem; transition: transform 0.3s;"></i>
+            <button type="button" id="btn-wompi-checkout" class="btn-confirmar" style="width: 100%; padding: 20px; background: #1a1a1a; color: #fff; border: none; border-radius: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
+                <span id="btn-text">Pagar con Wompi</span>
+                <i class="fa-solid fa-shield-halved" style="font-size: 0.9rem;"></i>
             </button>
 
             <style>
-                .btn-confirmar:hover {
+                .btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; }
+                .btn-confirmar:hover:not(:disabled) {
                     background: #333;
                     transform: translateY(-2px);
                     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
                 }
-                .btn-confirmar:hover i {
-                    transform: translateX(5px);
-                }
-                .btn-confirmar:active {
+                .btn-confirmar:active:not(:disabled) {
                     transform: translateY(0);
-                }
-                .payment-instructions i {
-                    animation: pulse 2s infinite;
-                }
-                @keyframes pulse {
-                    0% { opacity: 0.6; }
-                    50% { opacity: 1; }
-                    100% { opacity: 0.6; }
                 }
             </style>
 
@@ -177,12 +166,70 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Wompi Widget Script -->
+<script src="https://checkout.wompi.co/widget.js"></script>
+
 <script>
-    document.getElementById('shipping-form').addEventListener('submit', function(e) {
-        if (!this.checkValidity()) {
-            e.preventDefault();
-            this.reportValidity();
+    document.getElementById('btn-wompi-checkout').addEventListener('click', function() {
+        const shippingForm = document.getElementById('shipping-form');
+        const btn = this;
+        const btnText = document.getElementById('btn-text');
+        
+        // 1. Validar formulario
+        if (!shippingForm.checkValidity()) {
+            shippingForm.reportValidity();
+            return;
         }
+
+        // 2. Bloquear botón
+        btn.disabled = true;
+        btnText.innerText = "Procesando...";
+
+        // 3. Crear venta preliminar vía AJAX
+        const formData = {
+            departamento: document.getElementById('id_departamento').value,
+            ciudad: document.getElementById('id_ciudad').value,
+            direccion: document.getElementById('id_direccion').value
+        };
+
+        fetch("{% url 'api_crear_venta_preliminar' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // 4. Abrir Widget de Wompi
+                var checkout = new WidgetCheckout({
+                    currency: 'COP',
+                    amountInCents: data.total_cents,
+                    reference: data.referencia,
+                    publicKey: data.public_key,
+                    redirectUrl: '{{ site_url }}{% url "mis_ventas" %}'
+                });
+
+                checkout.open(function ( result ) {
+                    var transaction = result.transaction;
+                    console.log('Transacción finalizada: ', transaction);
+                    // Redirigir al historial para ver el estado
+                    window.location.href = '{% url "mis_ventas" %}';
+                });
+            } else {
+                alert("Error al procesar el pedido: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Ocurrió un error inesperado. Intenta nuevamente.");
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btnText.innerText = "Pagar con Wompi";
+        });
     });
 </script>
 {% endblock %}

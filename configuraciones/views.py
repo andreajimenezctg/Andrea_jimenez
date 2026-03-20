@@ -86,6 +86,82 @@ def mis_ventas(request):
     return render(request, "cliente/mis_ventas.html", {"ventas": ventas})
 
 
+@csrf_exempt
+@login_required
+def api_crear_venta_preliminar(request):
+    """Crea una venta en estado pendiente para procesar el pago con Wompi"""
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Método no permitido"}, status=405)
+        
+    try:
+        data = json.loads(request.body)
+        cliente = get_object_or_404(Cliente, user=request.user)
+        carrito = get_object_or_404(CarritoDeCompras, cliente=cliente)
+        items = [i for i in carrito.items.select_related("prenda", "variacion").all() if i.prenda]
+        
+        if not items:
+            return JsonResponse({"status": "error", "message": "Carrito vacío"}, status=400)
+            
+        subtotal = sum(i.subtotal for i in items)
+        descuento = 0 
+        costo_envio = 15000
+        total = subtotal - descuento + costo_envio
+        
+        # Crear Pedido preliminar
+        pedido = Pedido.objects.create(
+            cliente=cliente,
+            estado="Pendiente",
+            departamento=data.get("departamento", "N/A"),
+            ciudad=data.get("ciudad", "N/A"),
+            direccion_envio=data.get("direccion", "N/A"),
+            costo_envio=costo_envio
+        )
+        
+        # Crear Pago preliminar
+        pago = Pago.objects.create(
+            pedido=pedido,
+            metodo="Wompi",
+            estado="Pendiente",
+        )
+        
+        # Crear Venta preliminar
+        venta = Venta.objects.create(
+            cliente=cliente,
+            subtotal=subtotal,
+            descuento=descuento,
+            total=total,
+            pago=pago
+        )
+        
+        # Registrar detalles
+        for item in items:
+            precio = item.prenda.precio_descuento if item.prenda.precio_descuento else item.prenda.precio
+            DetalleVenta.objects.create(
+                venta=venta,
+                prenda=item.prenda,
+                variacion=item.variacion,
+                cantidad=item.cantidad,
+                precio_unitario=precio
+            )
+        
+        # No borramos el carrito aún, solo lo haremos cuando el pago sea exitoso (vía webhook o redirección)
+        # Opcional: Podríamos borrarlo aquí si confiamos en el flujo
+        
+        referencia = f"AJ-{venta.id}-{int(time.time())}"
+        
+        return JsonResponse({
+            "status": "success",
+            "venta_id": venta.id,
+            "total_cents": int(total * 100),
+            "referencia": referencia,
+            "public_key": settings.WOMPI_PUBLIC_KEY
+        })
+        
+    except Exception as e:
+        logger.error(f"Error venta preliminar: {str(e)}")
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
 def catalogo(request):
     """Vista para ver el catálogo general de productos"""
     productos = Prenda.objects.filter(disponible=True).order_by("-id")

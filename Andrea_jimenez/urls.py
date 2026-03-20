@@ -76,6 +76,7 @@ urlpatterns = [
     path("checkout/", views.checkout, name="checkout"),
     path("confirmar/", views.confirmar_compra, name="confirmar_compra"),
     path("confirmar_compra/", views.confirmar_compra, name="confirmar_compra_alt"),
+    path("api/crear-venta-preliminar/", views.api_crear_venta_preliminar, name="api_crear_venta_preliminar"),
     path("factura/<int:venta_id>/", views.factura_imprimir, name="factura_imprimir"),
     path("descargar_factura/<int:venta_id>/", views.descargar_factura_pdf, name="descargar_factura_pdf"),
 
