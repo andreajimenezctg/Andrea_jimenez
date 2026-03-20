@@ -10,6 +10,5 @@ def global_config(request):
         
     return {
         'whatsapp_number': getattr(settings, 'WHATSAPP_NUMBER', '573014717412'),
-        'wompi_public_key': getattr(settings, 'WOMPI_PUBLIC_KEY', ''),
         'es_cliente': es_cliente,
     }

@@ -41,7 +41,7 @@
 {% block content %}
 <main class="container">
     <h1>Finalizar Compra</h1>
-    <p class="subtitle">Revisa tu pedido y completa el pago de forma segura con PayPal.</p>
+    <p class="subtitle">Revisa tu pedido y completa la información de envío para finalizar.</p>
 
     <div class="card-panel" style="margin-bottom: 40px;">
         <table class="summary-table">
@@ -49,33 +49,41 @@
                 <tr>
                     <th>Producto</th>
                     <th style="text-align: center;">Cantidad</th>
-                    <th style="text-align: right;">Precio</th>
                     <th style="text-align: right;">Subtotal</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in carrito_items %}
                 <tr>
-                    <td style="font-weight: 500;">{{ item.prenda.nombre }}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            {% if item.prenda.imagen %}
+                                <img src="{{ item.prenda.imagen.url }}" alt="{{ item.prenda.nombre }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                            {% endif %}
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.9rem;">{{ item.prenda.nombre }}</div>
+                                <div style="font-size: 0.75rem; color: #888;">Ref: {{ item.prenda.id }}</div>
+                            </div>
+                        </div>
+                    </td>
                     <td style="text-align: center;">{{ item.cantidad }}</td>
-                    <td style="text-align: right;">${{ item.prenda.precio|floatformat:0 }}</td>
-                    <td style="text-align: right; font-weight: 600;">${{ item.subtotal|floatformat:0 }}</td>
+                    <td style="text-align: right;">${{ item.subtotal|floatformat:0 }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        
-        <div class="totals-area">
+
+        <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
             <div class="total-row">
-                <span>Subtotal:</span>
+                <span style="color: #888;">Subtotal:</span>
                 <span style="min-width: 120px; text-align: right;">${{ total|floatformat:0 }}</span>
             </div>
             <div class="total-row">
-                <span>Envío:</span>
+                <span style="color: #888;">Envío:</span>
                 <span style="min-width: 120px; text-align: right;">$15.000</span>
             </div>
             <div class="total-row grand-total">
-                <span>Total a Pagar:</span>
+                <span>Total:</span>
                 <span style="min-width: 120px; text-align: right;">${{ total_con_envio|floatformat:0 }}</span>
             </div>
         </div>
@@ -84,8 +92,7 @@
     <div class="checkout-grid">
         <div class="card-panel">
             <h3 class="payment-method-title">Información de Envío</h3>
-            <form id="shipping-form" action="{% url 'confirmar_compra' %}" method="POST">
-                {% csrf_token %}
+            <form id="shipping-form">
                 <div class="form-group">
                     <label>Departamento</label>
                     <select name="departamento" id="id_departamento" required class="form-control">
@@ -94,22 +101,38 @@
                         <option value="Atlántico">Atlántico</option>
                         <option value="Bogotá D.C.">Bogotá D.C.</option>
                         <option value="Bolívar">Bolívar (Cartagena)</option>
+                        <option value="Boyacá">Boyacá</option>
                         <option value="Caldas">Caldas</option>
+                        <option value="Caquetá">Caquetá</option>
+                        <option value="Casanare">Casanare</option>
                         <option value="Cauca">Cauca</option>
+                        <option value="Cesar">Cesar</option>
+                        <option value="Chocó">Chocó</option>
+                        <option value="Córdoba">Córdoba</option>
                         <option value="Cundinamarca">Cundinamarca</option>
+                        <option value="Guainía">Guainía</option>
+                        <option value="Guaviare">Guaviare</option>
                         <option value="Huila">Huila</option>
+                        <option value="La Guajira">La Guajira</option>
+                        <option value="Magdalena">Magdalena</option>
                         <option value="Meta">Meta</option>
                         <option value="Nariño">Nariño</option>
+                        <option value="Norte de Santander">Norte de Santander</option>
+                        <option value="Putumayo">Putumayo</option>
                         <option value="Quindío">Quindío</option>
                         <option value="Risaralda">Risaralda</option>
+                        <option value="San Andrés y Providencia">San Andrés y Providencia</option>
                         <option value="Santander">Santander</option>
+                        <option value="Sucre">Sucre</option>
                         <option value="Tolima">Tolima</option>
                         <option value="Valle del Cauca">Valle del Cauca</option>
+                        <option value="Vaupés">Vaupés</option>
+                        <option value="Vichada">Vichada</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Ciudad</label>
-                    <input type="text" name="ciudad" id="id_ciudad" placeholder="Ej: Cartagena" required class="form-control">
+                    <label>Ciudad / Municipio</label>
+                    <input type="text" name="ciudad" id="id_ciudad" placeholder="Ej: Cartagena, Bogotá..." required class="form-control">
                 </div>
                 <div class="form-group">
                     <label>Dirección Completa</label>
@@ -121,28 +144,25 @@
         <div class="card-panel">
             <h3 class="payment-method-title">Finalizar Pedido</h3>
             <p style="font-size: 0.85rem; color: #666; margin-bottom: 25px; line-height: 1.6;">
-                El total a pagar es de <strong>${{ total_con_envio|floatformat:0 }} COP</strong>.
+                Tu pedido será registrado y procesado. Al finalizar podrás ver tu factura y coordinar la entrega.
             </p>
             
-            <div class="payment-instructions" style="background: #fdfcfb; padding: 20px; border-radius: 4px; border: 1px dashed #e8b4b8; margin-bottom: 25px;">
-                <p style="font-size: 0.8rem; color: #555; margin-bottom: 10px;">
-                    <i class="fa-solid fa-info-circle" style="color: #e8b4b8;"></i> 
-                    Al hacer clic en el botón, tu pedido se registrará y podrás pagar de forma segura con <strong>PayPal</strong>.
-                </p>
-            </div>
-
-            <div id="paypal-button-container"></div>
+            <button type="button" id="btn-finalizar-pedido" class="btn-confirmar" style="width: 100%; padding: 20px; background: #1a1a1a; color: #fff; border: none; border-radius: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
+                <span id="btn-text">Finalizar Pedido</span>
+                <i class="fa-solid fa-check" style="font-size: 0.9rem;"></i>
+            </button>
 
             <style>
-                #paypal-button-container { min-height: 150px; width: 100%; margin-top: 20px; }
+                .btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; }
+                .btn-confirmar:hover:not(:disabled) {
+                    background: #333;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                }
+                .btn-confirmar:active:not(:disabled) {
+                    transform: translateY(0);
+                }
             </style>
-
-            <div id="payment-fallback" style="margin-top: 25px; text-align: center;">
-                <p style="font-size: 0.75rem; color: #888;">¿Necesitas ayuda con tu compra?</p>
-                <a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20de%20${{ total_con_envio|floatformat:0 }}." target="_blank" style="color: #25d366; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
-                    <i class="fab fa-whatsapp"></i> Hablar con un asesor
-                </a>
-            </div>
         </div>
     </div>
 
@@ -155,96 +175,50 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&disable-funding=credit,card,venmo"></script>
-
 <script>
-    const shippingForm = document.getElementById('shipping-form');
-    
-    // Total convertido a USD para PayPal (Simulado con tasa fija)
-    const totalCOP = parseInt("{{ total_con_envio|floatformat:0 }}".replace(/\./g, '')) || 0;
-    const tasaCambio = 4000; 
-    const totalUSD = (totalCOP / tasaCambio).toFixed(2);
-
-    paypal.Buttons({
-        style: {
-            layout: 'vertical',
-            color: 'gold',
-            shape: 'rect',
-            label: 'paypal'
-        },
-        createOrder: function(data, actions) {
-            // 1. Validar formulario
-            if (!shippingForm.checkValidity()) {
-                shippingForm.reportValidity();
-                return actions.reject();
-            }
-
-            // 2. Registrar venta preliminar vía AJAX antes de abrir PayPal
-            const formData = {
-                departamento: document.getElementById('id_departamento').value,
-                ciudad: document.getElementById('id_ciudad').value,
-                direccion: document.getElementById('id_direccion').value
-            };
-
-            return fetch("{% url 'api_crear_venta_preliminar' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json())
-            .then(resData => {
-                if (resData.status === 'success') {
-                    // Guardamos el venta_id para la captura final
-                    window.currentVentaId = resData.venta_id;
-                    
-                    // Crear orden en PayPal
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: totalUSD,
-                                currency_code: 'USD'
-                            },
-                            description: "Compra en Andrea Jiménez #" + resData.venta_id
-                        }]
-                    });
-                } else {
-                    alert("Error al registrar el pedido: " + resData.message);
-                    return actions.reject();
-                }
-            });
-        },
-        onApprove: function(data, actions) {
-            return actions.order.capture().then(function(orderData) {
-                // 3. Confirmar pago en el servidor
-                return fetch("{% url 'paypal_capture' %}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({
-                        venta_id: window.currentVentaId,
-                        orderID: data.orderID
-                    })
-                })
-                .then(response => response.json())
-                .then(captureData => {
-                    if (captureData.status === 'success') {
-                        window.location.href = "{% url 'factura_imprimir' 0 %}".replace('0', captureData.venta_id);
-                    } else {
-                        alert("Error al confirmar el pago: " + captureData.message);
-                    }
-                });
-            });
-        },
-        onError: function(err) {
-            console.error('PayPal Error:', err);
-            alert("Ocurrió un error con el pago de PayPal.");
+    document.getElementById('btn-finalizar-pedido').addEventListener('click', function() {
+        const shippingForm = document.getElementById('shipping-form');
+        const btn = this;
+        const btnText = document.getElementById('btn-text');
+        
+        if (!shippingForm.checkValidity()) {
+            shippingForm.reportValidity();
+            return;
         }
-    }).render('#paypal-button-container');
+
+        btn.disabled = true;
+        btnText.innerText = "Procesando...";
+
+        const formData = {
+            departamento: document.getElementById('id_departamento').value,
+            ciudad: document.getElementById('id_ciudad').value,
+            direccion: document.getElementById('id_direccion').value
+        };
+
+        fetch("{% url 'api_crear_venta_preliminar' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.href = "{% url 'factura_imprimir' 0 %}".replace('0', data.venta_id);
+            } else {
+                alert("Error al procesar el pedido: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Ocurrió un error inesperado. Intenta nuevamente.");
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btnText.innerText = "Finalizar Pedido";
+        });
+    });
 </script>
 {% endblock %}

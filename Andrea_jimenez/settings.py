@@ -201,16 +201,7 @@ LOGGING = {
     },
 }
 
-# PayPal
-PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID', 'sb')
-PAYPAL_SECRET = os.getenv('PAYPAL_SECRET', '')
-PAYPAL_MODE = os.getenv('PAYPAL_MODE', 'sandbox')
-PAYPAL_CURRENCY = 'USD'
-
-# Wompi
-WOMPI_PUBLIC_KEY = os.getenv('WOMPI_PUBLIC_KEY', 'pub_test_Q5yS9jV99S6qV5yS9jV99S6qV5yS9jV9')
-WOMPI_INTEGRITY_SECRET = os.getenv('WOMPI_INTEGRITY_SECRET', 'prod_integrity_xyz')
-WOMPI_EVENTS_SECRET = os.getenv('WOMPI_EVENTS_SECRET', 'prod_events_xyz')
+# Configuración del Sitio
 SITE_URL = os.getenv('SITE_URL', 'https://andrea-jimenez.onrender.com')
 
 # WhatsApp

@@ -89,7 +89,7 @@ def mis_ventas(request):
 @csrf_exempt
 @login_required
 def api_crear_venta_preliminar(request):
-    """Crea una venta en estado pendiente para procesar el pago con Wompi"""
+    """Crea una venta en estado pendiente"""
     if request.method != "POST":
         return JsonResponse({"status": "error", "message": "Método no permitido"}, status=405)
         
@@ -120,7 +120,7 @@ def api_crear_venta_preliminar(request):
         # Crear Pago preliminar
         pago = Pago.objects.create(
             pedido=pedido,
-            metodo="Wompi",
+            metodo="Pendiente",
             estado="Pendiente",
         )
         
@@ -144,17 +144,9 @@ def api_crear_venta_preliminar(request):
                 precio_unitario=precio
             )
         
-        # No borramos el carrito aún, solo lo haremos cuando el pago sea exitoso (vía webhook o redirección)
-        # Opcional: Podríamos borrarlo aquí si confiamos en el flujo
-        
-        referencia = f"AJ-{venta.id}-{int(time.time())}"
-        
         return JsonResponse({
             "status": "success",
             "venta_id": venta.id,
-            "total_cents": int(total * 100),
-            "referencia": referencia,
-            "public_key": settings.WOMPI_PUBLIC_KEY
         })
         
     except Exception as e:
@@ -550,15 +542,10 @@ def checkout(request):
     total = int(sum(i.subtotal for i in items))
     total_con_envio = total + 15000
     
-    paypal_id = str(settings.PAYPAL_CLIENT_ID) if settings.PAYPAL_CLIENT_ID else 'sb'
-    
     return render(request, "cliente/checkout.html", {
         "carrito_items": items,
         "total": total,
         "total_con_envio": total_con_envio,
-        "paypal_client_id": paypal_id,
-        "paypal_currency": settings.PAYPAL_CURRENCY,
-        "wompi_public_key": settings.WOMPI_PUBLIC_KEY,
         "whatsapp_number": settings.WHATSAPP_NUMBER,
         "site_url": settings.SITE_URL,
     })
@@ -695,68 +682,6 @@ def confirmar_compra(request):
     return redirect("checkout")
 
 
-@csrf_exempt
-@login_required
-def paypal_capture(request):
-    """Captura el pago de PayPal y genera la venta final"""
-    if request.method != "POST":
-        return JsonResponse({"status": "error", "message": "Método no permitido"}, status=405)
-        
-    try:
-        data = json.loads(request.body)
-        venta_id = data.get("venta_id")
-        order_id = data.get("orderID")
-        
-        venta = get_object_or_404(Venta, id=venta_id)
-        cliente = get_object_or_404(Cliente, user=request.user)
-        
-        # Actualizar estado de pago y pedido
-        if venta.pago:
-            venta.pago.estado = "Aprobado"
-            venta.pago.metodo = "PayPal"
-            venta.pago.save()
-            
-            if venta.pago.pedido:
-                venta.pago.pedido.estado = "Pagado"
-                venta.pago.save()
-        
-        # Limpiar carrito
-        carrito = CarritoDeCompras.objects.get(cliente=cliente)
-        carrito.items.all().delete()
-        
-        # Enviar correo de factura
-        if cliente.user.email:
-            try:
-                pdf_buffer = generate_invoice_pdf(venta)
-                pdf_content = pdf_buffer.getvalue()
-                context = {
-                    'cliente': cliente,
-                    'venta': venta,
-                    'total': venta.total,
-                    'metodo_pago': "PayPal",
-                    'site_url': settings.SITE_URL,
-                    'current_year': timezone.now().year,
-                }
-                html_content = render_to_string('email/email_factura.html', context)
-                email = EmailMessage(
-                    f"Factura de Compra #{venta.id} - Andrea Jiménez",
-                    html_content,
-                    settings.EMAIL_HOST_USER,
-                    [cliente.user.email]
-                )
-                email.content_subtype = "html"
-                email.attach(f"Factura_{venta.id}.pdf", pdf_content, "application/pdf")
-                email.send(fail_silently=True)
-            except Exception as e:
-                logger.error(f"Error envío correo PayPal: {str(e)}")
-        
-        return JsonResponse({"status": "success", "venta_id": venta.id})
-        
-    except Exception as e:
-        logger.error(f"Error captura PayPal: {str(e)}")
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
-
 @login_required
 def factura_imprimir(request, venta_id):
     venta = get_object_or_404(Venta, id=venta_id)
@@ -777,22 +702,13 @@ def factura_imprimir(request, venta_id):
         for d in items
     ]
     total = venta.total or 0
-    total_cents = int(total * 100)
     valor_letras = numero_a_letras(total)
 
-    # Configuración de Wompi para el pago
-    wompi_referencia = f"AJ-{venta.id}-{int(time.time())}"
-    paypal_id = str(settings.PAYPAL_CLIENT_ID) if settings.PAYPAL_CLIENT_ID else 'sb'
-    
     return render(request, "cliente/factura_imprimir.html", {
         "venta": venta,
         "items_detalle": items_detalle,
         "total": total,
-        "total_cents": total_cents,
         "valor_letras": valor_letras,
-        "wompi_public_key": settings.WOMPI_PUBLIC_KEY,
-        "paypal_client_id": paypal_id,
-        "wompi_referencia": wompi_referencia,
         "site_url": settings.SITE_URL,
     })
 

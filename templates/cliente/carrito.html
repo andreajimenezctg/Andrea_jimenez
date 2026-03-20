@@ -111,14 +111,9 @@
             </div>
 
             <a href="{% url 'checkout' %}" class="btn-checkout">Finalizar Compra</a>
-            
-            <div style="margin-top: 20px; text-align: center;">
-                <p style="font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Pagos seguros con</p>
-                <img src="https://www.paypalobjects.com/webstatic/mktg/logo/AM_mc_vs_dc_ae.jpg" alt="PayPal Visa Mastercard" style="height: 30px; opacity: 0.8;">
-            </div>
         </div>
     </div>
-    {% else %}
+{% else %}
     <div class="card-panel" style="text-align: center; padding: 80px 40px;">
         <i class="fa-solid fa-cart-shopping" style="font-size: 4rem; color: #eee; margin-bottom: 25px;"></i>
         <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 15px;">Tu carrito está vacío</h2>
