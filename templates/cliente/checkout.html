@@ -144,8 +144,8 @@
                     data-render="button"
                     data-public-key="{{ wompi_public_key }}"
                     data-currency="COP"
-                    data-amount-in-cents="{{ total_con_envio|add:"0" }}00"
-                    data-reference="AJ-{{ user.id }}-{% now 'U' %}"
+                    data-amount-in-cents="{{ total_con_envio }}00"
+                    data-reference="{{ wompi_referencia }}"
                     data-redirect-url="{{ site_url }}{% url 'mis_ventas' %}"
                 ></script>
             </form>

@@ -430,12 +430,18 @@ def checkout(request):
     # ✅ CORRECCIÓN: convertir a int para evitar errores de formato en JavaScript
     total = int(sum(i.subtotal for i in items))
     total_con_envio = total + 15000
+    # ✅ Generar referencia única para Wompi
+    import time
+    referencia_wompi = f"AJ-{request.user.id}-{int(time.time())}"
+    
     return render(request, "cliente/checkout.html", {
         "carrito_items": items,
         "total": total,
         "total_con_envio": total_con_envio,
         "wompi_public_key": settings.WOMPI_PUBLIC_KEY,
+        "wompi_referencia": referencia_wompi,
         "whatsapp_number": settings.WHATSAPP_NUMBER,
+        "site_url": settings.SITE_URL,
     })
 
 
@@ -568,100 +574,6 @@ def confirmar_compra(request):
         return redirect("factura_imprimir", venta_id=venta.id)
 
     return redirect("checkout")
-
-
-@csrf_exempt
-@login_required
-def paypal_capture(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            order_id = data.get("orderID")
-            shipping_data = data.get("shippingData", {})
-            
-            cliente = get_object_or_404(Cliente, user=request.user)
-            carrito = get_object_or_404(CarritoDeCompras, cliente=cliente)
-            items = [i for i in carrito.items.select_related("prenda", "variacion").all() if i.prenda]
-            
-            if not items:
-                return JsonResponse({"status": "error", "message": "Carrito vacío"}, status=400)
-                
-            subtotal = sum(i.subtotal for i in items)
-            descuento = 0 
-            costo_envio = 15000
-            total = subtotal - descuento + costo_envio
-            
-            pedido = Pedido.objects.create(
-                cliente=cliente,
-                estado="Pagado",
-                departamento=shipping_data.get("departamento", "N/A"),
-                ciudad=shipping_data.get("ciudad", "N/A"),
-                direccion_envio=shipping_data.get("direccion", "N/A"),
-                costo_envio=costo_envio
-            )
-            
-            pago = Pago.objects.create(
-                pedido=pedido,
-                metodo="PayPal",
-                estado="Aprobado",
-            )
-            
-            venta = Venta.objects.create(
-                cliente=cliente,
-                subtotal=subtotal,
-                descuento=descuento,
-                total=total,
-                pago=pago
-            )
-            
-            for item in items:
-                precio = item.prenda.precio_descuento if item.prenda.precio_descuento else item.prenda.precio
-                DetalleVenta.objects.create(
-                    venta=venta,
-                    prenda=item.prenda,
-                    variacion=item.variacion,
-                    cantidad=item.cantidad,
-                    precio_unitario=precio
-                )
-                if item.prenda.stock >= item.cantidad:
-                    item.prenda.stock -= item.cantidad
-                    item.prenda.save()
-            
-            carrito.items.all().delete()
-            
-            if cliente.user.email:
-                try:
-                    pdf_buffer = generate_invoice_pdf(venta)
-                    pdf_content = pdf_buffer.getvalue()
-                    context = {
-                        'cliente': cliente,
-                        'venta': venta,
-                        'total': total,
-                        'metodo_pago': "PayPal",
-                        'site_url': settings.SITE_URL,
-                        'current_year': timezone.now().year,
-                    }
-                    html_content = render_to_string('email/email_factura.html', context)
-                    email = EmailMessage(
-                        f"Factura de Compra #{venta.id} - Andrea Jiménez",
-                        html_content,
-                        settings.EMAIL_HOST_USER,
-                        [cliente.user.email]
-                    )
-                    email.content_subtype = "html"
-                    if len(pdf_content) > 0:
-                        email.attach(f"Factura_{venta.id}.pdf", pdf_content, "application/pdf")
-                        email.send(fail_silently=True)
-                except Exception as e:
-                    logger.error(f"Error correo PayPal: {str(e)}")
-            
-            return JsonResponse({"status": "success", "venta_id": venta.id})
-            
-        except Exception as e:
-            logger.error(f"Error captura PayPal: {str(e)}")
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-            
-    return JsonResponse({"status": "error", "message": "Método no permitido"}, status=405)
 
 
 @login_required

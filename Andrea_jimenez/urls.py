@@ -76,7 +76,6 @@ urlpatterns = [
     path("checkout/", views.checkout, name="checkout"),
     path("confirmar/", views.confirmar_compra, name="confirmar_compra"),
     path("confirmar_compra/", views.confirmar_compra, name="confirmar_compra_alt"),
-    path("paypal/capture/", views.paypal_capture, name="paypal_capture"),
     path("factura/<int:venta_id>/", views.factura_imprimir, name="factura_imprimir"),
     path("descargar_factura/<int:venta_id>/", views.descargar_factura_pdf, name="descargar_factura_pdf"),
 
