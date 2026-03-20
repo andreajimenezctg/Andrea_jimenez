@@ -521,7 +521,7 @@ def eliminar_item_carrito(request, item_id):
 
 
 # =====================================================
-#        CHECKOUT (PAGO PAYPAL)
+#        CHECKOUT Y PEDIDO
 # =====================================================
 
 @login_required
@@ -552,7 +552,7 @@ def checkout(request):
 
 
 # =====================================================
-#        CONFIRMAR COMPRA (PROCESO PSE)
+#        CONFIRMAR COMPRA
 # =====================================================
 
 @login_required
@@ -599,7 +599,7 @@ def confirmar_compra(request):
 
         pago = Pago.objects.create(
             pedido=pedido,
-            metodo="Wompi",
+            metodo="Pendiente",
             estado="Pendiente"
         )
 
@@ -676,7 +676,7 @@ def confirmar_compra(request):
         else:
             logger.warning(f"No se pudo enviar correo: El cliente {cliente.user.username} no tiene email registrado.")
 
-        messages.success(request, f"¡Pago exitoso vía Wompi! Pedido #{venta.id} generado.")
+        messages.success(request, f"¡Pedido #{venta.id} registrado con éxito! Pronto procesaremos tu entrega.")
         return redirect("factura_imprimir", venta_id=venta.id)
 
     return redirect("checkout")
