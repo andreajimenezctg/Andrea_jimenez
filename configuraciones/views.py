@@ -430,14 +430,11 @@ def checkout(request):
     # ✅ CORRECCIÓN: convertir a int para evitar errores de formato en JavaScript
     total = int(sum(i.subtotal for i in items))
     total_con_envio = total + 15000
-    paypal_id = str(settings.PAYPAL_CLIENT_ID) if settings.PAYPAL_CLIENT_ID else 'sb'
-    
     return render(request, "cliente/checkout.html", {
         "carrito_items": items,
         "total": total,
         "total_con_envio": total_con_envio,
-        "paypal_client_id": paypal_id,
-        "paypal_currency": settings.PAYPAL_CURRENCY,
+        "wompi_public_key": settings.WOMPI_PUBLIC_KEY,
         "whatsapp_number": settings.WHATSAPP_NUMBER,
     })
 
@@ -490,8 +487,8 @@ def confirmar_compra(request):
 
         pago = Pago.objects.create(
             pedido=pedido,
-            metodo="Transferencia / WhatsApp",
-            estado="Pendiente"
+            metodo="Wompi",
+            estado="Aprobado"
         )
 
         venta = Venta.objects.create(
@@ -567,7 +564,7 @@ def confirmar_compra(request):
         else:
             logger.warning(f"No se pudo enviar correo: El cliente {cliente.user.username} no tiene email registrado.")
 
-        messages.success(request, f"¡Pedido #{venta.id} registrado con éxito! Por favor coordina el pago por WhatsApp.")
+        messages.success(request, f"¡Pago exitoso vía Wompi! Pedido #{venta.id} generado.")
         return redirect("factura_imprimir", venta_id=venta.id)
 
     return redirect("checkout")

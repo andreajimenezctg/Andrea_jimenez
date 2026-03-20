@@ -10,7 +10,6 @@ def global_config(request):
         
     return {
         'whatsapp_number': getattr(settings, 'WHATSAPP_NUMBER', '573014717412'),
-        'paypal_client_id': getattr(settings, 'PAYPAL_CLIENT_ID', 'sb'),
-        'paypal_currency': getattr(settings, 'PAYPAL_CURRENCY', 'USD'),
+        'wompi_public_key': getattr(settings, 'WOMPI_PUBLIC_KEY', ''),
         'es_cliente': es_cliente,
     }
