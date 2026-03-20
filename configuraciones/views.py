@@ -599,8 +599,8 @@ def confirmar_compra(request):
 
         pago = Pago.objects.create(
             pedido=pedido,
-            metodo="Pendiente",
-            estado="Pendiente"
+            metodo="Simulación Tarjeta",
+            estado="Aprobado"
         )
 
         venta = Venta.objects.create(
@@ -676,7 +676,7 @@ def confirmar_compra(request):
         else:
             logger.warning(f"No se pudo enviar correo: El cliente {cliente.user.username} no tiene email registrado.")
 
-        messages.success(request, f"¡Pedido #{venta.id} registrado con éxito! Pronto procesaremos tu entrega.")
+        messages.success(request, f"¡Pago simulado con éxito! Pedido #{venta.id} registrado.")
         return redirect("factura_imprimir", venta_id=venta.id)
 
     return redirect("checkout")

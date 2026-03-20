@@ -92,7 +92,8 @@
     <div class="checkout-grid">
         <div class="card-panel">
             <h3 class="payment-method-title">Información de Envío</h3>
-            <form id="shipping-form">
+            <form id="payment-form" action="{% url 'confirmar_compra' %}" method="POST">
+                {% csrf_token %}
                 <div class="form-group">
                     <label>Departamento</label>
                     <select name="departamento" id="id_departamento" required class="form-control">
@@ -138,31 +139,72 @@
                     <label>Dirección Completa</label>
                     <input type="text" name="direccion" id="id_direccion" placeholder="Calle 123 #45-67..." required class="form-control">
                 </div>
+
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                
+                <h3 class="payment-method-title">Datos de Pago (Simulación)</h3>
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 4px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: #888;">TARJETA CRÉDITO / DÉBITO</span>
+                        <div style="display: flex; gap: 8px;">
+                            <i class="fa-brands fa-cc-visa" style="font-size: 1.5rem; color: #1a1f71;"></i>
+                            <i class="fa-brands fa-cc-mastercard" style="font-size: 1.5rem; color: #eb001b;"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <input type="text" name="card_number" placeholder="0000 0000 0000 0000" required class="form-control" maxlength="19">
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Fecha Expiración</label>
+                            <input type="text" name="expiry" placeholder="MM/YY" required class="form-control" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>CVC</label>
+                            <input type="text" name="cvc" placeholder="123" required class="form-control" maxlength="4">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Nombre en la Tarjeta</label>
+                        <input type="text" name="card_name" placeholder="Nombre como aparece" required class="form-control">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-confirmar" style="width: 100%; padding: 20px; background: #1a1a1a; color: #fff; border: none; border-radius: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
+                    <span>Realizar Pago</span>
+                    <i class="fa-solid fa-lock" style="font-size: 0.9rem;"></i>
+                </button>
             </form>
         </div>
 
         <div class="card-panel">
-            <h3 class="payment-method-title">Finalizar Pedido</h3>
-            <p style="font-size: 0.85rem; color: #666; margin-bottom: 25px; line-height: 1.6;">
-                Tu pedido será registrado y procesado. Al finalizar podrás ver tu factura y coordinar la entrega.
-            </p>
+            <h3 class="payment-method-title">Resumen de Pago</h3>
+            <div style="background: #fdfcfb; padding: 25px; border: 1px solid #eee;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #888;">Pedido:</span>
+                    <span style="font-weight: 600;">#{{ user.id }}{% now "Hi" %}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #888;">Subtotal:</span>
+                    <span>${{ total|floatformat:0 }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #888;">Envío:</span>
+                    <span>$15.000</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 15px; border-top: 1px solid #eee; margin-top: 15px;">
+                    <span style="font-weight: 700; font-size: 1.1rem;">Total:</span>
+                    <span style="font-weight: 700; font-size: 1.1rem; color: #e8b4b8;">${{ total_con_envio|floatformat:0 }}</span>
+                </div>
+            </div>
             
-            <button type="button" id="btn-finalizar-pedido" class="btn-confirmar" style="width: 100%; padding: 20px; background: #1a1a1a; color: #fff; border: none; border-radius: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
-                <span id="btn-text">Finalizar Pedido</span>
-                <i class="fa-solid fa-check" style="font-size: 0.9rem;"></i>
-            </button>
-
-            <style>
-                .btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; }
-                .btn-confirmar:hover:not(:disabled) {
-                    background: #333;
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-                }
-                .btn-confirmar:active:not(:disabled) {
-                    transform: translateY(0);
-                }
-            </style>
+            <p style="font-size: 0.75rem; color: #999; margin-top: 20px; line-height: 1.5; text-align: center;">
+                <i class="fa-solid fa-shield-check"></i> Pago procesado de forma segura. Tus datos están protegidos por encriptación de 256 bits.
+            </p>
         </div>
     </div>
 
@@ -176,49 +218,26 @@
 
 {% block extra_js %}
 <script>
-    document.getElementById('btn-finalizar-pedido').addEventListener('click', function() {
-        const shippingForm = document.getElementById('shipping-form');
-        const btn = this;
-        const btnText = document.getElementById('btn-text');
-        
-        if (!shippingForm.checkValidity()) {
-            shippingForm.reportValidity();
-            return;
+    // Formatear número de tarjeta con espacios
+    document.querySelector('input[name="card_number"]').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.replace(/(.{4})/g, '$1 ').trim();
+        e.target.value = value;
+    });
+
+    // Formatear fecha de expiración
+    document.querySelector('input[name="expiry"]').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 2) {
+            value = value.substring(0, 2) + '/' + value.substring(2, 4);
         }
+        e.target.value = value;
+    });
 
+    document.getElementById('payment-form').addEventListener('submit', function() {
+        const btn = this.querySelector('.btn-confirmar');
         btn.disabled = true;
-        btnText.innerText = "Procesando...";
-
-        const formData = {
-            departamento: document.getElementById('id_departamento').value,
-            ciudad: document.getElementById('id_ciudad').value,
-            direccion: document.getElementById('id_direccion').value
-        };
-
-        fetch("{% url 'api_crear_venta_preliminar' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                window.location.href = "{% url 'factura_imprimir' 0 %}".replace('0', data.venta_id);
-            } else {
-                alert("Error al procesar el pedido: " + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("Ocurrió un error inesperado. Intenta nuevamente.");
-        })
-        .finally(() => {
-            btn.disabled = false;
-            btnText.innerText = "Finalizar Pedido";
-        });
+        btn.innerHTML = '<span>Procesando Pago...</span> <i class="fa-solid fa-circle-notch fa-spin"></i>';
     });
 </script>
 {% endblock %}
