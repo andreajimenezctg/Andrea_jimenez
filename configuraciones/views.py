@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Sum, Q, Count, F
 from configuraciones.models import (
     Cliente, Prenda, Categoria, Venta, DetalleVenta,
-    CarritoDeCompras, ItemCarrito, Pago, Pedido
+    CarritoDeCompras, ItemCarrito, Pago, Pedido, CuponDescuento, VariacionPrenda
 )
 from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 import json
@@ -428,7 +428,6 @@ def agregar_al_carrito(request, prenda_id):
     variacion = None
     
     if variacion_id:
-        from configuraciones.models import VariacionPrenda
         variacion = get_object_or_404(VariacionPrenda, id=variacion_id, prenda=producto)
 
     if producto.stock < 1:
@@ -539,12 +538,13 @@ def checkout(request):
         return redirect("carrito")
 
     # ✅ CORRECCIÓN: convertir a int para evitar errores de formato en JavaScript
-    total = int(sum(i.subtotal for i in items))
-    total_con_envio = total + 15000
+    subtotal = int(sum(i.subtotal for i in items))
+    costo_envio = 15000
+    total_con_envio = subtotal + costo_envio
     
     return render(request, "cliente/checkout.html", {
         "carrito_items": items,
-        "total": total,
+        "total": subtotal,
         "total_con_envio": total_con_envio,
         "whatsapp_number": settings.WHATSAPP_NUMBER,
         "site_url": settings.SITE_URL,
@@ -563,6 +563,7 @@ def confirmar_compra(request):
     items = [i for i in carrito.items.select_related("prenda", "variacion").all() if i.prenda]
 
     if not items:
+        messages.error(request, "Tu carrito está vacío.")
         return redirect("carrito")
 
     if request.method == "POST":
@@ -588,21 +589,24 @@ def confirmar_compra(request):
         costo_envio = 15000
         total = subtotal - descuento + costo_envio
 
+        # 1. Crear Pedido
         pedido = Pedido.objects.create(
             cliente=cliente,
-            estado="Pendiente",
+            estado="Pagado", # Se marca como pagado ya que es una simulación exitosa
             departamento=departamento,
             ciudad=ciudad,
             direccion_envio=direccion,
             costo_envio=costo_envio
         )
 
+        # 2. Crear Pago
         pago = Pago.objects.create(
             pedido=pedido,
             metodo="Simulación Tarjeta",
             estado="Aprobado"
         )
 
+        # 3. Crear Venta
         venta = Venta.objects.create(
             cliente=cliente,
             subtotal=subtotal,
@@ -612,6 +616,7 @@ def confirmar_compra(request):
             pago=pago
         )
 
+        # 4. Registrar detalles y actualizar stock
         for item in items:
             precio = item.prenda.precio_descuento if item.prenda.precio_descuento else item.prenda.precio
             DetalleVenta.objects.create(
@@ -621,7 +626,16 @@ def confirmar_compra(request):
                 cantidad=item.cantidad,
                 precio_unitario=precio
             )
+            
+            # Descontar stock
+            if item.variacion:
+                item.variacion.stock -= item.cantidad
+                item.variacion.save()
+                
+            item.prenda.stock -= item.cantidad
+            item.prenda.save()
 
+        # 5. Limpiar carrito
         carrito.items.all().delete()
 
         if cliente.user.email:
@@ -1083,10 +1097,21 @@ def gestion_ventas(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    context = {
+    context= {
         "ventas": page_obj,
         "page_obj": page_obj,
         "total_ventas": total_ventas,
-        "ventas_hoy": vent **...**
+        "ventas_hoy": ventas_hoy,
+        "ingresos_mes": ingresos_mes,
+        "promedio_venta": promedio_venta,
+        "labels": labels,
+        "data": data,
+        "search_query": search_query,
+        "from_date": from_date,
+        "to_date": to_date,
+        "selected_status": status
+    }
+    return render(request, "admin/gestion_ventas.html", context)
 
-_This response is too long to display in full._
+_This response is too long to display in full._  
+   

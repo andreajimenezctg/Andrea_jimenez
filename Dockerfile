@@ -31,4 +31,4 @@ ENV PORT 8080
 EXPOSE 8080
 
 # Start the application
-CMD gunicorn Andrea_jimenez.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+CMD gunicorn Andrea_jimenez.wsgi:application --bind 0.0.0.0:${PORT:-8080} --workers 2 --threads 4 --timeout 120
