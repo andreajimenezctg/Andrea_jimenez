@@ -29,7 +29,7 @@
     .form-control { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 0; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; background: #fcfcfc; }
     
     .payment-method-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 20px; color: #1a1a1a; }
-    #paypal-button-container { min-height: 150px; width: 100%; margin-top: 20px; display: block !important; visibility: visible !important; opacity: 1 !important; }
+    #paypal-button-container { min-height: 150px; width: 100%; margin-top: 20px; }
 
     @media (max-width: 992px) {
         .checkout-grid { grid-template-columns: 1fr; }
@@ -37,8 +37,6 @@
         h1 { font-size: 2.2rem; }
     }
 </style>
-<!-- PayPal SDK -->
-<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&intent=capture"></script>
 {% endblock %}
 
 {% block content %}
@@ -79,7 +77,7 @@
             </div>
             <div class="total-row grand-total">
                 <span>Total a Pagar:</span>
-                <span style="min-width: 120px; text-align: right;">${{ total|add:15000|floatformat:0 }}</span>
+                <span style="min-width: 120px; text-align: right;">${{ total_con_envio|floatformat:0 }}</span>
             </div>
         </div>
     </div>
@@ -121,25 +119,56 @@
         </div>
 
         <div class="card-panel">
-            <h3 class="payment-method-title">Método de Pago</h3>
+            <h3 class="payment-method-title">Finalizar Pedido</h3>
             <p style="font-size: 0.85rem; color: #666; margin-bottom: 25px; line-height: 1.6;">
-                El total de <strong>${{ total|add:15000|floatformat:0 }} COP</strong> se pagará en dólares vía PayPal.
+                El total a pagar es de <strong>${{ total_con_envio|floatformat:0 }} COP</strong>.
             </p>
-            <div id="paypal-loading" style="text-align: center; padding: 20px; color: #888;">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> Cargando opciones de pago...
+            
+            <div class="payment-instructions" style="background: #fdfcfb; padding: 20px; border-radius: 4px; border: 1px dashed #e8b4b8; margin-bottom: 25px;">
+                <p style="font-size: 0.8rem; color: #555; margin-bottom: 10px;">
+                    <i class="fa-solid fa-info-circle" style="color: #e8b4b8;"></i> 
+                    Al hacer clic en el botón, tu pedido se registrará y podrás coordinar el pago por <strong>WhatsApp</strong> o <strong>Transferencia Bancaria</strong>.
+                </p>
             </div>
-            <div id="paypal-button-container" style="display: block !important;"></div>
-            <div id="payment-fallback" style="margin-top: 20px; text-align: center; display: none;">
-                <p style="font-size: 0.75rem; color: #888;">¿No cargan las opciones de pago?</p>
-                <a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20tengo%20problemas%20con%20PayPal%20para%20pagar%20mi%20pedido%20de%20${{ total|add:15000|floatformat:0 }}." target="_blank" style="color: #25d366; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
-                    <i class="fab fa-whatsapp"></i> Pagar por WhatsApp
+
+            <button type="button" id="btn-confirmar-pedido" class="btn-confirmar" style="width: 100%; padding: 20px; background: #1a1a1a; color: #fff; border: none; border-radius: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
+                <span>Confirmar Pedido</span>
+                <i class="fa-solid fa-arrow-right" style="font-size: 0.9rem; transition: transform 0.3s;"></i>
+            </button>
+
+            <style>
+                .btn-confirmar:hover {
+                    background: #333;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                }
+                .btn-confirmar:hover i {
+                    transform: translateX(5px);
+                }
+                .btn-confirmar:active {
+                    transform: translateY(0);
+                }
+                .payment-instructions i {
+                    animation: pulse 2s infinite;
+                }
+                @keyframes pulse {
+                    0% { opacity: 0.6; }
+                    50% { opacity: 1; }
+                    100% { opacity: 0.6; }
+                }
+            </style>
+
+            <div id="payment-fallback" style="margin-top: 25px; text-align: center;">
+                <p style="font-size: 0.75rem; color: #888;">¿Necesitas ayuda con tu compra?</p>
+                <a href="https://api.whatsapp.com/send?phone={{ whatsapp_number }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20de%20${{ total_con_envio|floatformat:0 }}." target="_blank" style="color: #25d366; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
+                    <i class="fab fa-whatsapp"></i> Hablar con un asesor
                 </a>
             </div>
         </div>
     </div>
 
     <p style="margin-top: 60px; text-align: center;">
-        <a href="{% url 'carrito' %}" style="color: #999; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; transition: color 0.3s;">
+        <a href="{% url 'carrito' %}" style="color: #999; text-decoration: none; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; transition: color 0.3s;">
             <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Volver al carrito
         </a>
     </p>
@@ -148,106 +177,44 @@
 
 {% block extra_js %}
 <script>
-    // Total convertido a USD para PayPal
-    const totalRaw = "{{ total }}";
-    const totalCOP = (parseInt(totalRaw.replace(/[^0-9]/g, '')) || 0) + 15000;
-    const tasaCambio = 4000; 
-    const totalUSD = (totalCOP / tasaCambio).toFixed(2);
-    
-    console.log("Total COP:", totalCOP);
-    console.log("Total USD:", totalUSD);
-
-    function initPayPalButton() {
-        const loadingEl = document.getElementById('paypal-loading');
-        const containerEl = document.getElementById('paypal-button-container');
-        const fallbackEl = document.getElementById('payment-fallback');
-
-        // Mostrar fallback si tarda mucho
-        setTimeout(() => {
-            if (loadingEl && loadingEl.style.display !== 'none') {
-                if (fallbackEl) fallbackEl.style.display = 'block';
-            }
-        }, 8000);
-
-        if (!window.paypal) {
-            console.error("PayPal SDK not loaded. Retrying in 2 seconds...");
-            setTimeout(initPayPalButton, 2000);
+    document.getElementById('btn-confirmar-pedido').addEventListener('click', function() {
+        var form = document.getElementById('shipping-form');
+        
+        if (!form.checkValidity()) {
+            form.reportValidity();
             return;
         }
-        
-        // Limpiar el contenedor antes de renderizar
-        if (containerEl) containerEl.innerHTML = '';
-        
-        console.log("Rendering PayPal Buttons with ID:", "{{ paypal_client_id }}");
-        if ("{{ paypal_client_id }}" === "sb") {
-            console.warn("Using PayPal Sandbox (sb) ID. Payment might not work if live is intended.");
+
+        // Crear campos ocultos para el envío
+        var formData = new FormData(form);
+        var finalForm = document.createElement('form');
+        finalForm.method = 'POST';
+        finalForm.action = "{% url 'confirmar_compra' %}";
+
+        // Añadir CSRF token
+        var csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        finalForm.appendChild(csrfInput);
+
+        // Añadir datos del formulario original
+        for (var pair of formData.entries()) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = pair[0];
+            input.value = pair[1];
+            finalForm.appendChild(input);
         }
 
-        paypal.Buttons({
-            style: {
-                layout: 'vertical',
-                color:  'gold',
-                shape:  'rect',
-                label:  'paypal'
-            },
-            createOrder: function(data, actions) {
-                const form = document.getElementById('shipping-form');
-                if (!form.checkValidity()) {
-                    alert("Por favor completa todos los datos de envío.");
-                    form.reportValidity();
-                    return actions.reject();
-                }
+        document.body.appendChild(finalForm);
+        
+        // Cambiar estado del botón
+        this.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Procesando...';
+        this.disabled = true;
+        this.style.opacity = '0.7';
 
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: totalUSD,
-                            currency_code: 'USD'
-                        },
-                        description: "Compra en Andrea Jiménez"
-                    }]
-                });
-            },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(orderData) {
-                    const shippingData = {
-                        departamento: document.getElementById('id_departamento').value,
-                        ciudad: document.getElementById('id_ciudad').value,
-                        direccion: document.getElementById('id_direccion').value
-                    };
-
-                    fetch("{% url 'paypal_capture' %}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": "{{ csrf_token }}"
-                        },
-                        body: JSON.stringify({
-                            orderID: data.orderID,
-                            shippingData: shippingData
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(orderDataServer => {
-                        if (orderDataServer.status === "success") {
-                            window.location.href = "{% url 'factura_imprimir' 0 %}".replace('0', orderDataServer.venta_id);
-                        } else {
-                            alert("Error al procesar el pago: " + orderDataServer.message);
-                        }
-                    });
-                });
-            },
-            onError: function(err) {
-                console.error("PayPal Error:", err);
-                alert("Hubo un error con PayPal. Asegúrate de que los datos de envío sean correctos.");
-            }
-        }).render('#paypal-button-container').then(() => {
-            if (loadingEl) loadingEl.style.display = 'none';
-            console.log("PayPal Buttons rendered.");
-        });
-    }
-
-    // Inicializar cuando la página cargue
-    window.addEventListener('load', initPayPalButton);
+        finalForm.submit();
+    });
 </script>
 {% endblock %}

@@ -16,6 +16,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from configuraciones.utils import generate_invoice_pdf, numero_a_letras
 from django.conf import settings
+from django.utils import timezone
 import datetime
 import logging
 from django.core.paginator import Paginator
@@ -203,7 +204,7 @@ def migrar_datos_produccion(request):
 
 # =====================================================
 #        VISTAS PÚBLICAS
-# ====================================================="}]}
+# =====================================================
 
 def home(request):
     productos_carrusel = Prenda.objects.filter(is_archived=False).order_by("-id")[:12]
@@ -371,12 +372,14 @@ def carrito(request):
     )
     carrito, created = CarritoDeCompras.objects.get_or_create(cliente=cliente)
 
-    items = carrito.items.all()
+    items = [i for i in carrito.items.select_related("prenda").all() if i.prenda]
     total = sum(item.subtotal for item in items)
+    total_con_envio = total + 15000
 
     return render(request, "cliente/carrito.html", {
         "carrito_items": items,
-        "total": total
+        "total": total,
+        "total_con_envio": total_con_envio
     })
 
 
@@ -440,13 +443,16 @@ def checkout(request):
         return redirect("carrito")
 
     total = sum(i.subtotal for i in items)
+    total_con_envio = total + 15000
     paypal_id = str(settings.PAYPAL_CLIENT_ID) if settings.PAYPAL_CLIENT_ID else 'sb'
     
     return render(request, "cliente/checkout.html", {
         "carrito_items": items,
         "total": total,
+        "total_con_envio": total_con_envio,
         "paypal_client_id": paypal_id,
         "paypal_currency": settings.PAYPAL_CURRENCY,
+        "whatsapp_number": settings.WHATSAPP_NUMBER,
     })
 
 
@@ -490,18 +496,18 @@ def confirmar_compra(request):
         # 1. Crear el Pedido con info de envío
         pedido = Pedido.objects.create(
             cliente=cliente,
-            estado="Pagado",
+            estado="Pendiente",
             departamento=departamento,
             ciudad=ciudad,
             direccion_envio=direccion,
             costo_envio=costo_envio
         )
 
-        # 2. Crear el Pago (Simulado PSE)
+        # 2. Crear el Pago (Transferencia/WhatsApp)
         pago = Pago.objects.create(
             pedido=pedido,
-            metodo="PSE",
-            estado="Aprobado"
+            metodo="Transferencia / WhatsApp",
+            estado="Pendiente"
         )
 
         # 3. Crear la Venta
@@ -586,7 +592,7 @@ def confirmar_compra(request):
         else:
             logger.warning(f"No se pudo enviar correo: El cliente {cliente.user.username} no tiene email registrado.")
 
-        messages.success(request, f"¡Pago PSE Exitoso! Venta #{venta.id} generada.")
+        messages.success(request, f"¡Pedido #{venta.id} registrado con éxito! Por favor coordina el pago por WhatsApp.")
         return redirect("factura_imprimir", venta_id=venta.id)
 
     return redirect("checkout")
@@ -711,7 +717,7 @@ def factura_imprimir(request, venta_id):
             "precio_unitario": d.precio_unitario,
             "subtotal": d.cantidad * d.precio_unitario,
             "barcode_url": d.prenda.barcode_image.url if d.prenda and d.prenda.barcode_image else None,
-            "codigo_barras": d.prenda.codigo_barras if d.prenda else f"AJ-{d.prenda.id:04d}"
+            "codigo_barras": d.prenda.codigo_barras if d.prenda else f"AJ-{d.id:04d}"
         }
         for d in items
     ]

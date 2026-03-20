@@ -1,27 +1,183 @@
 /* =========================================
-   OFERTAS ESPECIALES — Andrea Jimenez
-   Estilos especificos para ofertas (complementa tienda.css)
+   OFERTAS — Andrea Jimenez
+   Paleta: Crema #FAF0E1 | Rosado #E8B4B8 | Negro #1A1A1A
    ========================================= */
 
-/* Sobreescritura del badge para ofertas */
-.contenedor-ofertas .etiqueta-oferta {
-    background: var(--rosado, #E8B4B8);
-    color: var(--negro, #1A1A1A);
-    font-weight: 600;
+/* Solo estilos específicos de las ofertas, la navegación viene de navbar.css */
+
+/* Reutilizando los mismos estilos de la tienda para mantener consistencia */
+
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
 }
 
-/* Precio tachado en ofertas */
-.card-precio .precio-tachado {
-    text-decoration: line-through;
-    color: #aaa;
-    font-size: 0.95rem;
+.loader-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #E8B4B8;
+    animation: loaderPulse 1.5s ease-in-out infinite;
+    letter-spacing: 4px;
+    text-transform: uppercase;
 }
 
-.card-precio .descuento-badge {
-    background: var(--rosado, #E8B4B8);
-    color: var(--negro, #1A1A1A);
-    padding: 4px 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
+@keyframes loaderPulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+.contenedor-ofertas {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 120px 20px 40px;
+    min-height: 70vh;
+}
+
+.titulo-ofertas {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.titulo-ofertas h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 400;
+    color: var(--negro);
+    margin-bottom: 15px;
+    position: relative;
+    padding-bottom: 20px;
     letter-spacing: 1px;
+}
+
+.titulo-ofertas h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background-color: var(--rosado);
+}
+
+.titulo-ofertas p {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--gris-texto);
+    font-size: 1.1rem;
+    font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+    font-style: italic;
+}
+
+.card-oferta {
+    background: var(--blanco);
+    width: 300px;
+    overflow: hidden;
+    box-shadow: var(--sombra-suave);
+    transition: var(--transicion);
+    position: relative;
+    border: 1px solid rgba(232, 180, 184, 0.12);
+}
+
+.card-oferta:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    border-color: var(--rosado);
+}
+
+.card-imagen-container {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+}
+
+.card-imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.card-oferta:hover .card-imagen {
+    transform: scale(1.05);
+}
+
+.etiqueta-oferta {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--rosado);
+    color: var(--blanco);
+    padding: 5px 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    z-index: 2;
+}
+
+.card-contenido {
+    padding: 20px;
+    text-align: center;
+}
+
+.card-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--negro);
+    margin-bottom: 8px;
+}
+
+.card-descripcion {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--gris-texto);
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.card-precio {
+    margin-bottom: 15px;
+}
+
+.precio-oferta {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--negro);
+}
+
+.card-boton {
+    display: inline-block;
+    width: 100%;
+    padding: 12px;
+    background: var(--negro);
+    color: var(--blanco);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: var(--transicion);
+    border-radius: 8px;
+}
+
+.card-boton:hover {
+    background: var(--rosado);
+    color: var(--negro);
+    transform: scale(1.02);
 }

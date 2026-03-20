@@ -147,12 +147,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-loader">
-    <div class="loader-logo">
-        <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez Logo">
-    </div>
-</div>
-
 <video autoplay muted loop playsinline id="video-fondo" preload="auto">
     <source src="{% static 'img/video/fondo.mp4' %}" type="video/mp4">
 </video>
@@ -239,23 +233,6 @@
         carrusel.scrollBy({ left: 380, behavior: 'smooth' });
     });
 })();
-
-// Función para ocultar el loader de forma segura
-function hideLoader() {
-    var loader = document.querySelector('.page-loader');
-    if (loader) {
-        loader.style.opacity = '0';
-        setTimeout(function() {
-            loader.style.display = 'none';
-        }, 800);
-    }
-}
-
-// Ocultar cuando la página cargue completamente
-window.addEventListener('load', hideLoader);
-
-// Seguridad: Ocultar después de 3 segundos pase lo que pase
-setTimeout(hideLoader, 3000);
 
 // Navbar shrink on scroll
 window.addEventListener('scroll', function() {

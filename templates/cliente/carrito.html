@@ -12,7 +12,7 @@
     
     .cart-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: start; }
     
-    .card-panel { background: #fff; padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
+    .card-panel { background: #fff; padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 30px; }
     
     .cart-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
     .cart-table thead { background: #1a1a1a; color: #fff; }
@@ -34,12 +34,10 @@
     .btn-checkout:hover { background: #e8b4b8; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(232, 180, 184, 0.3); }
     
     .btn-remove { color: #ff4444; text-decoration: none; font-size: 0.8rem; transition: 0.3s; }
-    .btn-remove:hover { color: #cc0000; }
 
     @media (max-width: 992px) {
         .cart-grid { grid-template-columns: 1fr; }
         .container { padding-top: 100px !important; }
-        h1 { font-size: 2.2rem; }
     }
 </style>
 {% endblock %}
@@ -108,14 +106,14 @@
                 </div>
                 <div class="total-row grand-total">
                     <span>Total:</span>
-                    <span>${{ total|add:15000|floatformat:0 }}</span>
+                    <span>${{ total_con_envio|floatformat:0 }}</span>
                 </div>
             </div>
 
-            <a href="{% url 'checkout' %}" class="btn-checkout">Finalizar Compra</a>
+            <a href="{% url 'checkout' %}" class="btn-checkout">Proceder al pago</a>
             
-            <div style="margin-top: 30px; text-align: center;">
-                <p style="font-size: 0.75rem; color: #888; margin-bottom: 15px; letter-spacing: 1px;">PAGOS SEGUROS CON</p>
+            <div style="margin-top: 20px; text-align: center;">
+                <p style="font-size: 0.75rem; color: #888; margin-bottom: 10px;">PAGOS SEGUROS CON</p>
                 <div style="display: flex; justify-content: center; gap: 15px; opacity: 0.6;">
                     <i class="fa-brands fa-cc-paypal fa-2x"></i>
                     <i class="fa-brands fa-cc-visa fa-2x"></i>
@@ -126,10 +124,10 @@
     </div>
     {% else %}
     <div class="card-panel" style="text-align: center; padding: 80px 40px;">
-        <i class="fa-solid fa-bag-shopping" style="font-size: 4rem; color: #eee; margin-bottom: 20px;"></i>
-        <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 15px;">Tu carrito está vacío</h2>
-        <p style="color: #888; margin-bottom: 30px;">Parece que aún no has añadido ninguna prenda a tu colección.</p>
-        <a href="{% url 'tienda' %}" class="btn-checkout" style="display: inline-block; width: auto; padding: 18px 40px;">Ir a la Tienda</a>
+        <i class="fa-solid fa-cart-shopping" style="font-size: 4rem; color: #eee; margin-bottom: 25px;"></i>
+        <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 15px;">Tu carrito está vacío</h2>
+        <p style="color: #888; margin-bottom: 30px;">Parece que aún no has añadido ninguna prenda a tu carrito.</p>
+        <a href="{% url 'tienda' %}" class="btn-checkout" style="display: inline-block; width: auto; padding: 18px 50px;">Ir a la tienda</a>
     </div>
     {% endif %}
 </main>

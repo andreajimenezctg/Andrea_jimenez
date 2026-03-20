@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="{% static 'css/tienda.css' %}?v={% now 'U' %}">
-    <link rel="stylesheet" href="{% static 'css/oferta.css' %}?v={% now 'U' %}">
     <style>
         .swiper {
             width: 100%;
@@ -37,10 +36,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-loader">
-    <div class="loader-logo">Andrea Jiménez</div>
-</div>
-
 <main class="contenedor-ofertas fade-in-section">
     <div class="titulo-ofertas">
         <h1>Ofertas Especiales</h1>
@@ -102,52 +97,36 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const swiper = new Swiper(".mySwiper", {
-            slidesPerView: 1,
-            spaceBetween: 10,
-            loop: false,
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            coverflowEffect: {
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true,
+            },
             pagination: {
                 el: ".swiper-pagination",
-                clickable: true,
             },
             navigation: {
                 nextEl: ".swiper-button-next",
                 prevEl: ".swiper-button-prev",
             },
-            breakpoints: {
-                640: {
-                    slidesPerView: 2,
-                    spaceBetween: 20,
-                },
-                1024: {
-                    slidesPerView: 3,
-                    spaceBetween: 30,
-                },
-                1440: {
-                    slidesPerView: 4,
-                    spaceBetween: 30,
-                },
-            },
         });
-     });
-
-     const observer = new IntersectionObserver((entries) => {
-         entries.forEach(entry => {
-             if (entry.isIntersecting) {
-                 entry.target.classList.add('visible');
-             }
-         });
-     }, { threshold: 0.1 });
-
-     document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
-
-     window.addEventListener('load', () => {
-        const loader = document.querySelector('.page-loader');
-        if (loader) {
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 500);
-        }
     });
+
+    // Fade-in sections on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
 </script>
 {% endblock %}

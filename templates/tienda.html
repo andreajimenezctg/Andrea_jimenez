@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="{% static 'css/tienda.css' %}?v={% now 'U' %}">
-    <link rel="stylesheet" href="{% static 'css/oferta.css' %}?v={% now 'U' %}">
     <style>
         .swiper {
             width: 100%;
@@ -16,8 +15,16 @@
         .swiper-slide {
             background-position: center;
             background-size: cover;
-            width: 300px;
+            width: auto;
             height: auto;
+        }
+        .card-oferta {
+            width: 100% !important;
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        .card-imagen-container {
+            height: 350px !important;
         }
         .swiper-button-next, .swiper-button-prev {
             color: #ff7a9c;
@@ -25,28 +32,23 @@
         .swiper-pagination-bullet-active {
             background: #ff7a9c;
         }
-        .grid-ofertas {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
         .contenedor-ofertas {
             padding-top: 140px !important;
+            max-width: 1400px;
+            margin: 0 auto;
         }
         @media (max-width: 992px) {
             .contenedor-ofertas {
                 padding-top: 100px !important;
+            }
+            .card-imagen-container {
+                height: 300px !important;
             }
         }
     </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-loader">
-    <div class="loader-logo">Andrea Jiménez</div>
-</div>
-
 <main class="contenedor-ofertas fade-in-section">
     <div class="titulo-ofertas">
         <h1>Nuestra Colección</h1>
@@ -124,6 +126,20 @@
             <div class="swiper-button-prev"></div>
             <div class="swiper-pagination"></div>
         </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="pagination-container" style="text-align: center; margin-top: 40px; display: flex; justify-content: center; gap: 10px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&categoria={{ selected_category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" class="btn-filtrar" style="width: auto;"><i class="fa-solid fa-chevron-left"></i> Anterior</a>
+            {% endif %}
+            
+            <span style="display: flex; align-items: center; padding: 0 15px; font-weight: 500;">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&categoria={{ selected_category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" class="btn-filtrar" style="width: auto;">Siguiente <i class="fa-solid fa-chevron-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
     {% else %}
         <div class="sin-ofertas">
             <i class="fa-solid fa-shirt"></i>
@@ -167,7 +183,7 @@
                 },
             },
         });
-     });
+    });
 
      // Fade-in sections on scroll
      const observer = new IntersectionObserver((entries) => {
@@ -179,15 +195,5 @@
      }, { threshold: 0.1 });
 
      document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
-
-     window.addEventListener('load', () => {
-        const loader = document.querySelector('.page-loader');
-        if (loader) {
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 500);
-        }
-    });
 </script>
 {% endblock %}

@@ -82,19 +82,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Andrea_jimenez.wsgi.application'
 
-# ✅ BASE DE DATOS CORREGIDA PARA RENDER
-database_url = os.getenv('DATABASE_URL')
-if not database_url:
-    # Fallback para desarrollo local
-    database_url = f"postgres://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD', 'riki123')}@{os.getenv('DB_HOST', '127.0.0.1')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'andrea_jimenez')}"
+# ✅ BASE DE DATOS
+if DEBUG and not os.getenv('DATABASE_URL'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        # Fallback para desarrollo local
+        database_url = f"postgres://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD', 'riki123')}@{os.getenv('DB_HOST', '127.0.0.1')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'andrea_jimenez')}"
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=database_url,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -126,7 +134,7 @@ STORAGES = {
 }
 
 WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_USE_FINDERS = True
+WHITENOISE_USE_FINDERS = DEBUG
 
 # Media files
 MEDIA_URL = "/media/"
