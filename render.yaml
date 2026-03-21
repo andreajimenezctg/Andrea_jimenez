@@ -27,4 +27,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: DEPLOY_TRIGGER
-        value: 1
+        value: 2
