@@ -1,0 +1,28 @@
+databases:
+  - name: andrea-jimenez-db
+    databaseName: andrea_jimenez
+    user: andrea_user
+    plan: free
+
+services:
+  - type: web
+    name: andrea-jimenez
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn Andrea_jimenez.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 1 --threads 1 --timeout 120"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: andrea-jimenez-db
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: Andrea_jimenez.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: PYTHON_VERSION
+        value: 3.11.9

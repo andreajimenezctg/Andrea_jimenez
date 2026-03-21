@@ -1,0 +1,247 @@
+/* =========================================
+   PERFIL — Andrea Jimenez
+   Paleta: Crema #FAF0E1 | Rosado #E8B4B8 | Negro #1A1A1A
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700&family=Montserrat:wght@300;400;500;600&display=swap');
+
+:root {
+    --crema: #FAF0E1;
+    --rosado: #E8B4B8;
+    --negro: #1A1A1A;
+    --blanco: #ffffff;
+    --gris-texto: #666666;
+    --transicion: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --borde-rosado: 1px solid rgba(232, 180, 184, 0.2);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: var(--crema);
+    color: var(--negro);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================
+   NAVBAR — Uniforme
+   ========================================= */
+header {
+    background-color: var(--negro);
+    padding: 0 40px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    min-height: 78px;
+    border-bottom: var(--borde-rosado);
+}
+
+.navbar {
+    background: var(--negro);
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 78px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.navbar .logo a {
+    color: var(--crema);
+    text-decoration: none;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+    transition: opacity 0.3s ease;
+    margin-right: 35px;
+}
+
+.navbar .logo a:hover {
+    opacity: 0.8;
+}
+
+.navbar .menu {
+    display: flex;
+    list-style: none;
+    gap: 1.2rem;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    flex: 1;
+    justify-content: flex-start;
+}
+
+.navbar .menu li {
+    display: flex;
+    align-items: center;
+}
+
+.navbar .menu li a,
+.navbar a {
+    color: rgba(250, 240, 225, 0.7);
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: color 0.4s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    padding: 8px 0;
+    white-space: nowrap;
+}
+
+.navbar .menu li a i { font-size: 0.8rem; opacity: 0.6; transition: opacity 0.4s ease; }
+
+.navbar .menu li a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--rosado);
+    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.navbar a:hover,
+.navbar .menu li a:hover { color: var(--rosado); }
+.navbar .menu li a:hover i { opacity: 1; }
+.navbar .menu li a:hover::after { width: 100%; }
+
+/* =========================================
+   PERFIL CONTAINER
+   ========================================= */
+.perfil-container {
+    max-width: 600px;
+    margin: 130px auto 50px;
+    padding: 50px;
+    background: var(--blanco);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    border: 1px solid rgba(232, 180, 184, 0.12);
+    animation: fadeInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+
+.perfil-container h1,
+.perfil-container h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 1.8rem;
+    color: var(--negro);
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.perfil-container h1::after,
+.perfil-container h2::after {
+    content: '';
+    width: 50px;
+    height: 2px;
+    background: var(--rosado);
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.perfil-card p {
+    margin: 14px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 300;
+    color: var(--gris-texto);
+    letter-spacing: 0.3px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(232, 180, 184, 0.1);
+}
+
+.perfil-card p:last-child {
+    border-bottom: none;
+}
+
+.perfil-card p strong {
+    color: var(--negro);
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+/* Botones del perfil */
+.perfil-container a,
+.perfil-container .btn {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 14px 28px;
+    background: var(--negro);
+    color: var(--crema);
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: var(--transicion);
+    border: 1px solid var(--negro);
+}
+
+.perfil-container a:hover,
+.perfil-container .btn:hover {
+    background: var(--rosado);
+    color: var(--negro);
+    border-color: var(--rosado);
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   FOOTER
+   ========================================= */
+footer {
+    text-align: center;
+    padding: 30px 20px;
+    background: var(--negro);
+    color: rgba(250, 240, 225, 0.4);
+    margin-top: 40px;
+    border-top: 1px solid rgba(232, 180, 184, 0.08);
+}
+
+footer p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: rgba(250, 240, 225, 0.4);
+}
+
+/* =========================================
+   ANIMACIONES
+   ========================================= */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .perfil-container {
+        margin: 100px 15px 30px;
+        padding: 30px;
+    }
+}

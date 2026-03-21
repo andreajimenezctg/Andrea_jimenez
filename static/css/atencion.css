@@ -1,0 +1,132 @@
+/* =========================================
+   ATENCION AL CLIENTE — Andrea Jimenez
+   Paleta: Crema #FAF0E1 | Rosado #E8B4B8 | Negro #1A1A1A
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500&family=Montserrat:wght@300;400;500;600&display=swap');
+
+:root {
+    --crema: #FAF0E1;
+    --rosado: #E8B4B8;
+    --rosado-hover: #d4a0a4;
+    --negro: #1A1A1A;
+    --negro-suave: #2a2a2a;
+    --blanco: #ffffff;
+    --gris-texto: #666666;
+    --sombra-suave: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --transicion: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --borde-rosado: 1px solid rgba(232, 180, 184, 0.2);
+}
+
+/* =========================================
+   CONTENEDOR PRINCIPAL
+   ========================================= */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px;
+    background: transparent !important;
+    animation: fadeInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+
+/* =========================================
+   TITULOS Y TEXTO
+   ========================================= */
+h1 {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    color: var(--negro);
+}
+
+h1 {
+    font-size: 2.5rem;
+    position: relative;
+    padding-bottom: 20px;
+}
+
+h1::after {
+    content: '';
+    width: 60px;
+    height: 2px;
+    background: var(--rosado);
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: lineReveal 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 0.3s both;
+}
+
+h2 { font-size: 1.6rem; margin-top: 10px; }
+h3 { font-size: 1.2rem; margin-top: 10px; text-align: left; color: var(--negro); }
+
+p {
+    text-align: center;
+    margin: 15px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 300;
+    color: var(--gris-texto);
+    letter-spacing: 0.3px;
+    line-height: 1.7;
+}
+
+/* =========================================
+   FORMULARIO DE CONTACTO
+   ========================================= */
+.form-group {
+    margin: 15px 0;
+}
+
+.form-control {
+    width: 100%;
+    padding: 15px 18px;
+    border: 1px solid rgba(26, 26, 26, 0.12);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: var(--negro);
+    background: #fff;
+    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--rosado);
+    box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.15);
+}
+
+.form-control::placeholder {
+    color: #aaa;
+    font-weight: 300;
+}
+
+textarea.form-control {
+    height: 150px;
+    resize: vertical;
+}
+
+/* =========================================
+   ANIMACIONES
+   ========================================= */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lineReveal {
+    from { width: 0; }
+    to { width: 60px; }
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 15px;
+    }
+
+    h1 { font-size: 2rem; }
+}

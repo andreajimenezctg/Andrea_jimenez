@@ -1,0 +1,348 @@
+/* ============================================
+   DASHBOARD SPECIFIC STYLES
+   ============================================ */
+
+.dashboard {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Charts Period Select */
+.chart-period-select {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-gray-lighter);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    color: var(--color-gray-dark);
+    background: var(--color-white);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.chart-period-select:focus {
+    outline: none;
+    border-color: var(--color-rose);
+}
+
+.chart-wrapper {
+    height: 280px;
+    position: relative;
+}
+
+.chart-wrapper-pie {
+    height: 260px;
+}
+
+/* Progress Stats Grid */
+.progress-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.progress-card .card-body {
+    padding: var(--spacing-lg);
+}
+
+.progress-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xl);
+}
+
+.progress-circle-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.progress-circle {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: var(--color-cream);
+    stroke-width: 8;
+}
+
+.progress-circle-fill {
+    fill: none;
+    stroke: var(--color-rose);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s ease;
+}
+
+.progress-circle-fill.success {
+    stroke: var(--color-success);
+}
+
+.progress-circle-fill.warning {
+    stroke: var(--color-warning);
+}
+
+.progress-circle-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-black);
+}
+
+.progress-info h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: var(--spacing-xs);
+}
+
+.progress-info p {
+    font-size: 0.85rem;
+    color: var(--color-gray);
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Recent Sales List */
+.recent-sales-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.recent-sale-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--color-cream-light);
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+}
+
+.recent-sale-item:hover {
+    background: var(--color-cream);
+}
+
+.sale-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--color-rose-light);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-rose-dark);
+    flex-shrink: 0;
+}
+
+.sale-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.sale-customer {
+    font-weight: 500;
+    color: var(--color-black);
+    font-size: 0.9rem;
+}
+
+.sale-date {
+    font-size: 0.8rem;
+    color: var(--color-gray);
+}
+
+.sale-amount {
+    font-weight: 600;
+    color: var(--color-success);
+    font-size: 0.95rem;
+}
+
+/* Low Stock List */
+.low-stock-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.low-stock-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--color-cream-light);
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+}
+
+.low-stock-item:hover {
+    background: var(--color-cream);
+}
+
+.product-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--color-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-light);
+}
+
+.product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-details .product-name {
+    font-weight: 500;
+    color: var(--color-black);
+    font-size: 0.9rem;
+}
+
+.product-details .product-stock {
+    font-size: 0.8rem;
+    color: var(--color-gray);
+}
+
+/* Quick Actions */
+.quick-actions {
+    margin-top: var(--spacing-xl);
+}
+
+.quick-actions-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-black);
+    margin-bottom: var(--spacing-lg);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-lg);
+}
+
+.quick-action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+    text-align: center;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.quick-action-card:hover .quick-action-icon {
+    background: linear-gradient(135deg, var(--color-rose) 0%, var(--color-rose-dark) 100%);
+    color: var(--color-white);
+}
+
+.quick-action-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--color-cream);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--color-rose);
+    transition: var(--transition-normal);
+}
+
+.quick-action-card span {
+    font-weight: 500;
+    color: var(--color-black);
+    font-size: 0.9rem;
+}
+
+/* Empty State Adjustments */
+.card .empty-state {
+    padding: var(--spacing-xl);
+}
+
+.card .empty-state-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .progress-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .progress-stat {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-wrapper {
+        height: 220px;
+    }
+}

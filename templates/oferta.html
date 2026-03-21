@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Andrea Jiménez | Ofertas Especiales{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="{% static 'css/tienda.css' %}?v={% now 'U' %}">
+    <style>
+        .swiper {
+            width: 100%;
+            padding: 20px 0 50px;
+        }
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: 300px;
+            height: auto;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #ff7a9c;
+        }
+        .swiper-pagination-bullet-active {
+            background: #ff7a9c;
+        }
+        .contenedor-ofertas {
+            padding-top: 140px !important;
+        }
+        @media (max-width: 992px) {
+            .contenedor-ofertas {
+                padding-top: 100px !important;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="contenedor-ofertas fade-in-section">
+    <div class="titulo-ofertas">
+        <h1>Ofertas Especiales</h1>
+        <p>Descubre nuestras mejores promociones con descuentos exclusivos</p>
+    </div>
+
+    {% if productos %}
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                {% for producto in productos %}
+                <div class="swiper-slide">
+                    <div class="card-oferta">
+                        <div class="card-imagen-container">
+                            <a href="{% url 'detalle_producto' producto.slug %}">
+                                <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}" class="card-imagen">
+                            </a>
+                            <span class="etiqueta-oferta"><i class="fa-solid fa-fire"></i> Oferta especial</span>
+                        </div>
+
+                        <div class="card-contenido">
+                            <h3 class="card-titulo"><a href="{% url 'detalle_producto' producto.slug %}" style="text-decoration: none; color: inherit;">{{ producto.nombre }}</a></h3>
+                            {% if producto.descripcion %}
+                                <p class="card-descripcion">{{ producto.descripcion|truncatechars:60 }}</p>
+                            {% endif %}
+                            
+                            <div class="card-precio">
+                                <span class="precio-oferta">COP ${{ producto.precio|floatformat:0 }}</span>
+                            </div>
+                            
+                            {% if user.is_authenticated and es_cliente %}
+                                <a href="{% url 'agregar_al_carrito' producto.id %}" class="card-boton"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</a>
+                            {% elif not user.is_authenticated %}
+                                <a href="{% url 'registro' %}" class="card-boton iniciar-sesion"><i class="fa-solid fa-user-plus"></i> Regístrate para comprar</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    {% else %}
+        <div class="sin-ofertas">
+            <i class="fa-solid fa-tag"></i>
+            <h3>No hay ofertas disponibles por ahora</h3>
+            <p>Vuelve pronto, estamos preparando nuevas promociones para ti.</p>
+            <a href="{% url 'tienda' %}" class="card-boton"><i class="fa-solid fa-store"></i> Ir a la tienda</a>
+        </div>
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const swiper = new Swiper(".mySwiper", {
+            effect: "coverflow",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: "auto",
+            coverflowEffect: {
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
+    });
+
+    // Fade-in sections on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
+</script>
+{% endblock %}

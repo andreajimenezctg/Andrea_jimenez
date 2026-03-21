@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Simulación de Pago - Andrea Jiménez</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+    <style>
+        .payment-box {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 40px auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn-pay {
+            background: #28a745;
+            color: white;
+            padding: 12px;
+            border: none;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        .btn-pay:hover {
+            background: #218838;
+        }
+
+        .pse-logo {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Inicio</a>
+            <a href="{% url 'carrito' %}">Volver al Carrito</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="payment-box">
+            {% if metodo == 'PSE' %}
+            <img src="https://www.pse.com.co/images/pse-logo.png" alt="PSE" class="pse-logo">
+            <h2>Simulación de Pago PSE</h2>
+            <form method="POST" action="{% url 'confirmar_compra' %}">
+                {% csrf_token %}
+                <input type="hidden" name="metodo_pago" value="PSE">
+                <div class="form-group">
+                    <label>Banco</label>
+                    <select required>
+                        <option value="">Selecciona tu banco</option>
+                        <option>Bancolombia</option>
+                        <option>Banco de Bogotá</option>
+                        <option>Davivienda</option>
+                        <option>Nequi</option>
+                        <option>Daviplata</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tipo de Persona</label>
+                    <select required>
+                        <option>Natural</option>
+                        <option>Jurídica</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Correo electrónico (registrado en PSE)</label>
+                    <input type="email" value="{{ request.user.email }}" required>
+                </div>
+                <button type="submit" class="btn-pay">Pagar ${{ total|floatformat:2 }}</button>
+            </form>
+            {% else %}
+            <h2>Simulación de Pago con Tarjeta</h2>
+            <form method="POST" action="{% url 'confirmar_compra' %}">
+                {% csrf_token %}
+                <input type="hidden" name="metodo_pago" value="Tarjeta">
+                <div class="form-group">
+                    <label>Número de Tarjeta</label>
+                    <input type="text" placeholder="**** **** **** ****" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre en la Tarjeta</label>
+                    <input type="text" value="{{ request.user.get_full_name }}" required>
+                </div>
+                <div class="form-row" style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Vencimiento</label>
+                        <input type="text" placeholder="MM/AA" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>CVC</label>
+                        <input type="text" placeholder="***" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-pay">Pagar ${{ total|floatformat:2 }}</button>
+            </form>
+            {% endif %}
+            <p style="text-align: center; font-size: 0.9em; color: #666; margin-top: 20px;">
+                Esta es una <strong>simulación</strong> para fines académicos. No se realizará ningún cargo real.
+            </p>
+        </div>
+    </main>
+</body>
+
+</html>

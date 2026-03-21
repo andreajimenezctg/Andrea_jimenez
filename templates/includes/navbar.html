@@ -1,0 +1,114 @@
+{% load static %}
+<header>
+    <nav class="navbar">
+        <div class="nav-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="logo">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'img/logo.png' %}" alt="Andrea Jiménez" class="logo-img">
+                </a>
+            </div>
+        </div>
+
+        <ul class="menu" id="navMenu">
+            <li class="mobile-only sidebar-header">
+                <div class="sidebar-brand">
+                    <span class="brand-name">Andrea Jiménez</span>
+                    <span class="brand-sub">TIENDA ONLINE</span>
+                </div>
+                <button class="close-sidebar" id="closeSidebar"><i class="fa-solid fa-bars"></i></button>
+            </li>
+            <li><a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}"><i class="fa-solid fa-house mobile-only"></i> Inicio</a></li>
+            <li><a href="{% url 'tienda' %}" class="{% if 'tienda' in request.path %}active{% endif %}"><i class="fa-solid fa-store mobile-only"></i> Tienda</a></li>
+            <li><a href="{% url 'oferta' %}" class="{% if 'oferta' in request.path %}active{% endif %}"><i class="fa-solid fa-tags mobile-only"></i> Oferta</a></li>
+            <li><a href="{% url 'atencion' %}" class="{% if 'atencion' in request.path %}active{% endif %}"><i class="fa-solid fa-headset mobile-only"></i> Atención</a></li>
+            <li><a href="{% url 'distribuidores' %}" class="{% if 'distribuidores' in request.path %}active{% endif %}"><i class="fa-solid fa-location-dot mobile-only"></i> Ubicación</a></li>
+            
+            <li class="mobile-only" style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 20px; padding-top: 10px;"></li>
+            {% if user.is_authenticated %}
+                <li class="mobile-only"><a href="{% url 'panel_cliente' %}"><i class="fa-solid fa-user-gear"></i> Mi Perfil</a></li>
+                <li class="mobile-only"><a href="{% url 'logout' %}" style="color: #e8b4b8;"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
+            {% else %}
+                <li class="mobile-only"><a href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión</a></li>
+            {% endif %}
+        </ul>
+
+        <div class="user-actions">
+            {% if user.is_authenticated %}
+                {% if es_cliente %}
+                <div class="cart">
+                    <a href="{% url 'carrito' %}" aria-label="Bolsa de compras" style="margin-right: 15px;">
+                        <i class="fa-solid fa-bag-shopping" style="font-size: 1.1rem; color: var(--rosado);"></i>
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="dropdown" style="position: relative; display: inline-block;">
+                    <button class="dropdown-btn" id="userDropdownBtn">
+                        <i class="fa-regular fa-user"></i> 
+                        <span class="desktop-only">{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</span>
+                        <i class="fa-solid fa-chevron-down desktop-only" style="font-size: 0.6rem;"></i>
+                    </button>
+                    <div class="dropdown-content" id="userDropdownContent">
+                        {% if es_cliente %}
+                            <a href="{% url 'panel_cliente' %}">Mi Perfil</a>
+                            <a href="{% url 'mis_ventas' %}">Mis Compras</a>
+                        {% elif user.is_staff or user.is_superuser %}
+                            <a href="{% url 'panel_admin' %}">Panel Admin</a>
+                        {% endif %}
+                        <div style="border-top: 1px solid rgba(232, 180, 184, 0.1);"></div>
+                        <a href="{% url 'logout' %}" style="color: #E8B4B8;">Cerrar Sesión</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-login-nav">Entrar</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+</header>
+
+<script>
+    (function() {
+        // Sidebar Logic
+        var mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        var closeSidebar = document.getElementById('closeSidebar');
+        var navMenu = document.getElementById('navMenu');
+        var sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            if (navMenu && sidebarOverlay) {
+                navMenu.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+                document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+            }
+        }
+
+        if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+        if(closeSidebar) closeSidebar.addEventListener('click', toggleSidebar);
+        if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Dropdown Logic
+        var userDropdownBtn = document.getElementById('userDropdownBtn');
+        var userDropdownContent = document.getElementById('userDropdownContent');
+
+        if(userDropdownBtn && userDropdownContent) {
+            userDropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (userDropdownContent.style.display === 'block') {
+                    userDropdownContent.style.display = 'none';
+                } else {
+                    userDropdownContent.style.display = 'block';
+                }
+            });
+        }
+
+        document.addEventListener('click', function() {
+            if(userDropdownContent) {
+                userDropdownContent.style.display = 'none';
+            }
+        });
+    })();
+</script>

@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel de Administración{% endblock %} | Andrea Jiménez</title>
+    <link rel="stylesheet" href="{% static 'css/admin/admin_global.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-text">Andrea Jiménez</span>
+                    <span class="logo-subtitle">Panel Admin</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-user">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">{{ user.username|default:"Admin" }}</span>
+                    <span class="user-role">Administrador</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item {% if request.resolver_match.url_name == 'panel_admin' %}active{% endif %}">
+                        <a href="{% url 'panel_admin' %}" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if 'producto' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'gestion_productos' %}" class="nav-link">
+                            <i class="fas fa-tshirt"></i>
+                            <span>Productos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if 'categoria' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'gestion_categorias' %}" class="nav-link">
+                            <i class="fas fa-tags"></i>
+                            <span>Categorías</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if 'cliente' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'gestion_clientes' %}" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if 'venta' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'gestion_ventas' %}" class="nav-link">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Ventas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if 'escanear' in request.resolver_match.url_name %}active{% endif %}">
+                        <a href="{% url 'escanear_venta' %}" class="nav-link">
+                            <i class="fas fa-barcode"></i>
+                            <span>Escanear Venta</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="mobile-toggle" id="mobileToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">Admin</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="breadcrumb-item active">{% block breadcrumb %}Dashboard{% endblock %}</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-date">
+                        <i class="far fa-calendar-alt"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                    <a href="/" class="view-store-btn" target="_blank">
+                        <i class="fas fa-store"></i>
+                        <span>Ver Tienda</span>
+                    </a>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                        <span>{{ message }}</span>
+                        <button class="alert-close">&times;</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Current date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('es-ES', options);
+
+        // Sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mainContent = document.querySelector('.main-content');
+
+        // Desktop Toggle
+        sidebarToggle?.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        // Mobile Toggle
+        mobileToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('mobile-open');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 1024) {
+                if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target) && sidebar.classList.contains('mobile-open')) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            }
+        });
+
+        // Close alerts
+        document.querySelectorAll('.alert-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

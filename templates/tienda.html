@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tienda - Andrea Jiménez{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="{% static 'css/tienda.css' %}?v={% now 'U' %}">
+    <style>
+        .swiper {
+            width: 100%;
+            padding: 20px 0 50px;
+        }
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            width: auto;
+            height: auto;
+        }
+        .card-oferta {
+            width: 100% !important;
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        .card-imagen-container {
+            height: 350px !important;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #ff7a9c;
+        }
+        .swiper-pagination-bullet-active {
+            background: #ff7a9c;
+        }
+        .contenedor-ofertas {
+            padding-top: 140px !important;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        @media (max-width: 992px) {
+            .contenedor-ofertas {
+                padding-top: 100px !important;
+            }
+            .card-imagen-container {
+                height: 300px !important;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="contenedor-ofertas fade-in-section">
+    <div class="titulo-ofertas">
+        <h1>Nuestra Colección</h1>
+        <p>Explora nuestras prendas y accesorios. Los productos son visibles para todos.</p>
+    </div>
+
+    <!-- Filtros de Tienda -->
+    <div class="filtros-tienda">
+        <form method="GET" class="form-filtros">
+            <div class="filtro-item">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" name="q" placeholder="Buscar prenda..." value="{{ search_query }}">
+            </div>
+            <div class="filtro-item">
+                <i class="fa-solid fa-layer-group"></i>
+                <select name="categoria">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filtro-item">
+                <i class="fa-solid fa-tag"></i>
+                <input type="number" name="min_price" placeholder="Precio Min" value="{{ request.GET.min_price }}">
+            </div>
+            <div class="filtro-item">
+                <i class="fa-solid fa-tag"></i>
+                <input type="number" name="max_price" placeholder="Precio Max" value="{{ request.GET.max_price }}">
+            </div>
+            <button type="submit" class="btn-filtrar"><i class="fa-solid fa-filter"></i> Filtrar</button>
+            {% if search_query or selected_category or request.GET.min_price or request.GET.max_price %}
+            <a href="{% url 'tienda' %}" class="btn-limpiar"><i class="fa-solid fa-times"></i> Limpiar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    {% if productos %}
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                {% for producto in productos %}
+                <div class="swiper-slide">
+                    <div class="card-oferta">
+                        <div class="card-imagen-container">
+                            <a href="{% url 'detalle_producto' producto.slug %}">
+                                <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}" class="card-imagen">
+                            </a>
+                            <span class="etiqueta-oferta"><i class="fa-solid fa-gem"></i> Colección</span>
+                        </div>
+
+                        <div class="card-contenido">
+                            <h3 class="card-titulo"><a href="{% url 'detalle_producto' producto.slug %}" style="text-decoration: none; color: inherit;">{{ producto.nombre }}</a></h3>
+                            {% if producto.descripcion %}
+                                <p class="card-descripcion">{{ producto.descripcion|truncatechars:60 }}</p>
+                            {% endif %}
+                            
+                            <div class="card-precio">
+                                <span class="precio-oferta">COP ${{ producto.precio|floatformat:0 }}</span>
+                            </div>
+                            
+                            {% if user.is_authenticated and es_cliente %}
+                                <a href="{% url 'agregar_al_carrito' producto.id %}" class="card-boton"><i class="fa-solid fa-cart-plus"></i> Agregar al carrito</a>
+                            {% elif not user.is_authenticated %}
+                                <a href="{% url 'registro' %}" class="card-boton iniciar-sesion"><i class="fa-solid fa-user-plus"></i> Regístrate para comprar</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Swiper Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="pagination-container" style="text-align: center; margin-top: 40px; display: flex; justify-content: center; gap: 10px;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&categoria={{ selected_category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" class="btn-filtrar" style="width: auto;"><i class="fa-solid fa-chevron-left"></i> Anterior</a>
+            {% endif %}
+            
+            <span style="display: flex; align-items: center; padding: 0 15px; font-weight: 500;">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&categoria={{ selected_category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}" class="btn-filtrar" style="width: auto;">Siguiente <i class="fa-solid fa-chevron-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="sin-ofertas">
+            <i class="fa-solid fa-shirt"></i>
+            <h3>No hay productos disponibles</h3>
+            <p>Pronto tendremos nuevas prendas para ti.</p>
+        </div>
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const swiper = new Swiper(".mySwiper", {
+            slidesPerView: 1,
+            spaceBetween: 10,
+            loop: false,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                },
+                1440: {
+                    slidesPerView: 4,
+                    spaceBetween: 30,
+                },
+            },
+        });
+    });
+
+     // Fade-in sections on scroll
+     const observer = new IntersectionObserver((entries) => {
+         entries.forEach(entry => {
+             if (entry.isIntersecting) {
+                 entry.target.classList.add('visible');
+             }
+         });
+     }, { threshold: 0.1 });
+
+     document.querySelectorAll('.fade-in-section').forEach(el => observer.observe(el));
+</script>
+{% endblock %}

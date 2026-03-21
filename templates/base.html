@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Andrea Jiménez{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% include 'includes/navbar.html' %}
+
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <h3>Conecta</h3>
+            <div class="social-icons" style="display: flex; gap: 20px; font-size: 1.2rem;">
+                <a href="#" aria-label="Facebook" style="color: rgba(250,240,225,0.6); transition: color 0.3s;"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram" style="color: rgba(250,240,225,0.6); transition: color 0.3s;"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="TikTok" style="color: rgba(250,240,225,0.6); transition: color 0.3s;"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h3>Newsletter</h3>
+            <form action="#">
+                <input type="email" placeholder="Tu email" required>
+                <button type="submit"><i class="fa-solid fa-paper-plane"></i> Suscribirse</button>
+            </form>
+        </div>
+        <div class="footer-col">
+            <h3>Contacto</h3>
+            <p><i class="fa-solid fa-phone"></i> +{{ whatsapp_number|default:"570000000000" }}</p>
+            <p><i class="fa-solid fa-envelope"></i> andreajimenezctg@gmail.com</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 Andrea Jiménez &mdash; Todos los derechos reservados</p>
+    </div>
+</footer>
+
+<a href="https://api.whatsapp.com/send?phone={{ whatsapp_number|default:'570000000000' }}&text=Hola,%20necesito%20ayuda%20con%20mi%20pedido%20en%20Andrea%20Jiménez" target="_blank" class="whatsapp-btn" aria-label="Contactar por WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

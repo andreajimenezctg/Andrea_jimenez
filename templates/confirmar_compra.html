@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Compra confirmada</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+</head>
+<body>
+    <h1>¡Gracias por tu compra!</h1>
+    <p>Tu pedido se ha registrado con éxito.</p>
+
+    <h3>Detalles de la compra:</h3>
+    <ul>
+        {% for detalle in venta.detalles.all %}
+            <li>{{ detalle.cantidad }} x {{ detalle.prenda.nombre }} - ${{ detalle.precio }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'mis_ventas' %}">Ver historial de compras</a>
+    <br>
+    <a href="{% url 'tienda' %}">Volver a la tienda</a>
+</body>
+</html>

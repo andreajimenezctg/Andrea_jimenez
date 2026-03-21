@@ -1,0 +1,200 @@
+/* =========================================
+   EDITAR PERFIL — Andrea Jimenez
+   MISMA BASE QUE CARRITO
+========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Montserrat:wght@300;400;500;600&display=swap');
+
+:root{
+    --crema:#FAF0E1;
+    --rosado:#E8B4B8;
+    --negro:#1A1A1A;
+    --blanco:#ffffff;
+    --gris:#666;
+    --transicion:all .4s cubic-bezier(.25,.8,.25,1);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Montserrat',sans-serif;
+    background:var(--crema);
+    color:var(--negro);
+    line-height:1.6;
+    padding-top:78px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+    background:var(--negro);
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:1000;
+    min-height:78px;
+    border-bottom:1px solid rgba(232,180,184,0.2);
+}
+
+header nav{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:2rem;
+    padding:0 40px;
+    min-height:78px;
+    max-width:1400px;
+    margin:auto;
+}
+
+header nav a{
+    color:rgba(250,240,225,0.7);
+    text-decoration:none;
+    font-size:0.72rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    transition:.3s;
+}
+
+header nav a:hover{
+    color:var(--rosado);
+}
+
+/* =========================
+   CONTENEDOR
+========================= */
+
+.container{
+    max-width:600px;
+    margin:3rem auto;
+    padding:0 1rem;
+}
+
+/* =========================
+   TITULO
+========================= */
+
+h1{
+    text-align:center;
+    font-family:'Playfair Display',serif;
+    font-size:2.2rem;
+    font-weight:400;
+    margin-bottom:2rem;
+    position:relative;
+}
+
+h1::after{
+    content:'';
+    width:60px;
+    height:2px;
+    background:var(--rosado);
+    position:absolute;
+    bottom:-10px;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+/* =========================
+   TARJETA FORMULARIO
+========================= */
+
+.editar-perfil-container{
+    background:var(--blanco);
+    padding:40px;
+    border:1px solid rgba(232,180,184,0.2);
+    box-shadow:0 4px 20px rgba(0,0,0,0.06);
+}
+
+/* =========================
+   FORMULARIO
+========================= */
+
+.editar-perfil-container form{
+    display:flex;
+    flex-direction:column;
+}
+
+.editar-perfil-container label{
+    margin-top:15px;
+    margin-bottom:6px;
+    font-size:.75rem;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.editar-perfil-container input,
+.editar-perfil-container textarea{
+    padding:10px;
+    border:1px solid rgba(26,26,26,0.15);
+    background:var(--crema);
+    font-family:'Montserrat',sans-serif;
+    font-size:.9rem;
+}
+
+.editar-perfil-container input:focus,
+.editar-perfil-container textarea:focus{
+    outline:none;
+    border-color:var(--rosado);
+    box-shadow:0 0 0 3px rgba(232,180,184,0.15);
+}
+
+/* =========================
+   BOTON GUARDAR
+========================= */
+
+button.guardar{
+    margin-top:25px;
+    padding:12px;
+    border:1px solid var(--negro);
+    background:var(--negro);
+    color:var(--crema);
+    font-size:.7rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:var(--transicion);
+}
+
+button.guardar:hover{
+    background:var(--rosado);
+    border-color:var(--rosado);
+    color:var(--negro);
+}
+
+/* =========================
+   MENSAJES
+========================= */
+
+.empty-message{
+    text-align:center;
+    margin-top:50px;
+    padding:40px;
+    background:var(--blanco);
+    border:1px solid rgba(232,180,184,0.2);
+}
+
+/* =========================
+   ANIMACION
+========================= */
+
+.editar-perfil-container{
+    animation:fadeInUp .6s ease both;
+}
+
+@keyframes fadeInUp{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}

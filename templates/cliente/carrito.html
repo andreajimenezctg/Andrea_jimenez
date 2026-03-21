@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Carrito - Andrea Jiménez{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background-color: #f8f4f0 !important; }
+    .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; padding-top: 140px !important; }
+    h1 { font-family: 'Playfair Display', serif; text-align: center; font-size: 3rem; color: #1a1a1a; margin-bottom: 10px; font-weight: 400; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 50px; font-size: 1rem; }
+    
+    .cart-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: start; }
+    
+    .card-panel { background: #fff; padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 30px; }
+    
+    .cart-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    .cart-table thead { background: #1a1a1a; color: #fff; }
+    .cart-table th { padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 500; }
+    .cart-table td { padding: 20px 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #333; }
+    
+    .product-info { display: flex; align-items: center; gap: 15px; }
+    .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+    
+    .qty-control { display: flex; align-items: center; gap: 10px; }
+    .qty-btn { background: #f0f0f0; border: none; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; transition: 0.3s; }
+    .qty-btn:hover { background: #e8b4b8; color: white; }
+    
+    .totals-area { margin-top: 30px; border-top: 2px solid #1a1a1a; padding-top: 20px; }
+    .total-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
+    .total-row.grand-total { margin-top: 15px; font-size: 1.6rem; color: #e8b4b8; font-weight: 700; border-top: 1px solid #eee; padding-top: 15px; }
+    
+    .btn-checkout { display: block; width: 100%; background: #1a1a1a; color: #fff; text-align: center; padding: 18px; text-decoration: none; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; font-size: 0.85rem; transition: 0.4s; margin-top: 30px; }
+    .btn-checkout:hover { background: #e8b4b8; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(232, 180, 184, 0.3); }
+    
+    .btn-remove { color: #ff4444; text-decoration: none; font-size: 0.8rem; transition: 0.3s; }
+
+    @media (max-width: 992px) {
+        .cart-grid { grid-template-columns: 1fr; }
+        .container { padding-top: 100px !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container">
+    <h1>Mi Carrito</h1>
+    <p class="subtitle">Gestiona tus prendas seleccionadas antes de finalizar la compra.</p>
+
+    {% if carrito_items %}
+    <div class="cart-grid">
+        <div class="card-panel">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th style="text-align: center;">Cantidad</th>
+                        <th style="text-align: right;">Precio</th>
+                        <th style="text-align: right;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in carrito_items %}
+                    <tr>
+                        <td>
+                            <div class="product-info">
+                                <img src="{{ item.prenda.get_image_url }}" alt="{{ item.prenda.nombre }}" class="product-img">
+                                <div>
+                                    <div style="font-weight: 500; margin-bottom: 4px;">{{ item.prenda.nombre }}</div>
+                                    <div style="font-size: 0.75rem; color: #888;">Ref: {{ item.prenda.id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            <div class="qty-control" style="justify-content: center;">
+                                <a href="{% url 'restar_item' item.id %}" class="qty-btn">-</a>
+                                <span style="font-weight: 600;">{{ item.cantidad }}</span>
+                                <a href="{% url 'agregar_al_carrito' item.prenda.id %}" class="qty-btn">+</a>
+                            </div>
+                        </td>
+                        <td style="text-align: right; font-weight: 600;">${{ item.subtotal|floatformat:0 }}</td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'eliminar_item_carrito' item.id %}" class="btn-remove" title="Eliminar"><i class="fa-solid fa-trash-can"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <a href="{% url 'tienda' %}" style="color: #999; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500;">
+                <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Seguir comprando
+            </a>
+        </div>
+
+        <div class="card-panel">
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">Resumen de Compra</h3>
+            
+            <div class="totals-area">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>${{ total|floatformat:0 }}</span>
+                </div>
+                <div class="total-row">
+                    <span>Envío:</span>
+                    <span>$15.000</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total:</span>
+                    <span>${{ total_con_envio|floatformat:0 }}</span>
+                </div>
+            </div>
+
+            <a href="{% url 'checkout' %}" class="btn-checkout">Finalizar Compra</a>
+        </div>
+    </div>
+{% else %}
+    <div class="card-panel" style="text-align: center; padding: 80px 40px;">
+        <i class="fa-solid fa-cart-shopping" style="font-size: 4rem; color: #eee; margin-bottom: 25px;"></i>
+        <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 15px;">Tu carrito está vacío</h2>
+        <p style="color: #888; margin-bottom: 30px;">Parece que aún no has añadido ninguna prenda a tu carrito.</p>
+        <a href="{% url 'tienda' %}" class="btn-checkout" style="display: inline-block; width: auto; padding: 18px 50px;">Ir a la tienda</a>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

@@ -1,0 +1,313 @@
+/* =========================================
+   TIENDA — Andrea Jimenez
+   Paleta: Crema #FAF0E1 | Rosado #E8B4B8 | Negro #1A1A1A
+   ========================================= */
+
+/* Solo estilos específicos de la tienda, la navegación viene de navbar.css */
+
+/* =========================================
+   PAGE LOADER
+   ========================================= */
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.6s ease;
+}
+
+.loader-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #E8B4B8;
+    animation: loaderPulse 1.5s ease-in-out infinite;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+@keyframes loaderPulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* =========================================
+   FILTROS TIENDA
+   ========================================= */
+.filtros-tienda {
+    background: var(--blanco);
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    box-shadow: var(--sombra-suave);
+    border: var(--borde-rosado);
+    animation: fadeInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 0.2s both;
+}
+
+.form-filtros {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    align-items: center;
+}
+
+.filtro-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-item i {
+    position: absolute;
+    left: 15px;
+    color: var(--rosado);
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.filtro-item input,
+.filtro-item select {
+    width: 100%;
+    padding: 12px 15px 12px 40px;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    background: var(--crema);
+    color: var(--negro);
+    transition: var(--transicion);
+    appearance: none;
+}
+
+.filtro-item select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23E8B4B8' d='M6 8L2 4h8L6 8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+}
+
+.filtro-item input:focus,
+.filtro-item select:focus {
+    outline: none;
+    border-color: var(--rosado);
+    background: var(--blanco);
+    box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.1);
+}
+
+.btn-filtrar {
+    background: var(--negro);
+    color: var(--blanco);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transicion);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-filtrar:hover {
+    background: var(--rosado);
+    color: var(--negro);
+    transform: translateY(-2px);
+}
+
+.btn-limpiar {
+    color: var(--gris-texto);
+    text-decoration: none;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: var(--transicion);
+}
+
+.btn-limpiar:hover {
+    color: var(--rosado);
+}
+
+@media (max-width: 768px) {
+    .form-filtros {
+        grid-template-columns: 1fr;
+    }
+    
+    .filtros-tienda {
+        padding: 15px;
+    }
+}
+
+/* =========================================
+   CONTENIDO PRINCIPAL — Tienda / Coleccion
+   ========================================= */
+.contenedor-ofertas {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 120px 20px 40px;
+    min-height: 70vh;
+}
+
+.titulo-ofertas {
+    text-align: center;
+    margin-bottom: 50px;
+    animation: fadeInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+
+.titulo-ofertas h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 400;
+    color: var(--negro);
+    margin-bottom: 15px;
+    position: relative;
+    padding-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.titulo-ofertas h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background-color: var(--rosado);
+    animation: lineReveal 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) 0.5s both;
+}
+
+.titulo-ofertas p {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--gris-texto);
+    font-size: 1.1rem;
+    font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+    font-style: italic;
+}
+
+/* Grid de productos usando Flexbox */
+.grid-ofertas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+}
+
+/* =========================================
+   CARDS DE PRODUCTO
+   ========================================= */
+.card-oferta {
+    background: var(--blanco);
+    width: 300px;
+    overflow: hidden;
+    box-shadow: var(--sombra-suave);
+    transition: var(--transicion);
+    position: relative;
+    border: 1px solid rgba(232, 180, 184, 0.12);
+    animation: fadeInUp 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+
+.card-oferta:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    border-color: var(--rosado);
+}
+
+.card-imagen-container {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+}
+
+.card-imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.card-oferta:hover .card-imagen {
+    transform: scale(1.05);
+}
+
+/* Etiqueta */
+.etiqueta-oferta {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--rosado);
+    color: var(--blanco);
+    padding: 5px 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    z-index: 2;
+    box-shadow: 0 4px 10px rgba(232, 180, 184, 0.3);
+}
+
+.card-contenido {
+    padding: 20px;
+    text-align: center;
+}
+
+.card-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--negro);
+    margin-bottom: 8px;
+}
+
+.card-descripcion {
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--gris-texto);
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.card-precio {
+    margin-bottom: 15px;
+}
+
+.precio-oferta {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--negro);
+}
+
+.card-boton {
+    display: inline-block;
+    width: 100%;
+    padding: 12px;
+    background: var(--negro);
+    color: var(--blanco);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: var(--transicion);
+    border-radius: 8px;
+}
+
+.card-boton:hover {
+    background: var(--rosado);
+    color: var(--negro);
+    transform: scale(1.02);
+}

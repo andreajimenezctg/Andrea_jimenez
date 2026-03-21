@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Andrea Jiménez | Inicio{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}?v={% now 'U' %}">
+    <style>
+        /* CSS Crítico para asegurar que el inicio no se rompa */
+        body { 
+            background-color: #1a1a1a !important; 
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding-top: 80px;
+            background: transparent;
+        }
+
+        #video-fondo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            filter: brightness(0.4);
+        }
+
+        .overlay-fondo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.2);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .frase {
+            z-index: 10;
+            margin-bottom: 40px;
+            text-align: center;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .frase p {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: #FAF0E1 !important;
+            line-height: 1.2;
+            margin: 0;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .carrusel-container {
+            width: 100%;
+            z-index: 10;
+            padding: 0 20px;
+        }
+
+        .carrusel {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: 20px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .carrusel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carrusel-item {
+            flex: 0 0 350px !important;
+            scroll-snap-align: start;
+            padding: 0 10px;
+        }
+
+        @media (max-width: 992px) {
+            .carrusel-item {
+                flex: 0 0 95% !important; /* Aumentado a 95% para teléfonos */
+            }
+            .carrusel-img {
+                height: 500px !important; /* Aún más alto para que se vea mejor */
+            }
+            .frase p {
+                font-size: 2rem; /* Reducido para que quepa bien en teléfonos */
+            }
+        }
+
+        .carrusel-card {
+            background: rgba(26, 26, 26, 0.9) !important;
+            border: 1px solid rgba(232, 180, 184, 0.3) !important;
+            backdrop-filter: blur(10px);
+            display: block;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .carrusel-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+        }
+
+        .carrusel-info {
+            padding: 15px;
+            color: #FAF0E1 !important;
+        }
+
+        .carrusel-btn-add {
+            display: block;
+            background: #E8B4B8 !important;
+            color: #1A1A1A !important;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .carrusel-btn-add:hover {
+            background: #d4a0a4 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<video autoplay muted loop playsinline id="video-fondo" preload="auto">
+    <source src="{% static 'img/video/fondo.mp4' %}" type="video/mp4">
+</video>
+
+<div class="overlay-fondo"></div>
+
+<section class="hero fade-in-section">
+    <div class="frase">
+        <p>
+            "<span class="cursiva">Looks</span><br>
+            <span class="resaltado">que se adaptan</span><br>
+            a tu <span class="cursiva">Ritmo</span>"
+        </p>
+
+        <div class="carrusel-container">
+            <h3 class="carrusel-titulo" style="color: #E8B4B8; letter-spacing: 5px; margin-bottom: 25px; text-transform: uppercase; font-size: 0.8rem;">Selección Destacada</h3>
+            <div class="carrusel-wrapper">
+                <button type="button" class="carrusel-btn carrusel-prev">&#8249;</button>
+                <div class="carrusel">
+                    {% for producto in productos_carrusel %}
+                    <div class="carrusel-item">
+                        <a href="{% url 'detalle_producto' producto.slug %}" class="carrusel-card">
+                            <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}" class="carrusel-img">
+                            <div class="carrusel-info">
+                                <span class="carrusel-nombre">{{ producto.nombre }}</span>
+                                <span class="carrusel-precio">COP ${{ producto.precio|floatformat:0 }}</span>
+                            </div>
+                        </a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'agregar_al_carrito' producto.id %}" class="carrusel-btn-add"><i class="fa-solid fa-cart-plus"></i> Agregar</a>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p class="carrusel-vacio">Próximamente productos destacados. <a href="{% url 'tienda' %}" style="color: #E8B4B8;">Explorar tienda</a></p>
+                    {% endfor %}
+                </div>
+                <button type="button" class="carrusel-btn carrusel-next">&#8250;</button>
+            </div>
+        </div>
+
+        {% if not user.is_authenticated %}
+        <div class="btn-group" style="margin-top: 40px;">
+            <a href="{% url 'login' %}" class="btn" style="border: 1px solid #FAF0E1; color: #FAF0E1; padding: 12px 30px; text-decoration: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; margin: 0 10px;">Iniciar Sesión</a>
+            <a href="{% url 'registro' %}" class="btn btn-secundario" style="background: #E8B4B8; color: #1A1A1A; padding: 12px 30px; text-decoration: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; font-weight: 600; margin: 0 10px;">Registrarse</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="nosotros fade-in-section" style="padding: 100px 20px; text-align: center; background: transparent; color: #FAF0E1;">
+    <h2 style="font-family: 'Playfair Display', serif; font-size: 3rem; margin-bottom: 20px;">Nuestra Esencia</h2>
+    <div style="width: 50px; height: 2px; background: #E8B4B8; margin: 0 auto 30px;"></div>
+    <p style="max-width: 700px; margin: 0 auto; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; line-height: 1.8; color: rgba(250,240,225,0.8);">
+        En Andrea Jiménez creemos que la moda es una forma de ser tu misma. Creamos piezas que combinan comodidad, elegancia y versatilidad para acompañar cada momento de tu vida.
+    </p>
+</section>
+
+<section class="ofrecemos fade-in-section" style="padding: 100px 20px; text-align: center; background: transparent;">
+    <h2 style="font-family: 'Playfair Display', serif; font-size: 3rem; color: #FAF0E1; margin-bottom: 10px;">La Colección</h2>
+    <div style="width: 50px; height: 2px; background: #E8B4B8; margin: 0 auto 20px;"></div>
+    <p class="subtitulo" style="color: #E8B4B8; text-transform: uppercase; letter-spacing: 4px; font-size: 0.75rem; margin-bottom: 50px;">Piezas esenciales para tu guardarropa</p>
+    
+    <div class="galeria" style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto;">
+        <div class="item" style="flex: 1; min-width: 300px; max-width: 350px;"><img src="{% static 'img/vestido.jpeg' %}" alt="Vestidos exclusivos" style="width: 100%; height: 450px; object-fit: cover; box-shadow: 0 15px 35px rgba(0,0,0,0.5);"></div>
+        <div class="item" style="flex: 1; min-width: 300px; max-width: 350px;"><img src="{% static 'img/accesorios.jpeg' %}" alt="Accesorios de lujo" style="width: 100%; height: 450px; object-fit: cover; box-shadow: 0 15px 35px rgba(0,0,0,0.5);"></div>
+        <div class="item" style="flex: 1; min-width: 300px; max-width: 350px;"><img src="{% static 'img/bolsos.jpeg' %}" alt="Bolsos de diseño" style="width: 100%; height: 450px; object-fit: cover; box-shadow: 0 15px 35px rgba(0,0,0,0.5);"></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Carrusel Logic
+(function() {
+    var carrusel = document.querySelector('.carrusel');
+    var prev = document.querySelector('.carrusel-prev');
+    var next = document.querySelector('.carrusel-next');
+    if (!carrusel || !prev || !next) return;
+    
+    prev.addEventListener('click', function() {
+        carrusel.scrollBy({ left: -380, behavior: 'smooth' });
+    });
+    next.addEventListener('click', function() {
+        carrusel.scrollBy({ left: 380, behavior: 'smooth' });
+    });
+})();
+
+// Navbar shrink on scroll
+window.addEventListener('scroll', function() {
+    var header = document.querySelector('header');
+    if (header) {
+        if (window.scrollY > 60) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    }
+});
+
+// Fade-in sections on scroll
+var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.fade-in-section').forEach(function(el) {
+    observer.observe(el);
+});
+</script>
+{% endblock %}

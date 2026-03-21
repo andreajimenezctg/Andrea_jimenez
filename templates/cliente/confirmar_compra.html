@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Compra Confirmada</title>
+    <link rel="icon" href="{% static 'img/favicon-round.png' %}" type="image/png">
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Inicio</a>
+            <a href="{% url 'perfil_cliente' %}">Mi Perfil</a>
+            <a href="{% url 'carrito' %}">Carrito</a>
+            <a href="{% url 'mis_ventas' %}">Mis Compras</a>
+            <a href="{% url 'logout' %}">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>¡Compra Confirmada!</h1>
+        <p>Gracias por tu compra, {{ venta.cliente.user.username }}.</p>
+
+        <h2>Detalle de la venta:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items_detalle %}
+                <tr>
+                    <td>{{ item.producto }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td>${{ item.precio_unitario }}</td>
+                    <td>${{ item.subtotal }}</td>
+                </tr>
+                {% endfor %}
+        </table>
+
+        <p><strong>Total: ${{ total }}</strong></p>
+
+        {% if pago %}
+        <p><strong>Método de pago:</strong> {{ pago.metodo }}</p>
+        {% endif %}
+
+        <p>
+            <a href="{% url 'factura_imprimir' venta.id %}" target="_blank" class="btn-comprar">Imprimir factura</a>
+            <a href="{% url 'descargar_factura_pdf' venta.id %}" class="btn-comprar">Descargar PDF</a>
+            <a href="{% url 'tienda' %}" class="btn-comprar">Seguir comprando</a>
+        </p>
+    </main>
+</body>
+
+</html>

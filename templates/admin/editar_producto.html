@@ -1,0 +1,250 @@
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Editar Producto{% endblock %}
+{% block breadcrumb %}Editar Producto{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin/gestion_general.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Editar <span>Producto</span></h1>
+            <p class="page-subtitle">Modifica la informacion de {{ producto.nombre }}</p>
+        </div>
+        <a href="{% url 'gestion_productos' %}" class="btn btn-ghost">
+            <i class="fas fa-arrow-left"></i>
+            Volver al listado
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+        <div class="form-card-header">
+            <h2 class="form-card-title">
+                <i class="fas fa-edit"></i>
+                Editar Informacion
+            </h2>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" id="productForm">
+            {% csrf_token %}
+            
+            <div class="form-card-body">
+                <!-- Basic Info Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Informacion Basica</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="nombre">
+                            Nombre del Producto <span>*</span>
+                        </label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               placeholder="Ej: Vestido Elegante de Noche" required
+                               value="{{ producto.nombre }}">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="codigo">
+                                Codigo / SKU
+                            </label>
+                            <input type="text" class="form-control" id="codigo" name="codigo" 
+                                   placeholder="Ej: VES-001"
+                                   value="{{ producto.codigo|default:'' }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="categoria">
+                                Categoria <span>*</span>
+                            </label>
+                            <select class="form-control" id="categoria" name="categoria" required>
+                                <option value="">Selecciona una categoria</option>
+                                {% for categoria in categorias %}
+                                <option value="{{ categoria.id }}" {% if producto.categoria.id == categoria.id %}selected{% endif %}>
+                                    {{ categoria.nombre }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="descripcion">
+                            Descripcion
+                        </label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" 
+                                  placeholder="Describe las caracteristicas del producto...">{{ producto.descripcion|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Pricing Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Precios e Inventario</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="precio">
+                                Precio (COP) <span>*</span>
+                            </label>
+                            <input type="number" class="form-control" id="precio" name="precio" 
+                                   placeholder="0" min="0" step="100" required
+                                   value="{{ producto.precio }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="precio_descuento">
+                                Precio Oferta (COP)
+                            </label>
+                            <input type="number" class="form-control" id="precio_descuento" name="precio_descuento" 
+                                   placeholder="0" min="0" step="100"
+                                   value="{{ producto.precio_descuento|default:'' }}">
+                            <small style="color: var(--color-gray); font-size: 0.8rem;">
+                                Deja vacio si no esta en oferta
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="stock">
+                                Stock <span>*</span>
+                            </label>
+                            <input type="number" class="form-control" id="stock" name="stock" 
+                                   placeholder="0" min="0" required
+                                   value="{{ producto.stock }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="talla">
+                                Tallas Disponibles
+                            </label>
+                            <input type="text" class="form-control" id="talla" name="talla" 
+                                   placeholder="Ej: S, M, L, XL"
+                                   value="{{ producto.talla|default:'' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Imagen del Producto</h3>
+                    
+                    {% if producto.imagen %}
+                    <div class="current-image">
+                        <p class="form-label">Imagen Actual:</p>
+                        <div class="image-preview-wrapper" style="margin-bottom: var(--spacing-lg);">
+                            <div class="image-preview">
+                                <img src="{{ producto.get_image_url }}" alt="{{ producto.nombre }}">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ producto.imagen|yesno:"Cambiar imagen,Subir imagen" }}</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" class="file-input" id="imagen" name="imagen" 
+                                   accept="image/*" onchange="previewImage(this)">
+                            <div class="file-input-display">
+                                <div class="file-input-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="file-input-text">
+                                    <span>Haz clic para subir</span> o arrastra la imagen aqui
+                                </div>
+                                <small>PNG, JPG o WEBP (Max. 5MB)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="image-preview-wrapper" id="previewWrapper" style="display: none; margin-top: var(--spacing-md);">
+                            <p class="form-label">Nueva imagen:</p>
+                            <div class="image-preview">
+                                <img id="imagePreview" src="" alt="Preview">
+                            </div>
+                            <button type="button" class="btn btn-ghost btn-sm" onclick="removeImage()" style="margin-top: var(--spacing-sm);">
+                                <i class="fas fa-times"></i>
+                                Cancelar cambio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Options Section -->
+                <div class="form-section">
+                    <h3 class="form-section-title">Opciones</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="es_oferta" id="es_oferta" 
+                                       {% if producto.es_oferta %}checked{% endif %}>
+                                <span>Marcar como oferta especial</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="es_destacado" id="es_destacado"
+                                       {% if producto.es_destacado %}checked{% endif %}>
+                                <span>Mostrar en productos destacados</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card-footer">
+                <a href="{% url 'gestion_productos' %}" class="btn btn-ghost">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const wrapper = document.getElementById('previewWrapper');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            wrapper.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeImage() {
+    const input = document.getElementById('imagen');
+    const preview = document.getElementById('imagePreview');
+    const wrapper = document.getElementById('previewWrapper');
+    
+    input.value = '';
+    preview.src = '';
+    wrapper.style.display = 'none';
+}
+
+// Form validation
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    const precio = document.getElementById('precio').value;
+    const precioOferta = document.getElementById('precio_descuento').value;
+    
+    if (precioOferta && parseFloat(precioOferta) >= parseFloat(precio)) {
+        e.preventDefault();
+        alert('El precio de oferta debe ser menor al precio regular');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,161 @@
+<div class="client-detail-grid">
+    <!-- Perfil del Cliente -->
+    <div class="detail-section">
+        <h4 class="section-title"><i class="fas fa-user-circle"></i> Información de Perfil</h4>
+        <div class="info-list">
+            <div class="info-item">
+                <span class="info-label">Nombre Completo</span>
+                <span class="info-value">{{ cliente.user.get_full_name|default:cliente.user.username }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ cliente.user.email|default:"No registrado" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Teléfono</span>
+                <span class="info-value">{{ cliente.telefono|default:"No registrado" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Dirección</span>
+                <span class="info-value">{{ cliente.direccion|default:"No registrada" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Fecha de Registro</span>
+                <span class="info-value">{{ cliente.user.date_joined|date:"d M, Y" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen de Compras -->
+    <div class="detail-section">
+        <h4 class="section-title"><i class="fas fa-shopping-cart"></i> Historial de Compras</h4>
+        {% if ventas %}
+        <div class="table-container-mini">
+            <table class="table-mini">
+                <thead>
+                    <tr>
+                        <th>ID Venta</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td>#{{ venta.id|stringformat:"06d" }}</td>
+                        <td>{{ venta.fecha_venta|date:"d/m/Y" }}</td>
+                        <td>COP ${{ venta.total|floatformat:0 }}</td>
+                        <td>
+                            <span class="status-badge status-{{ venta.pago.estado|lower|default:'pendiente' }}">
+                                {{ venta.pago.estado|default:"Completada" }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-mini">
+            <p>Este cliente aún no ha realizado compras.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.client-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.section-title {
+    font-size: 1rem;
+    color: var(--color-rose-dark);
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 0.75rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.table-container-mini {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.table-mini {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.table-mini th {
+    background: #f8f9fa;
+    padding: 10px;
+    text-align: left;
+    color: #666;
+    font-weight: 600;
+}
+
+.table-mini td {
+    padding: 10px;
+    border-top: 1px solid #eee;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-aprobado, .status-completada {
+    background: #e6f4ea;
+    color: #1e7e34;
+}
+
+.empty-mini {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .client-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

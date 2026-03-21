@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Finalizar Compra - Andrea Jiménez{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/carrito.css' %}?v={% now 'U' %}">
+<style>
+    body { background-color: #f8f4f0 !important; }
+    .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; padding-top: 140px !important; }
+    h1 { font-family: 'Playfair Display', serif; text-align: center; font-size: 3rem; color: #1a1a1a; margin-bottom: 10px; font-weight: 400; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 50px; font-size: 1rem; }
+    
+    .checkout-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: start; }
+    
+    .card-panel { background: #fff; padding: 40px; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
+    
+    .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    .summary-table thead { background: #1a1a1a; color: #fff; }
+    .summary-table th { padding: 15px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 500; }
+    .summary-table td { padding: 20px 15px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #333; }
+    
+    .totals-area { margin-top: 30px; border-top: 2px solid #1a1a1a; padding-top: 20px; }
+    .total-row { display: flex; justify-content: flex-end; gap: 50px; margin-bottom: 10px; font-size: 0.95rem; }
+    .total-row.grand-total { margin-top: 15px; font-size: 1.6rem; color: #e8b4b8; font-weight: 700; border-top: 1px solid #eee; padding-top: 15px; }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; font-weight: 600; color: #555; }
+    .form-control { width: 100%; padding: 14px; border: 1px solid #eee; border-radius: 0; font-family: 'Montserrat', sans-serif; font-size: 0.85rem; background: #fcfcfc; }
+    
+    .payment-method-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 20px; color: #1a1a1a; }
+
+    @media (max-width: 992px) {
+        .checkout-grid { grid-template-columns: 1fr; }
+        .container { padding-top: 100px !important; }
+        h1 { font-size: 2rem; }
+        .subtitle { margin-bottom: 30px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container">
+    <h1>Finalizar Compra</h1>
+    <p class="subtitle">Revisa tu pedido y completa la información de envío para finalizar.</p>
+
+    <div class="card-panel" style="margin-bottom: 40px;">
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="text-align: center;">Cantidad</th>
+                    <th style="text-align: right;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in carrito_items %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            {% if item.prenda.imagen %}
+                                <img src="{{ item.prenda.imagen.url }}" alt="{{ item.prenda.nombre }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                            {% endif %}
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.9rem;">{{ item.prenda.nombre }}</div>
+                                <div style="font-size: 0.75rem; color: #888;">Ref: {{ item.prenda.id }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="text-align: center;">{{ item.cantidad }}</td>
+                    <td style="text-align: right;">${{ item.subtotal|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+            <div class="total-row">
+                <span style="color: #888;">Subtotal:</span>
+                <span style="min-width: 120px; text-align: right;">${{ total|floatformat:0 }}</span>
+            </div>
+            <div class="total-row">
+                <span style="color: #888;">Envío:</span>
+                <span style="min-width: 120px; text-align: right;">$15.000</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Total:</span>
+                <span style="min-width: 120px; text-align: right;">${{ total_con_envio|floatformat:0 }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="checkout-grid">
+        <div class="card-panel">
+            <h3 class="payment-method-title">Información de Envío</h3>
+            <form id="payment-form" action="{% url 'confirmar_compra' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Departamento</label>
+                    <select name="departamento" id="id_departamento" required class="form-control">
+                        <option value="">Selecciona...</option>
+                        <option value="Antioquia">Antioquia</option>
+                        <option value="Atlántico">Atlántico</option>
+                        <option value="Bogotá D.C.">Bogotá D.C.</option>
+                        <option value="Bolívar">Bolívar (Cartagena)</option>
+                        <option value="Boyacá">Boyacá</option>
+                        <option value="Caldas">Caldas</option>
+                        <option value="Caquetá">Caquetá</option>
+                        <option value="Casanare">Casanare</option>
+                        <option value="Cauca">Cauca</option>
+                        <option value="Cesar">Cesar</option>
+                        <option value="Chocó">Chocó</option>
+                        <option value="Córdoba">Córdoba</option>
+                        <option value="Cundinamarca">Cundinamarca</option>
+                        <option value="Guainía">Guainía</option>
+                        <option value="Guaviare">Guaviare</option>
+                        <option value="Huila">Huila</option>
+                        <option value="La Guajira">La Guajira</option>
+                        <option value="Magdalena">Magdalena</option>
+                        <option value="Meta">Meta</option>
+                        <option value="Nariño">Nariño</option>
+                        <option value="Norte de Santander">Norte de Santander</option>
+                        <option value="Putumayo">Putumayo</option>
+                        <option value="Quindío">Quindío</option>
+                        <option value="Risaralda">Risaralda</option>
+                        <option value="San Andrés y Providencia">San Andrés y Providencia</option>
+                        <option value="Santander">Santander</option>
+                        <option value="Sucre">Sucre</option>
+                        <option value="Tolima">Tolima</option>
+                        <option value="Valle del Cauca">Valle del Cauca</option>
+                        <option value="Vaupés">Vaupés</option>
+                        <option value="Vichada">Vichada</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ciudad / Municipio</label>
+                    <input type="text" name="ciudad" id="id_ciudad" placeholder="Ej: Cartagena, Bogotá..." required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Dirección Completa</label>
+                    <input type="text" name="direccion" id="id_direccion" placeholder="Calle 123 #45-67..." required class="form-control">
+                </div>
+
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                
+                <h3 class="payment-method-title">Datos de Pago (Simulación)</h3>
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 4px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: #888;">TARJETA CRÉDITO / DÉBITO</span>
+                        <div style="display: flex; gap: 8px;">
+                            <i class="fa-brands fa-cc-visa" style="font-size: 1.5rem; color: #1a1f71;"></i>
+                            <i class="fa-brands fa-cc-mastercard" style="font-size: 1.5rem; color: #eb001b;"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <input type="text" name="card_number" placeholder="0000 0000 0000 0000" required class="form-control" maxlength="19">
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Fecha Expiración</label>
+                            <input type="text" name="expiry" placeholder="MM/YY" required class="form-control" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label>CVC</label>
+                            <input type="text" name="cvc" placeholder="123" required class="form-control" maxlength="4">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Nombre en la Tarjeta</label>
+                        <input type="text" name="card_name" placeholder="Nombre como aparece" required class="form-control">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-confirmar" style="width: 100%; padding: 20px; background: #1a1a1a; color: #fff; border: none; border-radius: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px;">
+                    <span>Realizar Pago</span>
+                    <i class="fa-solid fa-lock" style="font-size: 0.9rem;"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="card-panel">
+            <h3 class="payment-method-title">Resumen de Pago</h3>
+            <div style="background: #fdfcfb; padding: 25px; border: 1px solid #eee;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #888;">Pedido:</span>
+                    <span style="font-weight: 600;">ORD-{{ user.username }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #888;">Subtotal:</span>
+                    <span style="font-weight: 600;">${{ total|floatformat:0 }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #888;">Envío:</span>
+                    <span style="font-weight: 600;">$15.000</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding-top: 15px; border-top: 1px solid #eee; margin-top: 15px;">
+                    <span style="font-weight: 700; font-size: 1.1rem;">Total:</span>
+                    <span style="font-weight: 700; font-size: 1.1rem; color: #e8b4b8;">${{ total_con_envio|floatformat:0 }}</span>
+                </div>
+            </div>
+            
+            <p style="font-size: 0.75rem; color: #999; margin-top: 20px; line-height: 1.5; text-align: center;">
+                <i class="fa-solid fa-shield-check"></i> Pago procesado de forma segura. Tus datos están protegidos por encriptación de 256 bits.
+            </p>
+        </div>
+    </div>
+
+    <p style="margin-top: 60px; text-align: center;">
+        <a href="{% url 'carrito' %}" style="color: #999; text-decoration: none; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; transition: color 0.3s;">
+            <i class="fa-solid fa-arrow-left" style="margin-right: 8px;"></i> Volver al carrito
+        </a>
+    </p>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+    (function() {
+        "use strict";
+        
+        // Formateo de número de tarjeta
+        var cardInput = document.querySelector('input[name="card_number"]');
+        if (cardInput) {
+            cardInput.addEventListener("input", function (e) {
+                var val = e.target.value.replace(/\D/g, "");
+                var newVal = "";
+                for (var i = 0; i < val.length; i++) {
+                    if (i > 0 && i % 4 === 0) newVal += " ";
+                    newVal += val[i];
+                }
+                e.target.value = newVal.trim();
+            });
+        }
+
+        // Formateo de fecha de expiración
+        var expiryInput = document.querySelector('input[name="expiry"]');
+        if (expiryInput) {
+            expiryInput.addEventListener("input", function (e) {
+                var val = e.target.value.replace(/\D/g, "");
+                if (val.length > 2) {
+                    val = val.substring(0, 2) + "/" + val.substring(2, 4);
+                }
+                e.target.value = val;
+            });
+        }
+
+        // Manejo del envío del formulario
+        var paymentForm = document.getElementById("payment-form");
+        if (paymentForm) {
+            paymentForm.addEventListener("submit", function() {
+                var btn = this.querySelector(".btn-confirmar");
+                if (btn) {
+                    var span = btn.querySelector("span");
+                    if (span) {
+                        span.innerHTML = "PROCESANDO...";
+                    } else {
+                        btn.innerHTML = "PROCESANDO...";
+                    }
+                    btn.style.opacity = "0.7";
+                    btn.style.pointerEvents = "none";
+                }
+            });
+        }
+    })();
+</script>
+{% endblock %}

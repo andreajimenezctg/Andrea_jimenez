@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Atención al Cliente - Andrea Jiménez{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/atencion.css' %}?v={% now 'U' %}">
+    <style>
+        .container {
+            padding-top: 140px !important;
+            background: transparent !important;
+        }
+        @media (max-width: 992px) {
+            .container {
+                padding-top: 100px !important;
+            }
+        }
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #25d366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+        .whatsapp-btn:hover {
+            transform: scale(1.1);
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Título principal -->
+    <h1>ATENCIÓN AL CLIENTE</h1>
+    <p style="text-align: center; margin-bottom: 40px; color: var(--gris-texto);">¿Tienes alguna pregunta? ¡Estamos aquí para ayudarte!</p>
+
+    <!-- Formulario de contacto -->
+    <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: var(--sombra-suave); border: var(--borde-rosado); max-width: 600px; margin: 0 auto;">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="text" name="nombre" class="form-control" placeholder="Nombre" required style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px;" />
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="email" name="email" class="form-control" placeholder="Email" required style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px;" />
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <input type="tel" name="telefono" class="form-control" placeholder="Teléfono" required style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px;" />
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <textarea name="mensaje" class="form-control" placeholder="Escribe tu mensaje aquí..." required style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; min-height: 150px;"></textarea>
+            </div>
+            <button type="submit" class="btn-filtrar" style="width: 100%; border: none; background: var(--negro); color: white; padding: 15px; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">Enviar Mensaje</button>
+        </form>
+    </div>
+
+    <div style="margin-top: 60px; text-align: center;">
+        <h3 style="font-family: 'Playfair Display', serif; margin-bottom: 20px;">Información Adicional</h3>
+        <p style="color: var(--gris-texto); margin-bottom: 10px;">Aceptamos tarjeta de crédito/débito, PayPal y transferencia bancaria.</p>
+        <p style="color: var(--gris-texto);">Horario de atención: Lunes a Viernes 8:00 AM - 6:00 PM</p>
+    </div>
+</div>
+{% endblock %}
