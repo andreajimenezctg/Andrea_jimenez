@@ -1113,5 +1113,176 @@ def gestion_ventas(request):
     }
     return render(request, "admin/gestion_ventas.html", context)
 
-_This response is too long to display in full._  
-   
+
+# =====================================================
+#        CATEGORÍAS
+# =====================================================
+
+@login_required
+@user_passes_test(es_admin)
+def gestion_categorias(request):
+    categorias = Categoria.objects.all().order_by("nombre")
+    return render(request, "admin/gestion_categorias.html", {"categorias": categorias})
+
+
+@login_required
+@user_passes_test(es_admin)
+def crear_categoria(request):
+    if request.method == "POST":
+        nombre = request.POST.get("nombre", "").strip()
+        if nombre:
+            Categoria.objects.create(nombre=nombre)
+            messages.success(request, f"Categoría '{nombre}' creada correctamente.")
+        else:
+            messages.error(request, "El nombre de la categoría no puede estar vacío.")
+        return redirect("gestion_categorias")
+    return render(request, "admin/crear_categoria.html")
+
+
+@login_required
+@user_passes_test(es_admin)
+def editar_categoria(request, categoria_id):
+    categoria = get_object_or_404(Categoria, id=categoria_id)
+    if request.method == "POST":
+        nombre = request.POST.get("nombre", "").strip()
+        if nombre:
+            categoria.nombre = nombre
+            categoria.save()
+            messages.success(request, f"Categoría '{nombre}' actualizada correctamente.")
+        else:
+            messages.error(request, "El nombre de la categoría no puede estar vacío.")
+        return redirect("gestion_categorias")
+    return render(request, "admin/editar_categoria.html", {"categoria": categoria})
+
+
+@login_required
+@user_passes_test(es_admin)
+def eliminar_categoria(request, categoria_id):
+    categoria = get_object_or_404(Categoria, id=categoria_id)
+    nombre = categoria.nombre
+    categoria.delete()
+    messages.success(request, f"Categoría '{nombre}' eliminada correctamente.")
+    return redirect("gestion_categorias")
+
+
+# =====================================================
+#        ESCANEO Y API
+# =====================================================
+
+@login_required
+@user_passes_test(es_admin)
+def escanear_venta(request):
+    return render(request, "admin/escanear_venta.html")
+
+
+@login_required
+@user_passes_test(es_admin)
+def buscar_producto_api(request):
+    codigo = request.GET.get("codigo", "").strip()
+    if not codigo:
+        return JsonResponse({"found": False, "error": "Código no proporcionado"})
+    try:
+        prenda = Prenda.objects.get(codigo_barras=codigo)
+        return JsonResponse({
+            "found": True,
+            "id": prenda.id,
+            "nombre": prenda.nombre,
+            "precio": float(prenda.precio_descuento if prenda.precio_descuento else prenda.precio),
+            "stock": prenda.stock,
+            "imagen": prenda.imagen.url if prenda.imagen else None,
+        })
+    except Prenda.DoesNotExist:
+        return JsonResponse({"found": False, "error": "Producto no encontrado"})
+
+
+@login_required
+@user_passes_test(es_cliente)
+def simular_pago(request):
+    if request.method == "POST":
+        cliente = get_object_or_404(Cliente, user=request.user)
+        carrito = get_object_or_404(CarritoDeCompras, cliente=cliente)
+        items = [i for i in carrito.items.select_related("prenda", "variacion").all() if i.prenda]
+
+        if not items:
+            messages.error(request, "Tu carrito está vacío.")
+            return redirect("carrito")
+
+        subtotal = sum(i.subtotal for i in items)
+        costo_envio = 15000
+        total = subtotal + costo_envio
+
+        pedido = Pedido.objects.create(
+            cliente=cliente,
+            estado="Pagado",
+            departamento=request.POST.get("departamento", "N/A"),
+            ciudad=request.POST.get("ciudad", "N/A"),
+            direccion_envio=request.POST.get("direccion", "N/A"),
+            costo_envio=costo_envio
+        )
+
+        pago = Pago.objects.create(
+            pedido=pedido,
+            metodo="Simulación",
+            estado="Aprobado"
+        )
+
+        venta = Venta.objects.create(
+            cliente=cliente,
+            subtotal=subtotal,
+            descuento=0,
+            total=total,
+            pago=pago
+        )
+
+        for item in items:
+            precio = item.prenda.precio_descuento if item.prenda.precio_descuento else item.prenda.precio
+            DetalleVenta.objects.create(
+                venta=venta,
+                prenda=item.prenda,
+                variacion=item.variacion,
+                cantidad=item.cantidad,
+                precio_unitario=precio
+            )
+            if item.variacion:
+                item.variacion.stock -= item.cantidad
+                item.variacion.save()
+            item.prenda.stock -= item.cantidad
+            item.prenda.save()
+
+        carrito.items.all().delete()
+        messages.success(request, f"¡Pago simulado con éxito! Pedido #{venta.id} registrado.")
+        return redirect("factura_imprimir", venta_id=venta.id)
+
+    return redirect("checkout")
+
+
+# =====================================================
+#        GESTIÓN DE PEDIDOS (ADMIN)
+# =====================================================
+
+@login_required
+@user_passes_test(es_admin)
+def actualizar_estado_pedido(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    if request.method == "POST":
+        nuevo_estado = request.POST.get("estado")
+        estados_validos = [e[0] for e in Pedido.ESTADOS]
+        if nuevo_estado in estados_validos:
+            pedido.estado = nuevo_estado
+            pedido.save()
+            messages.success(request, f"Estado del pedido #{pedido_id} actualizado a '{nuevo_estado}'.")
+        else:
+            messages.error(request, "Estado no válido.")
+    return redirect("gestion_ventas")
+
+
+@login_required
+@user_passes_test(es_admin)
+def actualizar_envio_pedido(request, pedido_id):
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    if request.method == "POST":
+        pedido.transportadora = request.POST.get("transportadora", "").strip()
+        pedido.guia_rastreo = request.POST.get("guia_rastreo", "").strip()
+        pedido.save()
+        messages.success(request, f"Información de envío del pedido #{pedido_id} actualizada.")
+    return redirect("gestion_ventas")
