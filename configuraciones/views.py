@@ -174,38 +174,156 @@ def checkout(request):
     cliente = get_object_or_404(Cliente, user=request.user)
     carrito = get_object_or_404(CarritoDeCompras, cliente=cliente)
     items = carrito.items.all()
+    
+    if not items:
+        messages.warning(request, "Tu carrito está vacío.")
+        return redirect("tienda")
+        
     total = sum(i.subtotal for i in items)
+    envio = 15000
+    total_con_envio = total + envio
+    
     return render(request, "cliente/checkout.html", {
-        "items": items,
-        "total": total
+        "carrito_items": items,
+        "total": total,
+        "total_con_envio": total_con_envio
     })
 
 
 @login_required
 def confirmar_compra(request):
-    cliente = Cliente.objects.get(user=request.user)
-    carrito = CarritoDeCompras.objects.get(cliente=cliente)
-    items = carrito.items.all()
+    if request.method == "POST":
+        cliente = get_object_or_404(Cliente, user=request.user)
+        carrito = get_object_or_404(CarritoDeCompras, cliente=cliente)
+        items = carrito.items.all()
 
-    total = sum(i.subtotal for i in items)
+        if not items:
+            messages.error(request, "No hay productos en el carrito.")
+            return redirect("carrito")
 
-    venta = Venta.objects.create(
-        cliente=cliente,
-        total=total
-    )
-
-    for item in items:
-        DetalleVenta.objects.create(
-            venta=venta,
-            prenda=item.prenda,
-            cantidad=item.cantidad,
-            precio_unitario=item.prenda.precio
+        # 1. Crear el Pedido
+        pedido = Pedido.objects.create(
+            cliente=cliente,
+            departamento=request.POST.get("departamento"),
+            ciudad=request.POST.get("ciudad"),
+            direccion_envio=request.POST.get("direccion"),
+            costo_envio=15000,
+            estado="Pagado"  # En simulación lo marcamos como pagado de una vez
         )
 
-    carrito.items.all().delete()
+        # 2. Crear el Pago
+        pago = Pago.objects.create(
+            pedido=pedido,
+            metodo=request.POST.get("card_number", "Tarjeta (Simulación)"),
+            estado="Completado",
+            fecha=timezone.now().date()
+        )
 
-    messages.success(request, "Compra realizada con éxito")
-    return redirect("home")
+        # 3. Crear la Venta y sus Detalles
+        subtotal = sum(i.subtotal for i in items)
+        total = subtotal + 15000
+        
+        venta = Venta.objects.create(
+            cliente=cliente,
+            subtotal=subtotal,
+            total=total,
+            pago=pago,
+            fecha_venta=timezone.now()
+        )
+
+        for item in items:
+            DetalleVenta.objects.create(
+                venta=venta,
+                prenda=item.prenda,
+                variacion=item.variacion,
+                cantidad=item.cantidad,
+                precio_unitario=item.prenda.precio_descuento if item.prenda.precio_descuento else item.prenda.precio
+            )
+            
+            # 4. Reducir Stock
+            if item.variacion:
+                item.variacion.stock -= item.cantidad
+                item.variacion.save()
+            elif item.prenda:
+                item.prenda.stock -= item.cantidad
+                item.prenda.save()
+
+        # 5. Limpiar Carrito
+        items.delete()
+
+        messages.success(request, "¡Gracias por tu compra! Tu pedido ha sido procesado.")
+        return render(request, "confirmar_compra.html", {"venta": venta})
+        
+    return redirect("checkout")
+
+def buscar_producto_api(request):
+    barcode = request.GET.get('barcode')
+    query = request.GET.get('q')
+    
+    if barcode:
+        # Buscar por código de barras exacto
+        producto = Prenda.objects.filter(codigo_barras=barcode, is_archived=False).first()
+        if producto:
+            return JsonResponse({
+                'id': producto.id,
+                'nombre': producto.nombre,
+                'precio': float(producto.precio_descuento if producto.precio_descuento else producto.precio),
+                'stock': producto.stock,
+                'codigo': producto.codigo_barras
+            })
+        return JsonResponse({'error': 'Producto no encontrado'}, status=404)
+        
+    if query:
+        # Buscar por nombre (parcial)
+        productos = Prenda.objects.filter(
+            Q(nombre__icontains=query) | Q(codigo_barras__icontains=query),
+            is_archived=False
+        )[:10]
+        
+        data = [{
+            'id': p.id,
+            'nombre': p.nombre,
+            'precio': float(p.precio_descuento if p.precio_descuento else p.precio),
+            'stock': p.stock,
+            'codigo': p.codigo_barras
+        } for p in productos]
+        
+        return JsonResponse(data, safe=False)
+        
+    return JsonResponse({'error': 'No se proporcionó parámetro de búsqueda'}, status=400)
+
+@login_required
+def simular_pago(request):
+    # Esta vista puede ser un paso intermedio si se desea
+    total = request.GET.get('total', 0)
+    metodo = request.GET.get('metodo', 'Tarjeta')
+    return render(request, "cliente/simular_pago.html", {
+        "total": total,
+        "metodo": metodo
+    })
+
+@user_passes_test(es_admin)
+def actualizar_estado_pedido(request, pedido_id):
+    if request.method == "POST":
+        pedido = get_object_or_404(Pedido, id=pedido_id)
+        nuevo_estado = request.POST.get("estado")
+        if nuevo_estado in dict(Pedido.ESTADOS):
+            pedido.estado = nuevo_estado
+            pedido.save()
+            messages.success(request, f"Pedido #{pedido.id} actualizado a {nuevo_estado}")
+    return redirect("gestion_ventas")
+
+@user_passes_test(es_admin)
+def actualizar_envio_pedido(request, pedido_id):
+    if request.method == "POST":
+        pedido = get_object_or_404(Pedido, id=pedido_id)
+        pedido.transportadora = request.POST.get("transportadora")
+        pedido.guia_rastreo = request.POST.get("guia")
+        pedido.estado = "Enviado"
+        pedido.save()
+        messages.success(request, f"Guía de envío actualizada para Pedido #{pedido.id}")
+    return redirect("gestion_ventas")
+
 
 def oferta(request):
     productos = Prenda.objects.filter(is_archived=False, precio_descuento__isnull=False)
