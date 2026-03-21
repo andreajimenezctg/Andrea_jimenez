@@ -216,3 +216,6 @@ if not SITE_URL:
 
 # WhatsApp
 WHATSAPP_NUMBER = os.getenv('WHATSAPP_NUMBER', '573014717412')
+
+# Actualización de Pago - Trigger
+PAYMENT_UPDATE_TRIGGER = True
