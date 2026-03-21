@@ -10,7 +10,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn Andrea_jimenez.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 1 --threads 1 --timeout 120"
+    startCommand: "gunicorn Andrea_jimenez.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 1 --timeout 120"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -27,4 +27,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: DEPLOY_TRIGGER
-        value: 2
+        value: 3
