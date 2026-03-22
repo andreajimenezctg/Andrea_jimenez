@@ -51,9 +51,15 @@ def registro(request):
         email = request.POST.get("email")
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
+        direccion = request.POST.get("direccion")
+        telefono = request.POST.get("telefono")
 
         if password1 != password2:
             messages.error(request, "Las contraseñas no coinciden")
+            return redirect("registro")
+            
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "El nombre de usuario ya existe")
             return redirect("registro")
 
         user = User.objects.create_user(username=username, email=email, password=password1)
@@ -61,9 +67,13 @@ def registro(request):
         grupo, _ = Group.objects.get_or_create(name="Cliente")
         user.groups.add(grupo)
 
-        Cliente.objects.create(user=user)
+        Cliente.objects.create(
+            user=user,
+            direccion=direccion,
+            telefono=telefono
+        )
 
-        messages.success(request, "Usuario creado correctamente")
+        messages.success(request, "Usuario creado correctamente. Ahora puedes iniciar sesión.")
         return redirect("login")
 
     return render(request, "registro.html")
@@ -71,17 +81,17 @@ def registro(request):
 
 def inicio_sesion(request):
     if request.method == "POST":
-        user = authenticate(
-            request,
-            username=request.POST.get("username"),
-            password=request.POST.get("password")
-        )
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        
+        user = authenticate(request, username=username, password=password)
 
         if user:
             login(request, user)
+            messages.success(request, f"Bienvenido de nuevo, {user.username}")
             return redirect("home")
 
-        messages.error(request, "Credenciales incorrectas")
+        messages.error(request, "Nombre de usuario o contraseña incorrectos")
         return redirect("login")
 
     return render(request, "login.html")
