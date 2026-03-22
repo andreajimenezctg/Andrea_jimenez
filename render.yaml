@@ -29,4 +29,8 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: DEPLOY_TRIGGER
-        value: 6
+        value: 7
+      - key: EMAIL_HOST_USER
+        value: andreajimenezctg@gmail.com
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
