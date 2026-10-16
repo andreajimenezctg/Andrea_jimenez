@@ -46,4 +46,4 @@ def run():
     client_user.save()
     client_user.groups.set([client_group])
 
-    print("✅ Roles, permisos y usuarios creados correctamente.")
+    print("[OK] Roles, permisos y usuarios creados correctamente.")

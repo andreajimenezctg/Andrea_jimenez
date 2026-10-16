@@ -73,5 +73,4 @@ def crear_usuario_admin(sender, **kwargs):
             password=password
         )
         admin_user.is_active = True
-        admin_user.save()
-        print("✔ Admin creado automáticamente:", username)
+        print("[OK] Admin creado automáticamente:", username)

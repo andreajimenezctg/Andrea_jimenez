@@ -65,4 +65,4 @@ class Command(BaseCommand):
                                 prenda.imagen.save(archivo, f, save=True)
                             self.stdout.write(self.style.SUCCESS(f"    Imagen asignada: {archivo}"))
 
-        self.stdout.write(self.style.SUCCESS(f"\n✅ Listo. Productos creados: {creados}"))
+        self.stdout.write(self.style.SUCCESS(f"\n[OK] Listo. Productos creados: {creados}"))
