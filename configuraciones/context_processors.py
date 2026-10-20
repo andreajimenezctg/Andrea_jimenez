@@ -12,3 +12,6 @@ def global_config(request):
         'whatsapp_number': getattr(settings, 'WHATSAPP_NUMBER', '573014717412'),
         'es_cliente': es_cliente,
     }
+
+whatsapp_config = global_config
+

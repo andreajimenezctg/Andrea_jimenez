@@ -4,12 +4,11 @@ from django.views.generic.base import RedirectView
 from django.views.static import serve
 from configuraciones import views
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     # ----------------------------
-    # PÁGINA PRINCIPAL
+    # PÁGINA PRINCIPAL Y HEALTH
     # ----------------------------
     path("", views.home, name="home"),
     path("health/", views.health_check, name="health_check"),
@@ -22,7 +21,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # ----------------------------
-    # AUTENTICACIÓN
+    # AUTENTICACIÓN Y MIGRACIÓN
     # ----------------------------
     path("migrar-produccion-secreto-xyz/", views.migrar_datos_produccion, name="migrar_produccion"),
     path("login/", views.inicio_sesion, name="login"),
@@ -70,13 +69,16 @@ urlpatterns = [
     # CARRITO DE COMPRAS
     # ----------------------------
     path("carrito/", views.carrito, name="carrito"),
-    path("carrito/agregar/<int:prenda_id>/", views.agregar_al_carrito, name="agregar_al_carrito"),
+    path("agregar/<int:prenda_id>/", views.agregar_al_carrito, name="agregar_al_carrito"),
+    path("agregar_al_carrito/<int:prenda_id>/", views.agregar_al_carrito, name="agregar_al_carrito_alt"),
     path("carrito/restar/<int:item_id>/", views.restar_del_carrito, name="restar_item"),
-    path("carrito/eliminar/<int:item_id>/", views.eliminar_item_carrito, name="eliminar_item_carrito"),
-    path("carrito/actualizar/<int:item_id>/", views.actualizar_cantidad, name="actualizar_cantidad"),
+    path("restar_carrito/<int:item_id>/", views.restar_del_carrito, name="restar_del_carrito"),
+    path("eliminar/<int:item_id>/", views.eliminar_item_carrito, name="eliminar_item_carrito"),
+    path("actualizar/<int:item_id>/", views.actualizar_cantidad, name="actualizar_cantidad"),
     path("checkout/", views.checkout, name="checkout"),
     path("confirmar/", views.confirmar_compra, name="confirmar_compra"),
     path("confirmar_compra/", views.confirmar_compra, name="confirmar_compra_alt"),
+    path("paypal/capture/", views.paypal_capture, name="paypal_capture"),
     path("factura/<int:venta_id>/", views.factura_imprimir, name="factura_imprimir"),
     path("descargar_factura/<int:venta_id>/", views.descargar_factura_pdf, name="descargar_factura_pdf"),
 

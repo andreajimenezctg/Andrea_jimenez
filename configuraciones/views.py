@@ -24,6 +24,42 @@ logger = logging.getLogger(__name__)
 
 
 # =====================================================
+#        HEALTH CHECK (RENDER)
+# =====================================================
+
+def health_check(request):
+    """Endpoint for Render health checks and database connectivity verification."""
+    from django.db import connection
+    try:
+        connection.ensure_connection()
+        return HttpResponse("OK")
+    except Exception:
+        return HttpResponse("Database connection failed", status=500)
+
+
+def migrar_datos_produccion(request):
+    from django.core.management import call_command
+    from django.contrib.auth.models import User
+    output = []
+    try:
+        call_command('crear_productos_tienda')
+        output.append("[OK] Productos y categorias base creados.")
+    except Exception as e:
+        output.append(f"[ERROR] Error en crear_productos_tienda: {str(e)}")
+
+    if not User.objects.filter(username="admin").exists():
+        try:
+            User.objects.create_superuser("admin", "andreajimenezctg@gmail.com", "admin123456")
+            output.append("[OK] Superusuario 'admin' creado (Clave: admin123456).")
+        except Exception as e:
+            output.append(f"[ERROR] Error al crear superusuario: {str(e)}")
+    else:
+        output.append("[INFO] El superusuario 'admin' ya existe.")
+
+    return HttpResponse("<br>".join(output))
+
+
+# =====================================================
 #        HELPERS (ROLES)
 # =====================================================
 
@@ -225,6 +261,15 @@ def distribuidores(request):
     return render(request, "distribuidores.html")
 
 
+def detalle_producto(request, slug):
+    producto = get_object_or_404(Prenda, slug=slug)
+    relacionados = Prenda.objects.filter(is_archived=False).exclude(id=producto.id)[:4]
+    return render(request, "detalle_producto.html", {
+        "producto": producto,
+        "relacionados": relacionados,
+    })
+
+
 # =====================================================
 #        CARRITO
 # =====================================================
@@ -267,6 +312,18 @@ def agregar_al_carrito(request, prenda_id):
         )
 
     messages.success(request, f"'{producto.nombre}' agregado al carrito.")
+    return redirect("carrito")
+
+
+@login_required
+@user_passes_test(es_cliente)
+def restar_del_carrito(request, item_id):
+    item = get_object_or_404(ItemCarrito, id=item_id)
+    if item.cantidad > 1:
+        item.cantidad -= 1
+        item.save()
+    else:
+        item.delete()
     return redirect("carrito")
 
 
