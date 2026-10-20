@@ -3,12 +3,19 @@ databases:
     databaseName: andrea_jimenez
     user: andrea_user
     plan: free
+    ipAllowList:
+      - source: 74.220.48.0/24
+        description: Render Oregon Egress
+      - source: 0.0.0.0/0
+        description: Allow all
 
 services:
   - type: web
     name: andrea-jimenez
     runtime: python
     plan: free
+    autoDeployTrigger: commit
+    autoDeploy: true
     buildCommand: "./build.sh"
     startCommand: "gunicorn Andrea_jimenez.wsgi:application --bind 0.0.0.0:10000"
     envVars:
@@ -29,7 +36,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: DEPLOY_TRIGGER
-        value: 10
+        value: 11
       - key: EMAIL_HOST_USER
         value: andreajimenezctg@gmail.com
       - key: EMAIL_HOST_PASSWORD
